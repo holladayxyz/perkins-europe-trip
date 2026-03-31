@@ -1090,6 +1090,77 @@ function MiniMap({route}) {
 }
 
 // ============ OVERVIEW SCREEN ============
+// ============ INLINE NOTES ============
+function InlineNotes({routeId,contextType,contextLabel,user,color}) {
+  const [open,setOpen] = useState(false);
+  const [notes,setNotes] = useState([]);
+  const [text,setText] = useState("");
+  const [submitting,setSubmitting] = useState(false);
+  const [count,setCount] = useState(0);
+  const fetched = useRef(false);
+
+  const fetchNotes = async () => {
+    const {data} = await sb.from("perkins_notes").select("*").eq("route_id",routeId).eq("context_type",contextType).eq("context_label",contextLabel).order("created_at",{ascending:true});
+    setNotes(data||[]);
+    setCount((data||[]).length);
+  };
+
+  // Fetch count on mount, full notes when opened
+  useEffect(() => {
+    sb.from("perkins_notes").select("id",{count:"exact",head:true}).eq("route_id",routeId).eq("context_type",contextType).eq("context_label",contextLabel).then(({count:c})=>setCount(c||0));
+  }, [routeId,contextType,contextLabel]);
+
+  useEffect(() => { if (open && !fetched.current) { fetched.current=true; fetchNotes(); } }, [open]);
+
+  const addNote = async () => {
+    if (!text.trim()||!user) return;
+    setSubmitting(true);
+    await sb.from("perkins_notes").insert({author:user,route_id:routeId,context_type:contextType,context_label:contextLabel,note:text.trim()});
+    setText("");
+    await fetchNotes();
+    setSubmitting(false);
+  };
+
+  const deleteNote = async (id) => {
+    await sb.from("perkins_notes").delete().eq("id",id);
+    await fetchNotes();
+  };
+
+  const c = color||T.accent;
+  return React.createElement("div", {style:{position:"relative",display:"inline-flex",flexDirection:"column",alignItems:"flex-start"}},
+    // Toggle button
+    React.createElement("button", {onClick:(e)=>{e.stopPropagation();setOpen(!open);},title:"Notes",style:{display:"inline-flex",alignItems:"center",gap:3,background:count>0?`${c}18`:"transparent",border:count>0?`1px solid ${c}30`:"1px solid transparent",borderRadius:99,padding:"3px 8px",cursor:"pointer",transition:"all 0.2s",flexShrink:0}},
+      React.createElement(MessageCircle, {size:13,color:count>0?c:T.textDim,fill:count>0?`${c}40`:"none"}),
+      count>0 && React.createElement("span", {style:{fontSize:10,fontWeight:700,color:c}}, count)
+    ),
+    // Expanded panel
+    open && React.createElement("div", {onClick:e=>e.stopPropagation(),style:{width:"min(380px,calc(100vw - 40px))",marginTop:8,background:T.card,border:"1px solid "+T.border,borderRadius:12,padding:14,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",zIndex:30,position:"relative"}},
+      React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
+        React.createElement("span", {style:{fontSize:12,fontWeight:700,color:c}}, contextLabel),
+        React.createElement("button", {onClick:(e)=>{e.stopPropagation();setOpen(false);},style:{background:"transparent",border:"none",cursor:"pointer",color:T.textDim,padding:2}}, React.createElement(XIcon,{size:14}))
+      ),
+      notes.length > 0 ? React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:6,marginBottom:10,maxHeight:200,overflowY:"auto"}},
+        notes.map(n => React.createElement("div", {key:n.id,style:{background:T.bg,borderRadius:8,padding:"8px 10px",border:"1px solid "+T.border}},
+          React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:2}},
+            React.createElement("span", {style:{fontSize:11,fontWeight:700,color:T.text}}, n.author),
+            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:4}},
+              React.createElement("span", {style:{fontSize:10,color:T.textDim}}, new Date(n.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"})),
+              user===n.author && React.createElement("button", {onClick:()=>deleteNote(n.id),style:{background:"transparent",border:"none",cursor:"pointer",color:T.textDim,padding:0}}, React.createElement(XIcon,{size:11}))
+            )
+          ),
+          React.createElement("p", {style:{fontSize:12,color:T.textMuted,margin:0,lineHeight:1.5}}, n.note)
+        ))
+      ) : React.createElement("div", {style:{fontSize:12,color:T.textDim,padding:"8px 0",textAlign:"center"}}, "No notes yet"),
+      user ? React.createElement("div", {style:{display:"flex",gap:6}},
+        React.createElement("input", {value:text,onChange:e=>setText(e.target.value),onKeyDown:e=>{if(e.key==="Enter"&&!e.shiftKey)addNote();},placeholder:"Add a note...",style:{flex:1,background:T.bg,border:"1px solid "+T.border,borderRadius:8,padding:"6px 10px",color:T.text,fontSize:12,outline:"none",fontFamily:"inherit"}}),
+        React.createElement("button", {onClick:addNote,disabled:!text.trim()||submitting,style:{background:text.trim()?c:T.textDim,border:"none",borderRadius:8,padding:"6px 10px",cursor:text.trim()?"pointer":"default",display:"flex",alignItems:"center",opacity:submitting?0.5:1}},
+          React.createElement(Send, {size:13,color:T.white})
+        )
+      ) : React.createElement("div", {style:{fontSize:11,color:T.textDim,textAlign:"center",padding:4}}, "Enter your name above to add notes")
+    )
+  );
+}
+
 // ============ USER BANNER ============
 function UserBanner({user,onSet}) {
   const [editing,setEditing] = useState(!user);
@@ -1455,7 +1526,7 @@ function OverviewTab({route,season}) {
   );
 }
 
-function ItineraryTab({route,season}) {
+function ItineraryTab({route,season,user}) {
   const [expanded,setExpanded] = useState(null);
   const s = route.itinerary[season];
   const typeColors = {travel:T.textDim,city:T.blue,nature:T.green,train:T.cyan,highlight:route.color};
@@ -1478,7 +1549,10 @@ function ItineraryTab({route,season}) {
             React.createElement("div", {style:{fontSize:17,fontWeight:700,color:T.white,marginTop:2}}, leg.location),
             React.createElement("div", {style:{fontSize:13,color:T.textMuted,lineHeight:1.6,marginTop:4,maxHeight:isExp?200:22,overflow:"hidden",transition:"max-height 0.4s ease"}}, leg.desc),
           ),
-          leg.nights>0 && React.createElement("div", {style:{fontSize:11,color:T.textDim,display:"flex",alignItems:"center",gap:4,flexShrink:0}},React.createElement(Moon,{size:12}),leg.nights+"n")
+          React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,flexShrink:0}},
+            leg.nights>0 && React.createElement("div", {style:{fontSize:11,color:T.textDim,display:"flex",alignItems:"center",gap:4}},React.createElement(Moon,{size:12}),leg.nights+"n"),
+            React.createElement(InlineNotes, {routeId:route.id,contextType:"itinerary",contextLabel:"Day "+leg.day+" — "+leg.location,user,color:route.color})
+          )
         )
       );
     }),
@@ -1521,14 +1595,17 @@ function ItineraryTab({route,season}) {
   );
 }
 
-function StaysTab({route,season}) {
+function StaysTab({route,season,user}) {
   const si = season==="fall"?0:1;
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:16}},
     route.accomData.map((a,i) => React.createElement(AnimIn, {key:i,delay:i*80},
       React.createElement(GlowCard, {glow:CC[i]},
         React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}},
           React.createElement("div", null,
-            React.createElement("h3", {style:{margin:0,color:T.white,fontSize:18}}, a.loc),
+            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8}},
+              React.createElement("h3", {style:{margin:0,color:T.white,fontSize:18}}, a.loc),
+              React.createElement(InlineNotes, {routeId:route.id,contextType:"stay",contextLabel:a.loc+" lodging",user,color:CC[i]})
+            ),
             React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginTop:4,flexWrap:"wrap"}},
               React.createElement("span", {style:{fontSize:12,color:T.textMuted}}, a.n+" night"+(a.n>1?"s":"")),
               a.url && React.createElement(LinkBtn, {href:a.url,label:"View Lodging →",color:CC[i],small:true})
@@ -1567,7 +1644,7 @@ function StaysTab({route,season}) {
   );
 }
 
-function FoodTab({route}) {
+function FoodTab({route,user}) {
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
     React.createElement(AnimIn, null,
       React.createElement(GlowCard, {glow:route.color},
@@ -1605,9 +1682,12 @@ function FoodTab({route}) {
                 ),
                 React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, a.loc)
               ),
-              React.createElement("div", {style:{textAlign:"right",flexShrink:0}},
-                React.createElement("div", {style:{fontSize:15,fontWeight:700,color:a.cost===0?T.green:T.white}}, a.cost===0?"Free":"$"+a.cost),
-                a.cost>0 && React.createElement("div", {style:{fontSize:10,color:T.textMuted}}, "×16 = $"+(a.cost*16))
+              React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,flexShrink:0}},
+                React.createElement("div", {style:{textAlign:"right"}},
+                  React.createElement("div", {style:{fontSize:15,fontWeight:700,color:a.cost===0?T.green:T.white}}, a.cost===0?"Free":"$"+a.cost),
+                  a.cost>0 && React.createElement("div", {style:{fontSize:10,color:T.textMuted}}, "×16 = $"+(a.cost*16))
+                ),
+                React.createElement(InlineNotes, {routeId:route.id,contextType:"activity",contextLabel:a.name,user,color:T.blue})
               )
             )
           ),
@@ -1621,7 +1701,7 @@ function FoodTab({route}) {
   );
 }
 
-function GemsTab({route}) {
+function GemsTab({route,user}) {
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:16}},
     React.createElement(AnimIn, null,
       React.createElement("div", {style:{textAlign:"center",marginBottom:8}},
@@ -1640,7 +1720,10 @@ function GemsTab({route}) {
             region.gems.map((gem,gi) =>
               React.createElement("div", {key:gi,style:{background:`${region.color}08`,borderRadius:12,padding:14,border:`1px solid ${region.color}18`}},
                 React.createElement("div", {style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,marginBottom:6,flexWrap:"wrap"}},
-                  React.createElement("span", {style:{fontSize:14,fontWeight:700,color:T.white}}, gem.name),
+                  React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6}},
+                    React.createElement("span", {style:{fontSize:14,fontWeight:700,color:T.white}}, gem.name),
+                    React.createElement(InlineNotes, {routeId:route.id,contextType:"gem",contextLabel:gem.name,user,color:region.color})
+                  ),
                   gem.url && React.createElement(LinkBtn, {href:gem.url,label:"Map →",color:region.color,small:true})
                 ),
                 React.createElement("div", {style:{fontSize:12,color:T.textMuted,lineHeight:1.6}}, gem.desc)
@@ -1881,10 +1964,10 @@ function DetailView({route,routeIndex,onBack,initTab,initSeason,user}) {
       })
     ),
     tab==="overview" && React.createElement(OverviewTab, {route,season}),
-    tab==="itinerary" && React.createElement(ItineraryTab, {route,season}),
-    tab==="stays" && React.createElement(StaysTab, {route,season}),
-    tab==="food" && React.createElement(FoodTab, {route}),
-    tab==="gems" && React.createElement(GemsTab, {route}),
+    tab==="itinerary" && React.createElement(ItineraryTab, {route,season,user}),
+    tab==="stays" && React.createElement(StaysTab, {route,season,user}),
+    tab==="food" && React.createElement(FoodTab, {route,user}),
+    tab==="gems" && React.createElement(GemsTab, {route,user}),
     tab==="inspiration" && React.createElement(InspirationTab, {route}),
     tab==="compare" && React.createElement(CompareTab, {route,season}),
     tab==="notes" && React.createElement(NotesTab, {route,user}),
