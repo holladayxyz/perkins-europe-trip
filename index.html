@@ -29,7 +29,8 @@
     <script type="module">
 import React, { useState, useEffect, useRef } from "https://esm.sh/react@18.3.1";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "https://esm.sh/recharts@2.12.7?deps=react@18.3.1,react-dom@18.3.1";
-import { Plane, Train, MapPin, Calendar, Users, DollarSign, Utensils, Camera, Sun, Moon, ChevronRight, Star, Heart, Mountain, Building, Music, Church, Backpack, Shield, Coffee, Bed, ArrowRight, Globe, Compass, Check, X as XIcon, TrendingDown, TrendingUp, Info, ChevronLeft } from "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1";
+import { Plane, Train, MapPin, Calendar, Users, DollarSign, Utensils, Camera, Sun, Moon, ChevronRight, Star, Heart, Mountain, Building, Music, Church, Backpack, Shield, Coffee, Bed, ArrowRight, Globe, Compass, Check, X as XIcon, TrendingDown, TrendingUp, Info, ChevronLeft, MessageCircle, Vote, Send, User } from "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const T = { bg:"#0c0f1a", card:"#151929", cardHover:"#1a2035", border:"#1e2540", accent:"#f0a050", accentSoft:"rgba(240,160,80,0.12)", blue:"#5b9bf5", blueSoft:"rgba(91,155,245,0.12)", green:"#4ade80", greenSoft:"rgba(74,222,128,0.1)", purple:"#a78bfa", purpleSoft:"rgba(167,139,250,0.1)", rose:"#fb7185", roseSoft:"rgba(251,113,133,0.1)", cyan:"#22d3ee", cyanSoft:"rgba(34,211,238,0.1)", text:"#e8eaf0", textMuted:"#8892a8", textDim:"#505a72", white:"#ffffff", gradient1:"linear-gradient(135deg,#f0a050 0%,#e06830 100%)", gradient2:"linear-gradient(135deg,#5b9bf5 0%,#7c5bf5 100%)", gradient3:"linear-gradient(135deg,#4ade80 0%,#22d3ee 100%)", gradient4:"linear-gradient(135deg,#a78bfa 0%,#7c3aed 100%)", gradient5:"linear-gradient(135deg,#fb7185 0%,#f43f5e 100%)", gradient6:"linear-gradient(135deg,#22d3ee 0%,#0ea5e9 100%)" };
 const CC = [T.accent, T.blue, T.green, T.purple, T.rose, T.cyan, "#fbbf24", "#f472b6"];
@@ -38,6 +39,14 @@ const NIGHTS = 9;
 const calcPP = t => t.flights + t.accommodation*NIGHTS + t.trains + t.food*NIGHTS + t.activities + t.misc*NIGHTS;
 const calcCouple = t => calcPP(t)*2;
 const iconMap = { plane:Plane, train:Train, church:Church, mountain:Mountain, music:Music, camera:Camera, compass:Compass, heart:Heart, building:Building, star:Star, coffee:Coffee };
+
+// ===================== SUPABASE =====================
+const sb = createClient("https://emqkxzdjafttabexoqqj.supabase.co","eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImVtcWt4emRqYWZ0dGFiZXhvcXFqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODk5NDgsImV4cCI6MjA4NTM2NTk0OH0.0ghYuwnEmVAXSH1KYrKSXrg7BKB0IG362UtlFf7BU54");
+function useUser() {
+  const [user,setUser] = useState(()=>{ try { return localStorage.getItem("perkins_user")||""; } catch { return ""; }});
+  const save = (name) => { setUser(name); try { localStorage.setItem("perkins_user",name); } catch {} };
+  return [user,save];
+}
 
 // ===================== ROUTE DATA =====================
 const ROUTES = [
@@ -1081,7 +1090,218 @@ function MiniMap({route}) {
 }
 
 // ============ OVERVIEW SCREEN ============
-function OverviewScreen({onSelect}) {
+// ============ USER BANNER ============
+function UserBanner({user,onSet}) {
+  const [editing,setEditing] = useState(!user);
+  const [name,setName] = useState(user);
+  const submit = () => { if (name.trim()) { onSet(name.trim()); setEditing(false); } };
+  if (!editing) return React.createElement("div", {style:{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"8px 12px",background:T.card,borderBottom:"1px solid "+T.border}},
+    React.createElement(User, {size:14,color:T.accent}),
+    React.createElement("span", {style:{fontSize:12,color:T.text,fontWeight:600}}, user),
+    React.createElement("button", {onClick:()=>setEditing(true),style:{background:"transparent",border:"1px solid "+T.border,borderRadius:99,padding:"2px 10px",color:T.textMuted,fontSize:10,cursor:"pointer",fontWeight:600}}, "Change")
+  );
+  return React.createElement("div", {style:{display:"flex",alignItems:"center",justifyContent:"center",gap:8,padding:"12px",background:T.card,borderBottom:"1px solid "+T.border}},
+    React.createElement("span", {style:{fontSize:12,color:T.textMuted,fontWeight:600}}, "Enter your name:"),
+    React.createElement("input", {value:name,onChange:e=>setName(e.target.value),onKeyDown:e=>{if(e.key==="Enter")submit();},placeholder:"e.g. Ken",style:{background:T.bg,border:"1px solid "+T.border,borderRadius:8,padding:"6px 12px",color:T.text,fontSize:13,fontWeight:600,outline:"none",width:140}}),
+    React.createElement("button", {onClick:submit,style:{background:T.accent,border:"none",borderRadius:8,padding:"6px 16px",color:T.white,fontSize:12,fontWeight:700,cursor:"pointer"}}, "Save")
+  );
+}
+
+// ============ NOTES TAB ============
+function NotesTab({route,user}) {
+  const [notes,setNotes] = useState([]);
+  const [text,setText] = useState("");
+  const [ctx,setCtx] = useState("general");
+  const [ctxLabel,setCtxLabel] = useState("");
+  const [loading,setLoading] = useState(true);
+  const [submitting,setSubmitting] = useState(false);
+  const ctxTypes = [{v:"general",l:"General"},{v:"itinerary",l:"Itinerary"},{v:"activity",l:"Activity"},{v:"stay",l:"Lodging"},{v:"gem",l:"Hidden Gem"}];
+
+  const fetchNotes = async () => {
+    const {data} = await sb.from("perkins_notes").select("*").eq("route_id",route.id).order("created_at",{ascending:false});
+    setNotes(data||[]);
+    setLoading(false);
+  };
+  useEffect(() => { fetchNotes(); }, [route.id]);
+
+  const addNote = async () => {
+    if (!text.trim()||!user) return;
+    setSubmitting(true);
+    await sb.from("perkins_notes").insert({author:user,route_id:route.id,context_type:ctx,context_label:ctxLabel||null,note:text.trim()});
+    setText(""); setCtxLabel("");
+    await fetchNotes();
+    setSubmitting(false);
+  };
+
+  const deleteNote = async (id) => {
+    await sb.from("perkins_notes").delete().eq("id",id);
+    await fetchNotes();
+  };
+
+  const grouped = {};
+  notes.forEach(n => { const k = n.context_type; if (!grouped[k]) grouped[k] = []; grouped[k].push(n); });
+
+  const inp = {background:T.bg,border:"1px solid "+T.border,borderRadius:8,padding:"8px 12px",color:T.text,fontSize:13,outline:"none",fontFamily:"inherit"};
+
+  return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
+    user ? React.createElement(AnimIn, null,
+      React.createElement(GlowCard, {glow:route.color,style:{padding:20}},
+        React.createElement("h3", {style:{margin:"0 0 12px",color:T.white,fontSize:16,fontWeight:800}}, "Add a Note"),
+        React.createElement("div", {style:{display:"flex",gap:8,marginBottom:10,flexWrap:"wrap"}},
+          React.createElement("select", {value:ctx,onChange:e=>setCtx(e.target.value),style:{...inp,cursor:"pointer",minWidth:120}},
+            ctxTypes.map(c => React.createElement("option", {key:c.v,value:c.v}, c.l))
+          ),
+          React.createElement("input", {value:ctxLabel,onChange:e=>setCtxLabel(e.target.value),placeholder:"Label (e.g. Day 3 - Salzburg)",style:{...inp,flex:1,minWidth:180}})
+        ),
+        React.createElement("textarea", {value:text,onChange:e=>setText(e.target.value),placeholder:"Share your thoughts, ideas, or preferences about this route...",rows:3,style:{...inp,width:"100%",boxSizing:"border-box",resize:"vertical",marginBottom:10}}),
+        React.createElement("button", {onClick:addNote,disabled:!text.trim()||submitting,style:{display:"inline-flex",alignItems:"center",gap:6,background:text.trim()?route.color:T.textDim,border:"none",borderRadius:8,padding:"8px 20px",color:T.white,fontSize:13,fontWeight:700,cursor:text.trim()?"pointer":"default",opacity:submitting?0.6:1}},
+          React.createElement(Send,{size:14}), submitting?"Saving...":"Post Note"
+        )
+      )
+    ) : React.createElement(AnimIn, null,
+      React.createElement(GlowCard, {glow:T.accent,style:{padding:20,textAlign:"center"}},
+        React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:0}}, "Enter your name at the top of the page to add notes.")
+      )
+    ),
+    loading ? React.createElement("div", {style:{textAlign:"center",color:T.textMuted,padding:40,fontSize:13}}, "Loading notes...") :
+    notes.length === 0 ? React.createElement(AnimIn, null,
+      React.createElement("div", {style:{textAlign:"center",color:T.textMuted,padding:40}},
+        React.createElement(MessageCircle, {size:32,color:T.textDim,style:{marginBottom:8}}),
+        React.createElement("p", {style:{fontSize:14,margin:0}}, "No notes yet for this route."),
+        React.createElement("p", {style:{fontSize:12,margin:"4px 0 0",color:T.textDim}}, "Be the first to share your thoughts!")
+      )
+    ) :
+    Object.entries(grouped).map(([type,typeNotes]) => React.createElement(AnimIn, {key:type},
+      React.createElement("div", {style:{marginBottom:8}},
+        React.createElement("div", {style:{fontSize:11,fontWeight:700,color:route.color,textTransform:"uppercase",letterSpacing:1,marginBottom:8}},
+          (ctxTypes.find(c=>c.v===type)||{l:type}).l+" Notes"
+        ),
+        typeNotes.map(n => React.createElement(GlowCard, {key:n.id,glow:route.color+"40",style:{padding:14,marginBottom:8}},
+          React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",gap:8}},
+            React.createElement("div", {style:{flex:1}},
+              React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,marginBottom:4}},
+                React.createElement("span", {style:{fontSize:12,fontWeight:700,color:T.text}}, n.author),
+                n.context_label && React.createElement("span", {style:{fontSize:10,color:T.textMuted,background:T.bg,padding:"2px 8px",borderRadius:99}}, n.context_label),
+                React.createElement("span", {style:{fontSize:10,color:T.textDim}}, new Date(n.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"}))
+              ),
+              React.createElement("p", {style:{fontSize:13,color:T.text,margin:0,lineHeight:1.5}}, n.note)
+            ),
+            user===n.author && React.createElement("button", {onClick:()=>deleteNote(n.id),title:"Delete",style:{background:"transparent",border:"none",color:T.textDim,cursor:"pointer",padding:4,flexShrink:0}}, React.createElement(XIcon,{size:14}))
+          )
+        ))
+      )
+    ))
+  );
+}
+
+// ============ VOTING SECTION ============
+function VotingSection({user}) {
+  const [votes,setVotes] = useState({1:"",2:"",3:""});
+  const [allVotes,setAllVotes] = useState([]);
+  const [loading,setLoading] = useState(true);
+  const [saving,setSaving] = useState(false);
+
+  const fetchMyVotes = async () => {
+    if (!user) return;
+    const {data} = await sb.from("perkins_votes").select("*").eq("voter",user);
+    const obj = {1:"",2:"",3:""};
+    (data||[]).forEach(v => { obj[v.rank] = v.route_id; });
+    setVotes(obj);
+  };
+  const fetchAllVotes = async () => {
+    const {data} = await sb.from("perkins_votes").select("*");
+    setAllVotes(data||[]);
+    setLoading(false);
+  };
+  useEffect(() => { fetchMyVotes(); fetchAllVotes(); }, [user]);
+
+  const saveVote = async (rank,routeId) => {
+    if (!user) return;
+    setSaving(true);
+    await sb.from("perkins_votes").delete().eq("voter",user).eq("rank",rank);
+    if (routeId) await sb.from("perkins_votes").insert({voter:user,route_id:routeId,rank});
+    setVotes(v => ({...v,[rank]:routeId}));
+    await fetchAllVotes();
+    setSaving(false);
+  };
+
+  // Compute weighted scores
+  const scores = {};
+  ROUTES.forEach(r => { scores[r.id] = 0; });
+  allVotes.forEach(v => { const pts = v.rank===1?3:v.rank===2?2:1; scores[v.route_id] = (scores[v.route_id]||0) + pts; });
+  const ranked = ROUTES.map(r => ({id:r.id,name:r.name,color:r.color,score:scores[r.id]||0})).sort((a,b) => b.score - a.score);
+  const maxScore = Math.max(...ranked.map(r => r.score), 1);
+
+  // Unique voters
+  const voters = [...new Set(allVotes.map(v=>v.voter))];
+
+  const sel = {background:T.bg,border:"1px solid "+T.border,borderRadius:8,padding:"8px 12px",color:T.text,fontSize:13,outline:"none",fontFamily:"inherit",cursor:"pointer",width:"100%"};
+  const rankLabels = {1:"1st Choice (3 pts)",2:"2nd Choice (2 pts)",3:"3rd Choice (1 pt)"};
+  const rankEmoji = {1:"🥇",2:"🥈",3:"🥉"};
+
+  return React.createElement("div", {style:{marginTop:48}},
+    React.createElement("div", {style:{textAlign:"center",marginBottom:24}},
+      React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.rose,fontWeight:700,textTransform:"uppercase",marginBottom:6}}, "Family Vote"),
+      React.createElement("h2", {style:{fontSize:"clamp(18px,4vw,24px)",fontWeight:900,color:T.white,margin:0}}, "Pick Your Top 3 Routes"),
+      React.createElement("p", {style:{color:T.textMuted,fontSize:12,margin:"6px 0 0"}}, "Rank your 1st, 2nd, and 3rd choice · weighted scoring (3/2/1 pts)")
+    ),
+    React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(300px,100%),1fr))",gap:16}},
+      // Vote inputs
+      React.createElement(GlowCard, {glow:T.rose,style:{padding:20}},
+        user ? React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:12}},
+          React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},
+            React.createElement(Vote, {size:18,color:T.rose}),
+            React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Your Rankings")
+          ),
+          [1,2,3].map(rank => {
+            const used = Object.entries(votes).filter(([r,v])=>v&&Number(r)!==rank).map(([,v])=>v);
+            return React.createElement("div", {key:rank},
+              React.createElement("label", {style:{fontSize:11,color:T.textMuted,fontWeight:600,display:"block",marginBottom:4}}, rankEmoji[rank]+" "+rankLabels[rank]),
+              React.createElement("select", {value:votes[rank],onChange:e=>saveVote(rank,e.target.value),disabled:saving,style:sel},
+                React.createElement("option", {value:""}, "— Select a route —"),
+                ROUTES.filter(r => !used.includes(r.id)).map(r => React.createElement("option", {key:r.id,value:r.id}, r.name))
+              )
+            );
+          })
+        ) : React.createElement("div", {style:{textAlign:"center",padding:20}},
+          React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:0}}, "Enter your name at the top to vote.")
+        )
+      ),
+      // Results
+      React.createElement(GlowCard, {glow:T.accent,style:{padding:20}},
+        React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:16}},
+          React.createElement(TrendingUp, {size:18,color:T.accent}),
+          React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Current Standings"),
+          voters.length > 0 && React.createElement("span", {style:{fontSize:10,color:T.textMuted,background:T.bg,padding:"2px 8px",borderRadius:99}}, voters.length+" voter"+(voters.length!==1?"s":""))
+        ),
+        loading ? React.createElement("div", {style:{color:T.textMuted,fontSize:13,padding:20,textAlign:"center"}}, "Loading votes...") :
+        allVotes.length === 0 ? React.createElement("div", {style:{color:T.textMuted,fontSize:13,padding:20,textAlign:"center"}}, "No votes yet. Be the first!") :
+        React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:10}},
+          ranked.map((r,i) => React.createElement("div", {key:r.id,style:{display:"flex",alignItems:"center",gap:10}},
+            React.createElement("span", {style:{fontSize:14,fontWeight:800,color:i===0?T.accent:T.textMuted,width:20,textAlign:"right"}}, "#"+(i+1)),
+            React.createElement("div", {style:{flex:1}},
+              React.createElement("div", {style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
+                React.createElement("span", {style:{fontSize:13,fontWeight:700,color:T.text}}, r.name),
+                React.createElement("span", {style:{fontSize:12,fontWeight:800,color:r.color}}, r.score+" pts")
+              ),
+              React.createElement("div", {style:{height:6,background:T.bg,borderRadius:99,overflow:"hidden"}},
+                React.createElement("div", {style:{height:"100%",width:(r.score/maxScore*100)+"%",background:r.color,borderRadius:99,transition:"width 0.5s"}})
+              )
+            )
+          ))
+        ),
+        voters.length > 0 && React.createElement("div", {style:{marginTop:16,paddingTop:12,borderTop:"1px solid "+T.border}},
+          React.createElement("div", {style:{fontSize:11,color:T.textMuted,fontWeight:600,marginBottom:6}}, "Voters"),
+          React.createElement("div", {style:{display:"flex",flexWrap:"wrap",gap:4}},
+            voters.map(v => React.createElement("span", {key:v,style:{fontSize:11,padding:"3px 10px",borderRadius:99,background:T.accent+"12",border:"1px solid "+T.accent+"25",color:T.text,fontWeight:500}}, v))
+          )
+        )
+      )
+    )
+  );
+}
+
+function OverviewScreen({onSelect,user}) {
   return React.createElement("div", {style:{maxWidth:1100,margin:"0 auto",padding:"0 12px 60px"}},
     React.createElement(AnimIn, null,
       React.createElement("div", {style:{textAlign:"center",padding:"32px 16px 24px",position:"relative"}},
@@ -1120,6 +1340,7 @@ function OverviewScreen({onSelect}) {
         )
       ))
     ),
+    React.createElement(VotingSection, {user}),
     React.createElement(AnimIn, {delay:400},
       React.createElement("div", {style:{marginTop:48}},
         React.createElement("div", {style:{textAlign:"center",marginBottom:24}},
@@ -1604,8 +1825,8 @@ function CompareTab({route,season}) {
 }
 
 // ============ DETAIL VIEW ============
-function DetailView({route,routeIndex,onBack,initTab,initSeason}) {
-  const validTabs = ["overview","itinerary","stays","food","gems","inspiration","compare"];
+function DetailView({route,routeIndex,onBack,initTab,initSeason,user}) {
+  const validTabs = ["overview","itinerary","stays","food","gems","inspiration","compare","notes"];
   const [season,setSeason] = useState(initSeason==="spring"?"spring":"fall");
   const [tab,setTab] = useState(validTabs.includes(initTab)?initTab:"overview");
   useEffect(()=>{setHash(route.id,tab,season);},[tab,season,route.id]);
@@ -1617,6 +1838,7 @@ function DetailView({route,routeIndex,onBack,initTab,initSeason}) {
     {id:"gems",label:"Hidden Gems",icon:Star},
     {id:"inspiration",label:"Inspiration",icon:Camera},
     {id:"compare",label:"Compare",icon:Compass},
+    {id:"notes",label:"Notes",icon:MessageCircle},
   ];
   return React.createElement("div", {style:{maxWidth:900,margin:"0 auto",padding:"0 12px calc(40px + env(safe-area-inset-bottom,0px))"}},
     React.createElement("button", {onClick:onBack,style:{display:"flex",alignItems:"center",gap:6,background:"transparent",border:"none",color:route.color,fontSize:13,fontWeight:700,cursor:"pointer",padding:"12px 0",marginTop:4,WebkitTapHighlightColor:"transparent"}},
@@ -1626,7 +1848,7 @@ function DetailView({route,routeIndex,onBack,initTab,initSeason}) {
       React.createElement("div", {style:{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 0%,${route.color}14 0%,transparent 60%)`,pointerEvents:"none"}}),
       React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:route.color,fontWeight:700,textTransform:"uppercase",marginBottom:6}}, route.tagline),
       React.createElement("h1", {style:{fontSize:"clamp(24px,6vw,32px)",fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, route.name),
-      React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:"0 0 16px"}}, "Perkins Family Europe Trip · Route "+(routeIndex+1)+" of 3"),
+      React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:"0 0 16px"}}, "Perkins Family Europe Trip · Route "+(routeIndex+1)+" of "+ROUTES.length),
       React.createElement("div", {className:"hide-scrollbar",style:{display:"flex",justifyContent:"center",alignItems:"center",gap:4,flexWrap:"wrap",marginBottom:20,padding:"0 4px"}},
         route.cities.map((c,i) => React.createElement("div", {key:c,style:{display:"flex",alignItems:"center",gap:3}},
           React.createElement("span", {style:{background:T.card,border:"1px solid "+T.border,borderRadius:99,padding:"5px 10px",fontSize:12,fontWeight:600,color:T.text,display:"inline-flex",alignItems:"center",gap:4,whiteSpace:"nowrap"}},
@@ -1665,6 +1887,7 @@ function DetailView({route,routeIndex,onBack,initTab,initSeason}) {
     tab==="gems" && React.createElement(GemsTab, {route}),
     tab==="inspiration" && React.createElement(InspirationTab, {route}),
     tab==="compare" && React.createElement(CompareTab, {route,season}),
+    tab==="notes" && React.createElement(NotesTab, {route,user}),
     React.createElement("div", {style:{textAlign:"center",padding:"32px 0 0",fontSize:11,color:T.textDim}},
       React.createElement("p",null,"Compiled from 2 family calls + 17 voice memos from 12 contributors · All preferences anonymized"),
       React.createElement("p",{style:{marginTop:4}},"Pricing researched via Kiwi, Airbnb, ÖBB, SBB, and official sites · March 2026"),
@@ -1693,6 +1916,7 @@ function App() {
   const [selectedRoute, setSelectedRoute] = useState(initIdx>=0?initIdx:null);
   const [initTab] = useState(init.tab);
   const [initSeason] = useState(init.season);
+  const [user, setUser] = useUser();
 
   useEffect(()=>{
     const onHash = ()=>{
@@ -1710,16 +1934,19 @@ function App() {
     if (selectedRoute===null) setHash(null);
   },[selectedRoute]);
 
-  if (selectedRoute !== null) {
-    return React.createElement(DetailView, {
-      route: ROUTES[selectedRoute],
-      routeIndex: selectedRoute,
-      onBack: () => { setSelectedRoute(null); setHash(null); },
-      initTab: initTab,
-      initSeason: initSeason,
-    });
-  }
-  return React.createElement(OverviewScreen, { onSelect: (i)=>{ setSelectedRoute(i); setHash(ROUTES[i].id,"overview","fall"); } });
+  return React.createElement("div", null,
+    React.createElement(UserBanner, {user,onSet:setUser}),
+    selectedRoute !== null ?
+      React.createElement(DetailView, {
+        route: ROUTES[selectedRoute],
+        routeIndex: selectedRoute,
+        onBack: () => { setSelectedRoute(null); setHash(null); },
+        initTab: initTab,
+        initSeason: initSeason,
+        user: user,
+      }) :
+      React.createElement(OverviewScreen, { onSelect: (i)=>{ setSelectedRoute(i); setHash(ROUTES[i].id,"overview","fall"); }, user: user })
+  );
 }
 
 import ReactDOM from "https://esm.sh/react-dom@18.3.1/client";
