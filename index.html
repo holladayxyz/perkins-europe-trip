@@ -21,98 +21,949 @@
         -webkit-text-size-adjust: 100%;
         overflow-x: hidden;
       }
+      /* Hide scrollbar on tab nav */
       .hide-scrollbar::-webkit-scrollbar { display: none; }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module">
-import React, { useState, useEffect, useRef } from "https://esm.sh/react@18.3.1";
-import {
-  ResponsiveContainer, PieChart, Pie, Cell, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, Legend, RadarChart, Radar, PolarGrid,
-  PolarAngleAxis, PolarRadiusAxis
-} from "https://esm.sh/recharts@2.12.7?external=react,react-dom";
-import {
-  DollarSign, MapPin, Bed, Utensils, Star, Users, Compass,
-  Plane, TrendingDown, Sun, Mountain, Calendar, Heart, Shield,
-  Globe, Camera, Check, Clock, Map
-} from "https://esm.sh/lucide-react@0.383.0?external=react";
+import { useState, useEffect, useRef } from "https://esm.sh/react@18.3.1";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "https://esm.sh/recharts@2.12.7?deps=react@18.3.1,react-dom@18.3.1";
+import { Plane, Train, MapPin, Calendar, Users, DollarSign, Utensils, Camera, Sun, Moon, ChevronRight, Star, Heart, Mountain, Building, Music, Church, Backpack, Shield, Coffee, Bed, ArrowRight, Globe, Compass, Check, X as XIcon, TrendingDown, TrendingUp, Info } from "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1";
 
-// ============ DESIGN TOKENS ============
+// ============ THEME ============
 const T = {
-  bg: "#0c0f1a", card: "#131725", border: "#1f2437",
-  accent: "#f59f00", accentSoft: "#f59f000a",
-  blue: "#3892ff", blueSoft: "#3892ff0a",
-  green: "#22c55e", greenSoft: "#22c55e0a",
-  rose: "#f4707a", roseSoft: "#f4707a0a",
-  purple: "#a78bfa", cyan: "#22d3ee",
-  white: "#f8f9fb", text: "#e8eaf0", textMuted: "#949cb0", textDim: "#4c5368",
+  bg: "#0c0f1a",
+  card: "#151929",
+  cardHover: "#1a2035",
+  border: "#1e2540",
+  accent: "#f0a050",
+  accentSoft: "rgba(240,160,80,0.12)",
+  blue: "#5b9bf5",
+  blueSoft: "rgba(91,155,245,0.12)",
+  green: "#4ade80",
+  greenSoft: "rgba(74,222,128,0.1)",
+  purple: "#a78bfa",
+  purpleSoft: "rgba(167,139,250,0.1)",
+  rose: "#fb7185",
+  roseSoft: "rgba(251,113,133,0.1)",
+  cyan: "#22d3ee",
+  cyanSoft: "rgba(34,211,238,0.1)",
+  text: "#e8eaf0",
+  textMuted: "#8892a8",
+  textDim: "#505a72",
+  white: "#ffffff",
+  gradient1: "linear-gradient(135deg, #f0a050 0%, #e06830 100%)",
+  gradient2: "linear-gradient(135deg, #5b9bf5 0%, #7c5bf5 100%)",
+  gradient3: "linear-gradient(135deg, #4ade80 0%, #22d3ee 100%)",
 };
-const CHART_COLORS = [T.accent, T.blue, T.green, T.rose, T.purple, T.cyan];
+
+const CHART_COLORS = [T.accent, T.blue, T.green, T.purple, T.rose, T.cyan, "#fbbf24", "#f472b6"];
+
+const glassStyle = {
+  background: "rgba(21,25,41,0.7)",
+  WebkitBackdropFilter: "blur(12px)",
+  backdropFilter: "blur(12px)",
+  border: `1px solid ${T.border}`,
+  borderRadius: 16,
+};
 
 // ============ DATA ============
-const budgetTiers = {
+const itinerary = {
   fall: {
-    low: { flight: 550, accom: 120, transport: 55, food: 55, activity: 25, buffer: 30 },
-    mid: { flight: 700, accom: 175, transport: 70, food: 80, activity: 40, buffer: 50 },
-    high: { flight: 900, accom: 260, transport: 95, food: 120, activity: 65, buffer: 80 },
+    label: "Fall 2026", dates: "Sep 26 – Oct 6, 2026", travelDays: 11, groundDays: 9,
+    legs: [
+      { day: 0, date: "Sep 26", location: "SLC → Munich", type: "travel", icon: "plane", country: "Transit", desc: "Depart SLC afternoon. Overnight flight.", nights: 0, lat: 48.14, lng: 11.58 },
+      { day: 1, date: "Sep 27", location: "Munich", type: "city", icon: "church", country: "Germany", desc: "Arrive morning. LDS church (English available). Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.", nights: 1, lat: 48.14, lng: 11.58 },
+      { day: 2, date: "Sep 28", location: "Neuschwanstein & Bavaria", type: "nature", icon: "mountain", country: "Germany", desc: "Day trip to fairytale castle and Bavarian Alps. Quaint village of Füssen. Bakery crawl. Free evening.", nights: 1, lat: 47.56, lng: 10.75 },
+      { day: 3, date: "Sep 29", location: "Salzburg", type: "train", icon: "train", country: "Austria", desc: "Scenic train (1.5 hrs). Walk Old Town, Getreidegasse. Mozart's birthplace. Evening classical concert or opera.", nights: 1, lat: 47.8, lng: 13.04 },
+      { day: 4, date: "Sep 30", location: "Sound of Music Day", type: "highlight", icon: "music", country: "Austria", desc: "Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress. Bakeries and local restaurants.", nights: 1, lat: 47.8, lng: 13.04 },
+      { day: 5, date: "Oct 1", location: "Lake Bled", type: "nature", icon: "mountain", country: "Slovenia", desc: "Scenic Alpine train to Ljubljana (4.5 hrs), then local train to Bled Jezero (1.5 hrs via Jesenice). Pletna boat to island church. Bled cream cake. Sunset over Julian Alps.", nights: 1, lat: 46.37, lng: 14.09 },
+      { day: 6, date: "Oct 2", location: "→ Split", type: "train", icon: "train", country: "Croatia", desc: "Bled Castle morning. Train back to Ljubljana, then train to Zagreb and onward to Split. Diocletian's Palace by night.", nights: 1, lat: 43.51, lng: 16.44 },
+      { day: 7, date: "Oct 3", location: "Split", type: "city", icon: "camera", country: "Croatia", desc: "Diocletian's Palace, Riva promenade, fresh market. Afternoon: swim, kayak, or explore Trogir. Croatian seafood dinner.", nights: 1, lat: 43.51, lng: 16.44 },
+      { day: 8, date: "Oct 4", location: "Dubrovnik", type: "highlight", icon: "compass", country: "Croatia", desc: "Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls. Rest & explore.", nights: 1, lat: 42.65, lng: 18.09 },
+      { day: 9, date: "Oct 5", location: "Dubrovnik", type: "highlight", icon: "heart", country: "Croatia", desc: "Walk the full city walls. Kayaking optional. Cobblestone exploring, bakeries, local shops. Farewell group dinner.", nights: 1, lat: 42.65, lng: 18.09 },
+      { day: 10, date: "Oct 6", location: "Dubrovnik → Home", type: "travel", icon: "plane", country: "Transit", desc: "Fly home via connecting city. Arrive SLC late evening.", nights: 0, lat: 42.65, lng: 18.09 },
+    ]
   },
   spring: {
-    low: { flight: 480, accom: 100, transport: 50, food: 50, activity: 20, buffer: 25 },
-    mid: { flight: 600, accom: 150, transport: 65, food: 70, activity: 35, buffer: 45 },
-    high: { flight: 750, accom: 220, transport: 85, food: 100, activity: 55, buffer: 70 },
-  },
+    label: "Spring 2027", dates: "Apr 24 – May 4, 2027", travelDays: 11, groundDays: 9,
+    legs: [
+      { day: 0, date: "Apr 24", location: "SLC → Munich", type: "travel", icon: "plane", country: "Transit", desc: "Depart SLC afternoon. Overnight flight.", nights: 0, lat: 48.14, lng: 11.58 },
+      { day: 1, date: "Apr 25", location: "Munich", type: "city", icon: "church", country: "Germany", desc: "Arrive morning. LDS church (English available). Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.", nights: 1, lat: 48.14, lng: 11.58 },
+      { day: 2, date: "Apr 26", location: "Neuschwanstein & Bavaria", type: "nature", icon: "mountain", country: "Germany", desc: "Day trip to fairytale castle and Bavarian Alps. Quaint village of Füssen. Bakery crawl. Free evening.", nights: 1, lat: 47.56, lng: 10.75 },
+      { day: 3, date: "Apr 27", location: "Salzburg", type: "train", icon: "train", country: "Austria", desc: "Scenic train (1.5 hrs). Walk Old Town, Getreidegasse. Mozart's birthplace. Evening classical concert or opera.", nights: 1, lat: 47.8, lng: 13.04 },
+      { day: 4, date: "Apr 28", location: "Sound of Music Day", type: "highlight", icon: "music", country: "Austria", desc: "Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress. Bakeries and local restaurants.", nights: 1, lat: 47.8, lng: 13.04 },
+      { day: 5, date: "Apr 29", location: "Lake Bled", type: "nature", icon: "mountain", country: "Slovenia", desc: "Scenic Alpine train to Ljubljana (4.5 hrs), then local train to Bled Jezero (1.5 hrs via Jesenice). Pletna boat to island church. Bled cream cake. Sunset over Julian Alps.", nights: 1, lat: 46.37, lng: 14.09 },
+      { day: 6, date: "Apr 30", location: "→ Split", type: "train", icon: "train", country: "Croatia", desc: "Bled Castle morning. Train back to Ljubljana, then train to Zagreb and onward to Split. Diocletian's Palace by night.", nights: 1, lat: 43.51, lng: 16.44 },
+      { day: 7, date: "May 1", location: "Split", type: "city", icon: "camera", country: "Croatia", desc: "Diocletian's Palace, Riva promenade, fresh market. Afternoon: swim, kayak, or explore Trogir. Croatian seafood dinner.", nights: 1, lat: 43.51, lng: 16.44 },
+      { day: 8, date: "May 2", location: "Dubrovnik", type: "highlight", icon: "compass", country: "Croatia", desc: "Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls. Rest & explore.", nights: 1, lat: 42.65, lng: 18.09 },
+      { day: 9, date: "May 3", location: "Dubrovnik", type: "highlight", icon: "heart", country: "Croatia", desc: "Walk the full city walls. Kayaking optional. Cobblestone exploring, bakeries, local shops. Farewell group dinner.", nights: 1, lat: 42.65, lng: 18.09 },
+      { day: 10, date: "May 4", location: "Dubrovnik → Home", type: "travel", icon: "plane", country: "Transit", desc: "Fly home via connecting city. Arrive SLC late evening.", nights: 0, lat: 42.65, lng: 18.09 },
+    ]
+  }
 };
-const NIGHTS = 12;
-const calcPP = (b) => b.flight + b.accom * NIGHTS + b.transport * NIGHTS + b.food * NIGHTS + b.activity * NIGHTS + b.buffer * NIGHTS;
-const calcCouple = (b) => calcPP(b) * 2;
 
-const itinerary = [
-  { day: "1-3", city: "Munich", flag: "ð©ðª", nights: 3, highlights: "Marienplatz, Englischer Garten, Neuschwanstein day trip",
-    transport: null, beer: true, tip: "Bayern Ticket covers trains all day for groups up to 5" },
-  { day: "4-5", city: "Salzburg", flag: "ð¦ð¹", nights: 2, highlights: "Altstadt, Fortress Hohensalzburg, Sound of Music trail",
-    transport: "Train ~~1.5h from Munich", beer: false, tip: "Salzburg Card covers every funicular + museum" },
-  { day: "6-8", city: "Lake Bled", flag: "ð¸ð®", nights: 3, highlights: "Island church, Vintgar Gorge, cream cake",
-    transport: "Private transfer ~3h", beer: false, tip: "Rent boats early morning for empty lake" },
-  { day: "9-10", city: "Split", flag: "ð­ð·", nights: 2, highlights: "Diocletian's Palace, Marjan Hill, Riva promenade",
-    transport: "Flight ~1h or drive ~5h", beer: false, tip: "Green Market mornings for fresh produce & local cheese" },
-  { day: "11-13", city: "Dubrovnik", flag: "ð­ð·", nights: 3, highlights: "City Walls, Kayaking, Lokrum Island",
-    transport: "Bus ~4.5h coastal scenic", beer: false, tip: "Walls open at 8am â beat the cruise ship crowds" },
+// Budget tiers — AUDITED March 2026 against Kiwi, Airbnb, ÖBB, HZPP, FlixBus, and official activity sites
+// Flights: Kiwi SLC→MUC $518/pp cheapest (budget) → main carrier (Delta/Lufthansa) economy ~$850-1,100/pp one-way
+//          DBV→SLC $649/pp cheapest → main carrier ~$800-1,100/pp one-way. RT main carrier ~$1,700-$2,200/pp
+// Accommodation: Airbnb verified for 16 guests — $35/pp/night (Dubrovnik) to $96/pp/night (Bled lakefront)
+// Trains: Point-to-point advance tickets = ~€117/pp (~$126) vs €369 Eurail Global 7-day pass — saves ~$4,000 for group
+// Activities: All 12 verified against official sites. Total if doing everything = $592/pp.
+const budgetTiers = {
+  fall: {
+    value: { label: "Value", emoji: "🎒", flights: 1650, accommodation: 55, trains: 126, food: 55, activities: 235, misc: 25 },
+    mid: { label: "Mid-Tier", emoji: "✨", flights: 2050, accommodation: 75, trains: 126, food: 70, activities: 325, misc: 35 },
+    premium: { label: "Premium", emoji: "👑", flights: 2400, accommodation: 110, trains: 126, food: 95, activities: 415, misc: 50 },
+  },
+  spring: {
+    value: { label: "Value", emoji: "🎒", flights: 1450, accommodation: 45, trains: 126, food: 50, activities: 235, misc: 20 },
+    mid: { label: "Mid-Tier", emoji: "✨", flights: 1800, accommodation: 62, trains: 126, food: 65, activities: 325, misc: 30 },
+    premium: { label: "Premium", emoji: "👑", flights: 2100, accommodation: 95, trains: 126, food: 90, activities: 415, misc: 45 },
+  }
+};
+const NIGHTS = 9;
+const calcPP = (t) => t.flights + t.accommodation * NIGHTS + t.trains + t.food * NIGHTS + t.activities + t.misc * NIGHTS;
+const calcCouple = (t) => calcPP(t) * 2;
+
+const destinationVotes = [
+  { name: "Austria / Salzburg", votes: 9 }, { name: "Croatia / Dubrovnik", votes: 8 },
+  { name: "Germany / Bavaria", votes: 8 }, { name: "Switzerland", votes: 5 },
+  { name: "Prague / Czech Rep.", votes: 5 }, { name: "Italy / Rome", votes: 5 },
+  { name: "Slovenia / Bled", votes: 3 }, { name: "Greece", votes: 3 },
 ];
 
-const stays = [
-  { city: "Munich", name: "Holiday Inn City Centre", type: "Hotel", link: "https://www.ihg.com/holidayinn/hotels/gb/en/munich", rate: { fall: 165, spring: 140 }, pros: "Central, family rooms, IHG points", cons: "No kitchen" },
-  { city: "Munich", name: "4-Bed Airbnb Maxvorstadt", type: "Airbnb", link: "https://www.airbnb.com", rate: { fall: 290, spring: 240 }, pros: "Kitchen, space, 2 baths", cons: "Need 2 for group" },
-  { city: "Salzburg", name: "Hotel am Dom", type: "Hotel", link: "https://www.hotelamdom.at", rate: { fall: 185, spring: 155 }, pros: "Old town, rooftop bar", cons: "Smaller rooms" },
-  { city: "Lake Bled", name: "Garden Village Bled", type: "Glamping", link: "https://www.gardenvillagebled.com", rate: { fall: 145, spring: 120 }, pros: "Treehouses, lake view, kid friendly", cons: "15 min walk to center" },
-  { city: "Split", name: "Heritage Apartments Old Town", type: "Apartment", link: "https://www.airbnb.com", rate: { fall: 130, spring: 105 }, pros: "Inside Palace walls, kitchen", cons: "Stairs, no elevator" },
-  { city: "Dubrovnik", name: "Villa With Pool Lapad", type: "Villa", link: "https://www.airbnb.com", rate: { fall: 420, spring: 320 }, pros: "Private pool, 8 beds, sea view", cons: "10 min bus to Old Town" },
+const experienceData = [
+  { exp: "Togetherness", score: 10 }, { exp: "Bakeries & Food", score: 9 },
+  { exp: "Castles", score: 9 }, { exp: "Small Towns", score: 9 },
+  { exp: "Scenic Train", score: 9 }, { exp: "Nature / Hike", score: 8 },
+  { exp: "History", score: 7 }, { exp: "Cathedrals", score: 7 },
+  { exp: "Opera / Show", score: 6 }, { exp: "Architecture", score: 6 },
 ];
 
-const foodCosts = [
-  { city: "Munich", flag: "ð©ðª", breakfast: 4, lunch: 10, dinner: 18, snacks: 5 },
-  { city: "Salzburg", flag: "ð¦ð¹", breakfast: 4, lunch: 11, dinner: 20, snacks: 5 },
-  { city: "Bled", flag: "ð¸ð®", breakfast: 3, lunch: 8, dinner: 14, snacks: 4 },
-  { city: "Split", flag: "ð­ð·", breakfast: 3, lunch: 7, dinner: 13, snacks: 3 },
-  { city: "Dubrovnik", flag: "ð­ð·", breakfast: 4, lunch: 10, dinner: 22, snacks: 5 },
+// Food costs per person per day — researched via budgetyourtrip.com, numbeo.com, and travel forums (March 2026)
+const foodByCountry = [
+  { country: "Germany", breakfast: 14, lunch: 20, dinner: 30, snacks: 8, flag: "🇩🇪" },
+  { country: "Austria", breakfast: 15, lunch: 22, dinner: 32, snacks: 9, flag: "🇦🇹" },
+  { country: "Slovenia", breakfast: 10, lunch: 14, dinner: 22, snacks: 6, flag: "🇸🇮" },
+  { country: "Croatia", breakfast: 10, lunch: 15, dinner: 24, snacks: 6, flag: "🇭🇷" },
 ];
 
+// Activities — AUDITED against official sites March 2026. All € converted at ~$1.09/€.
 const activities = [
-  { name: "Neuschwanstein Castle", loc: "Bavaria", cost: 15, icon: "ð°", url: "https://www.neuschwanstein.de/en/", source: "Kelly" },
-  { name: "Englisch Garten Surfing", loc: "Munich", cost: 0, icon: "ð", url: "https://www.muenchen.de/en/seeing/sights/parks/englischer-garten", source: "Baker" },
-  { name: "HofbrÃ¤uhaus Dinner", loc: "Munich", cost: 25, icon: "ðº", url: "https://www.hofbraeuhaus.de/en", source: "Dad" },
-  { name: "Sound of Music Tour", loc: "Salzburg", cost: 55, icon: "ð¤", url: "https://www.soundofmusictour.com", source: "Kelly" },
-  { name: "Fortress Hohensalzburg", loc: "Salzburg", cost: 14, icon: "ð°", url: "https://www.hohensalzburg.com", source: null },
-  { name: "Vintgar Gorge", loc: "Bled", cost: 10, icon: "ð¿", url: "https://www.bled.si/en/what-to-see/natural-sights/vintgar-gorge", source: "Ken" },
-  { name: "Bled Island Pletna Boat", loc: "Bled", cost: 15, icon: "ð¶", url: null, source: null },
-  { name: "Diocletianâs Palace", loc: "Split", cost: 0, icon: "ð", url: "https://visitsplit.com/diocletians-palace", source: null },
-  { name: "Sea Kayak Dubrovnik", loc: "Dubrovnik", cost: 35, icon: "ð¨", url: null, source: "Ken" },
-  { name: "City Walls Walk", loc: "Dubrovnik", cost: 35, icon: "ð§±", url: "https://www.wallsofdubrovnik.com", source: "Mom" },
-  { name: "Lokrum Island", loc: "Dubrovnik", cost: 20, icon: "ðï¸", url: null, source: "Travis" },
+  { name: "Neuschwanstein Castle", cost: 26, loc: "Bavaria", icon: "🏰", source: "neuschwanstein.de — €21 + €2.50 booking = €23.50", url: "https://www.neuschwanstein.de/englisch/tourist/" },
+  { name: "Sound of Music Tour", cost: 76, loc: "Salzburg", icon: "🎵", source: "Panorama Tours — €70 pp (verified)", url: "https://www.panoramatours.com/en/salzburg/tour/original-sound-of-music-tour-tour-1a-28/" },
+  { name: "Hohensalzburg Fortress (All-Incl.)", cost: 21, loc: "Salzburg", icon: "🏯", source: "festung-hohensalzburg.at — €19.20 all-inclusive", url: "https://www.festung-hohensalzburg.at/en/your-visit/tickets" },
+  { name: "Mozart Fortress Concert", cost: 51, loc: "Salzburg", icon: "🎻", source: "salzburghighlights.at — €47 Cat 1 (rows 1-6)", url: "https://www.salzburghighlights.at/en/best-of-mozart-concerts/best-of-mozart-fortress-concert-21/" },
+  { name: "Mozart Dinner Concert", cost: 75, loc: "Salzburg", icon: "🎶", source: "Stiftskeller St. Peter — ~€69 pp", url: "https://www.mozart-dinner-concert-salzburg.com/" },
+  { name: "Lake Bled Pletna Boat", cost: 22, loc: "Slovenia", icon: "🚣", source: "pletna.si — €20 round trip (2025 rate)", url: "https://pletna.si/en/home/" },
+  { name: "Bled Castle Entry", cost: 17, loc: "Slovenia", icon: "🏰", source: "blejski-grad.si — €16 group rate (10+)", url: "https://www.blejski-grad.si/en/plan-your-visit/price-list/" },
+  { name: "Dubrovnik City Walls", cost: 44, loc: "Dubrovnik", icon: "🧱", source: "citywallsdubrovnik.hr — €40 Mar-Oct season", url: "https://shop.citywallsdubrovnik.hr/en/buy-tickets-for-the-following-locations" },
+  { name: "Sea Kayak Dubrovnik", cost: 38, loc: "Dubrovnik", icon: "🛶", source: "Adventure Dubrovnik — ~€35", url: "https://www.adventuredubrovnik.com/sea-kayaking-dubrovnik" },
+  { name: "Diocletian's Palace Tour", cost: 15, loc: "Split", icon: "🏛️", source: "Guided walking tour from €14", url: "https://diocletianpalace.com/diocletians-palace-walking-tour/" },
+  { name: "Food Walking Tour (Split)", cost: 120, loc: "Split", icon: "🍞", source: "My Hidden Croatia — €110 pp incl. food", url: "https://myhiddencroatia.com/when-in-split/" },
+  { name: "Zipline Omiš (optional)", cost: 87, loc: "Near Split", icon: "🪂", source: "zipline-croatia.com — €80 pp", url: "https://zipline-croatia.com/en/" },
 ];
 
+// Train/bus legs — AUDITED via seat61.com, ÖBB, SZ, HZPP, FlixBus official sites (March 2026)
+// Prices below use realistic advance-booking rates (2-3 months out). Flex fares can be 30-50% higher.
+// Point-to-point BEATS Eurail Pass: ~€120/pp advance vs €369 Eurail Global 7-day pass
+const trainLegs = [
+  { from: "Munich", to: "Salzburg", hrs: "1.5h", cost: 22, scenic: 4, type: "ÖBB Railjet", url: "https://www.oebb.at/en/" },
+  { from: "Salzburg", to: "Ljubljana", hrs: "4.5h", cost: 29, scenic: 5, type: "ÖBB EuroCity", url: "https://www.oebb.at/en/" },
+  { from: "Ljubljana", to: "Bled Jezero", hrs: "1.5h", cost: 7, scenic: 4, type: "SZ Train (via Jesenice)", url: "https://potniski.sz.si/en/" },
+  { from: "Bled Jezero", to: "Ljubljana", hrs: "1.5h", cost: 7, scenic: 4, type: "SZ Train (via Jesenice)", url: "https://potniski.sz.si/en/" },
+  { from: "Ljubljana", to: "Zagreb", hrs: "2.5h", cost: 18, scenic: 3, type: "SZ/HŽ Direct", url: "https://potniski.sz.si/en/" },
+  { from: "Zagreb", to: "Split", hrs: "6-8h", cost: 18, scenic: 4, type: "HZPP Train", url: "https://www.hzpp.hr/en" },
+  { from: "Split", to: "Dubrovnik", hrs: "4-5h", cost: 16, scenic: 5, type: "FlixBus (no rail option)", url: "https://www.flixbus.com/" },
+];
+
+// Group preferences aggregated anonymously from all input
+const groupPreferences = [
+  { category: "Top Destinations", items: ["Austria/Salzburg", "Croatia/Dubrovnik", "Germany/Bavaria", "Switzerland", "Prague", "Italy/Rome", "Slovenia", "Greece"] },
+  { category: "Travel Style", items: ["Rural small towns + some landmarks", "Castles & countryside", "Mountains & chill relaxation", "Nature mixed with history", "Scenic views & cathedrals", "Coast & history", "Amazing architecture & WWII history", "Everything — all of it"] },
+  { category: "Must-Haves", items: ["Good breakfast every day", "Bakeries & local food", "Mom-and-pop restaurants", "Opera or classical concert", "Sound of Music experience", "Scenic train rides", "Cobblestone town exploring", "Castle or cathedral stay", "Cathedrals & old buildings", "Private/uncrowded experiences"] },
+  { category: "Must-Avoids", items: ["No hostels", "No early mornings", "No crowded tourist traps", "Not August", "No checked luggage", "Not too hot or too rainy"] },
+];
+
+const weather = [
+  { city: "Munich", fH: 60, fL: 43, sH: 62, sL: 42, fR: 8, sR: 11 },
+  { city: "Salzburg", fH: 58, fL: 41, sH: 59, sL: 40, fR: 9, sR: 12 },
+  { city: "Lake Bled", fH: 59, fL: 42, sH: 61, sL: 41, fR: 10, sR: 12 },
+  { city: "Split", fH: 72, fL: 57, sH: 68, sL: 52, fR: 7, sR: 8 },
+  { city: "Dubrovnik", fH: 73, fL: 58, sH: 69, sL: 54, fR: 8, sR: 9 },
+];
+
+// Accommodation data — REAL Airbnb search results for 16 guests (March 2026)
+// Villa prices = per night for ENTIRE property (all 16 guests) | Per-couple calculated automatically
+const accomData = [
+  { loc: "Munich / Bavaria", n: 2, villa: [1452, 1200], hotel: [165, 130],
+    unique: "🏰 Monastery Residence $2,239/nt",
+    rec: "Bavarian house · 8BR · $91/pp/nt",
+    airbnb: "https://www.airbnb.com/rooms/1109206529214830368",
+    airbnbName: "Modern Bavarian House, Lengenfeld",
+    castleOption: { name: "Thierhaupten Monastery Residence", url: "https://www.airbnb.com/rooms/1264474549701160014", price: 2239, beds: "17BR / 16 beds", note: "Actual monastery — incredible for the group" },
+  },
+  { loc: "Salzburg Region", n: 3, villa: [798, 650], hotel: [150, 120],
+    unique: "🏰 Burglodge $1,175/nt (castle!)",
+    rec: "Forsthaus Neuberg · 9BR · $50/pp/nt",
+    airbnb: "https://www.airbnb.com/rooms/9474529",
+    airbnbName: "Forsthaus Neuberg (Guest Fav, 4.94★)",
+    castleOption: { name: "Burglodge Fischerkeusche", url: "https://www.airbnb.com/rooms/1036282935324077664", price: 1175, beds: "13BR / 24 beds", note: "Castle lodge for up to 35 — the group dream stay" },
+  },
+  { loc: "Lake Bled", n: 2, villa: [1530, 1250], hotel: [125, 95],
+    unique: "🦅 Eagle's Nest Lakeview $1,530/nt",
+    rec: "Eagle's Nest · 9BR · $96/pp/nt",
+    airbnb: "https://www.airbnb.com/rooms/952759732791662526",
+    airbnbName: "9BR Lakeview Eagle's Nest Plus (5.0★)",
+    castleOption: null,
+  },
+  { loc: "Split / Dalmatia", n: 2, villa: [665, 540], hotel: [120, 90],
+    unique: "🎬 Villa Dalmacroa · cinema · $1,875/nt",
+    rec: "Apartments Kaja · 7BR · $42/pp/nt",
+    airbnb: "https://www.airbnb.com/rooms/1094351562839288240",
+    airbnbName: "New Apartments Kaja (5.0★, 20 ppl)",
+    castleOption: { name: "Villa Dalmacroa (9BR + Cinema Room)", url: "https://www.airbnb.com/rooms/41542144", price: 1875, beds: "9BR / 16 beds", note: "Private villa w/ cinema, pool — a group showstopper" },
+  },
+  { loc: "Dubrovnik", n: 2, villa: [566, 450], hotel: [140, 105],
+    unique: "🏊 Villa Sonja · 22 guests · pool · $1,084/nt",
+    rec: "Villa Heights · 6BR · $35/pp/nt",
+    airbnb: "https://www.airbnb.com/rooms/31159275",
+    airbnbName: "Villa Heights (Superhost, Pool+Jacuzzi)",
+    castleOption: { name: "Villa Sonja (7BR, Pool, 22 guests)", url: "https://www.airbnb.com/rooms/1641839753763172441", price: 1084, beds: "7BR / 22 beds", note: "Fits everyone with room to spare — pool + views" },
+  },
+];
+
+// Hidden gems — lesser-known spots locals love, researched from travel forums, Atlas Obscura, and local blogs
 const hiddenGems = [
   { region: "Bavaria", gems: [
-    { name: "Viktualienmarkt", type: "market", desc: "200-year-old food market with beer garden", url: "https://www.viktualienmarkt-muenchen.de" },
-    { name: "Alter Peter Tower", type: "landmark", desc: "Climb 300 steps for best city panorama", url: "https://en.wikipedia.org/wiki/St._Peter%27s_Church,_Munich"Æ&VÃ¢%7&ær##r"ÂFFW3¢$"#B(	2ÖBÂ##r"ÂG&fVÄF3¢Âw&÷VæDF3¢À¢ÆVw3¢°¢²F¢ÂFFS¢$"#B"ÂÆö6Föã¢%4Ä2(i"×Væ6"ÂGS¢'G&fVÂ"Â6öã¢'ÆæR"Â6÷VçG'¢%G&ç6B"ÂFW63¢$FW'B4Ä2gFW&æööââ÷fW&ævBfÆvBâ"ÂævG3¢ÂÆC¢CãBÂÆæs¢ãSÒÀ¢²F¢ÂFFS¢$"#R"ÂÆö6Föã¢$×Væ6"ÂGS¢&6G"Â6öã¢&6W&6"Â6÷VçG'¢$vW&Öç"ÂFW63¢$'&fRÖ÷&æærâÄE26W&6VævÆ6fÆ&ÆRâÖ&VçÆG¢bf·GVÆVæÖ&·Bâw&÷WFææW"BG&FFöæÂ&VW"ÆÂâ"ÂævG3¢ÂÆC¢CãBÂÆæs¢ãSÒÀ¢²F¢"ÂFFS¢$"#b"ÂÆö6Föã¢$æWW66vç7FVâb&f&"ÂGS¢&æGW&R"Â6öã¢&Ö÷VçFâ"Â6÷VçG'¢$vW&Öç"ÂFW63¢$FG&Fòf'FÆR67FÆRæB&f&âÇ2âVçBfÆÆvRöbl;Ç76Vââ&¶W'7&vÂâg&VRWfVæærâ"ÂævG3¢ÂÆC¢CrãSbÂÆæs¢ãsRÒÀ¢²F¢2ÂFFS¢$"#r"ÂÆö6Föã¢%6Ç¦'W&r"ÂGS¢'G&â"Â6öã¢'G&â"Â6÷VçG'¢$W7G&"ÂFW63¢%66Væ2G&âãR'2âvÆ²öÆBF÷vâÂvWG&VFVv76RâÖ÷¦'Bw2&'FÆ6RâWfVæær6Æ766Â6öæ6W'B÷"÷W&â"ÂævG3¢ÂÆC¢CrãÂÆæs¢2ãBÒÀ¢²F¢BÂFFS¢$"#"ÂÆö6Föã¢%6÷VæBöb×W62F"ÂGS¢&vÆvB"Â6öã¢&×W62"Â6÷VçG'¢$W7G&"ÂFW63¢$Ö&&VÆÂv&FVç2ÂÆV÷öÆG6·&öâÂÖöæG6VR6W&6âöVç6Ç¦'W&rf÷'G&W72â&¶W&W2æBÆö6Â&W7FW&çG2â"ÂævG3¢ÂÆC¢CrãÂÆæs¢2ãBÒÀ¢²F¢RÂFFS¢$"#"ÂÆö6Föã¢$Æ¶R&ÆVB"ÂGS¢&æGW&R"Â6öã¢&Ö÷VçFâ"Â6÷VçG'¢%6Æ÷fVæ"ÂFW63¢%66Væ2ÇæRG&âFòÆ§V&Æ¦æBãR'2ÂFVâÆö6ÂG&âFò&ÆVB¦W¦W&òãR'2f¦W6Væ6RâÆWFæ&öBFò6ÆæB6W&6â&ÆVB7&VÒ6¶Râ7Vç6WB÷fW"§VÆâÇ2â"ÂævG3¢ÂÆC¢Cbã3rÂÆæs¢BãÒÀ¢²F¢bÂFFS¢$"3"ÂÆö6Föã¢.(i"7ÆB"ÂGS¢'G&â"Â6öã¢'G&â"Â6÷VçG'¢$7&öF"ÂFW63¢$&ÆVB67FÆRÖ÷&æærâG&â&6²FòÆ§V&Æ¦æÂFVâG&âFò¦w&V"æBöçv&BFò7ÆBâFö6ÆWFâw2Æ6R'ævBâ"ÂævG3¢ÂÆC¢C2ãSÂÆæs¢bãCBÒÀ¢²F¢rÂFFS¢$Ö"ÂÆö6Föã¢%7ÆB"ÂGS¢&6G"Â6öã¢&6ÖW&"Â6÷VçG'¢$7&öF"ÂFW63¢$Fö6ÆWFâw2Æ6RÂ&f&öÖVæFRÂg&W6Ö&¶WBâgFW&æööã¢7vÒÂ¶²Â÷"WÆ÷&RG&öv"â7&öFâ6VfööBFææW"â"ÂævG3¢ÂÆC¢C2ãSÂÆæs¢bãCBÒÀ¢²F¢ÂFFS¢$Ö""ÂÆö6Föã¢$GV'&÷fæ²"ÂGS¢&vÆvB"Â6öã¢&6ö×72"Â6÷VçG'¢$7&öF"ÂFW63¢%66Væ2G&F26ö7FÂG&ç6fW"BÓR'2â7G&öÆÂ7G&GVââ7Vç6WBg&öÒ6GvÆÇ2â&W7BbWÆ÷&Râ"ÂævG3¢ÂÆC¢C"ãcRÂÆæs¢ãÒÀ¢²F¢ÂFFS¢$Ö2"ÂÆö6Föã¢$GV'&÷fæ²"ÂGS¢&vÆvB"Â6öã¢&V'B"Â6÷VçG'¢$7&öF"ÂFW63¢%vÆ²FRgVÆÂ6GvÆÇ2â¶¶ær÷FöæÂâ6ö&&ÆW7FöæRWÆ÷&ærÂ&¶W&W2ÂÆö6Â6÷2âf&WvVÆÂw&÷WFææW"â"ÂævG3¢ÂÆC¢C"ãcRÂÆæs¢ãÒÀ¢²F¢ÂFFS¢$ÖB"ÂÆö6Föã¢$GV'&÷fæ²(i"öÖR"ÂGS¢'G&fVÂ"Â6öã¢'ÆæR"Â6÷VçG'¢%G&ç6B"ÂFW63¢$fÇöÖRf6öææV7Fær6Gâ'&fR4Ä2ÆFRWfVæærâ"ÂævG3¢ÂÆC¢C"ãcRÂÆæs¢ãÒÀ¢Ð¢Ð§Ó° ¢òò'VFvWBFW'2(	BTDDTBÖ&6##bvç7B¶vÂ&&æ"Â9d$"Â¥ÂfÆ'W2ÂæBöff6Â7FfG6FW0¢òòfÆvG3¢¶v4Ä>(i$ÕT2CS÷6VW7B'VFvWB(i"Öâ6'&W"FVÇFôÇVgFç6V6öæö×âCSÓÃ÷öæR×v¢òòD%n(i%4Ä2CcC÷6VW7B(i"Öâ6'&W"âCÓÃ÷öæR×vâ%BÖâ6'&W"âCÃsÒC"Ã#÷ ¢òò66öÖÖöFFöã¢&&æ"fW&fVBf÷"bwVW7G2(	BC3R÷öævBGV'&÷fæ²FòCb÷öævB&ÆVBÆ¶Vg&öçB¢òòG&ç3¢öçB×Fò×öçBGfæ6RF6¶WG2Òî(*Ãr÷âC#bg2(*Ã3cWW&ÂvÆö&ÂrÖF72(	B6fW2âCBÃf÷"w&÷W ¢òò7FfFW3¢ÆÂ"fW&fVBvç7Böff6Â6FW2âF÷FÂbFöærWfW'FærÒCS"÷à¦6öç7B'VFvWEFW'2Ò°¢fÆÃ¢°¢fÇVS¢²Æ&VÃ¢%fÇVR"ÂVÖö¦¢/	øé""ÂfÆvG3¢cSÂ66öÖÖöFFöã¢SRÂG&ç3¢#bÂfööC¢SRÂ7FfFW3¢#3RÂÖ63¢#RÒÀ¢ÖC¢²Æ&VÃ¢$ÖBÕFW""ÂVÖö¦¢.)Ê"ÂfÆvG3¢#SÂ66öÖÖöFFöã¢sRÂG&ç3¢#bÂfööC¢sÂ7FfFW3¢3#RÂÖ63¢3RÒÀ¢&VÖVÓ¢²Æ&VÃ¢%&VÖVÒ"ÂVÖö¦¢/	ù"ÂfÆvG3¢#CÂ66öÖÖöFFöã¢ÂG&ç3¢#bÂfööC¢RÂ7FfFW3¢CRÂÖ63¢SÒÀ¢ÒÀ¢7&æs¢°¢fÇVS¢²Æ&VÃ¢%fÇVR"ÂVÖö¦¢/	øé""ÂfÆvG3¢CSÂ66öÖÖöFFöã¢CRÂG&ç3¢#bÂfööC¢SÂ7FfFW3¢#3RÂÖ63¢#ÒÀ¢ÖC¢²Æ&VÃ¢$ÖBÕFW""ÂVÖö¦¢.)Ê"ÂfÆvG3¢Â66öÖÖöFFöã¢c"ÂG&ç3¢#bÂfööC¢cRÂ7FfFW3¢3#RÂÖ63¢3ÒÀ¢&VÖVÓ¢²Æ&VÃ¢%&VÖVÒ"ÂVÖö¦¢/	ù"ÂfÆvG3¢#Â66öÖÖöFFöã¢RÂG&ç3¢#bÂfööC¢Â7FfFW3¢CRÂÖ63¢CRÒÀ¢Ð§Ó°¦6öç7BätE2Ò°¦6öç7B6Æ5ÒBÓâBæfÆvG2²Bæ66öÖÖöFFöâ¢ätE2²BçG&ç2²BæfööB¢ätE2²Bæ7FfFW2²BæÖ62¢ätE3°¦6öç7B6Æ46÷WÆRÒBÓâ6Æ5B¢#° ¦6öç7BFW7FæFöåf÷FW2Ò°¢²æÖS¢$W7G&ò6Ç¦'W&r"Âf÷FW3¢ÒÂ²æÖS¢$7&öFòGV'&÷fæ²"Âf÷FW3¢ÒÀ¢²æÖS¢$vW&Öçò&f&"Âf÷FW3¢ÒÂ²æÖS¢%7vG¦W&ÆæB"Âf÷FW3¢RÒÀ¢²æÖS¢%&wVRò7¦V6&Wâ"Âf÷FW3¢RÒÂ²æÖS¢$FÇò&öÖR"Âf÷FW3¢RÒÀ¢²æÖS¢%6Æ÷fVæò&ÆVB"Âf÷FW3¢2ÒÂ²æÖS¢$w&VV6R"Âf÷FW3¢2ÒÀ¥Ó° ¦6öç7BWW&Væ6TFFÒ°¢²W¢%FövWFW&æW72"Â66÷&S¢ÒÂ²W¢$&¶W&W2bfööB"Â66÷&S¢ÒÀ¢²W¢$67FÆW2"Â66÷&S¢ÒÂ²W¢%6ÖÆÂF÷vç2"Â66÷&S¢ÒÀ¢²W¢%66Væ2G&â"Â66÷&S¢ÒÂ²W¢$æGW&Rò¶R"Â66÷&S¢ÒÀ¢²W¢$7F÷'"Â66÷&S¢rÒÂ²W¢$6FVG&Ç2"Â66÷&S¢rÒÀ¢²W¢$÷W&ò6÷r"Â66÷&S¢bÒÂ²W¢$&6FV7GW&R"Â66÷&S¢bÒÀ¥Ó° ¢òòfööB6÷7G2W"W'6öâW"F(	B&W6V&6VBf'VFvWG÷W'G&æ6öÒÂçVÖ&Vòæ6öÒÂæBG&fVÂf÷'V×2Ö&6##b¦6öç7BfööD'6÷VçG'Ò°¢²6÷VçG'¢$vW&Öç"Â'&V¶f7C¢BÂÇVæ6¢#ÂFææW#¢3Â6æ6·3¢ÂfÆs¢/	øz	øz¢"ÒÀ¢²6÷VçG'¢$W7G&"Â'&V¶f7C¢RÂÇVæ6¢#"ÂFææW#¢3"Â6æ6·3¢ÂfÆs¢/	øzo	ø{"ÒÀ¢²6÷VçG'¢%6Æ÷fVæ"Â'&V¶f7C¢ÂÇVæ6¢BÂFææW#¢#"Â6æ6·3¢bÂfÆs¢/	ø{	øzâ"ÒÀ¢²6÷VçG'¢$7&öF"Â'&V¶f7C¢ÂÇVæ6¢RÂFææW#¢#BÂ6æ6·3¢bÂfÆs¢/	øzß	ø{r"ÒÀ¥Ó° ¢òò7FfFW2(	BTDDTBvç7Böff6Â6FW2Ö&6##bâÆÂ(*Â6öçfW'FVBBâCãþ(*Âà¦6öç7B7FfFW2Ò°¢²æÖS¢$æWW66vç7FVâ67FÆR"Â6÷7C¢#bÂÆö3¢$&f&"Â6öã¢/	øû"Â6÷W&6S¢&æWW66vç7FVâæFR(	B(*Ã#²(*Ã"ãS&öö¶ærÒ(*Ã#2ãS"ÂW&Ã¢&GG3¢ò÷wwrææWW66vç7FVâæFRöVævÆ66÷F÷W&7Bò"ÒÀ¢²æÖS¢%6÷VæBöb×W62F÷W""Â6÷7C¢sbÂÆö3¢%6Ç¦'W&r"Â6öã¢/	øëR"Â6÷W&6S¢%æ÷&ÖF÷W'2(	B(*ÃsfW&fVB"ÂW&Ã¢&GG3¢ò÷wwrçæ÷&ÖF÷W'2æ6öÒöVâ÷6Ç¦'W&r÷F÷W"ö÷&væÂ×6÷VæBÖöbÖ×W62×F÷W"×F÷W"ÓÓ#ò"ÒÀ¢²æÖS¢$öVç6Ç¦'W&rf÷'G&W72ÆÂÔæ6Ââ"Â6÷7C¢#ÂÆö3¢%6Ç¦'W&r"Â6öã¢/	øúò"Â6÷W&6S¢&fW7GVærÖöVç6Ç¦'W&ræB(	B(*Ãã#ÆÂÖæ6ÇW6fR"ÂW&Ã¢&GG3¢ò÷wwræfW7GVærÖöVç6Ç¦'W&ræBöVâ÷÷W"×f6B÷F6¶WG2"ÒÀ¢²æÖS¢$Ö÷¦'Bf÷'G&W726öæ6W'B"Â6÷7C¢SÂÆö3¢%6Ç¦'W&r"Â6öã¢/	øë²"Â6÷W&6S¢'6Ç¦'W&vvÆvG2æB(	B(*ÃCr6B&÷w2Ób"ÂW&Ã¢&GG3¢ò÷wwrç6Ç¦'W&vvÆvG2æBöVâö&W7BÖöbÖÖ÷¦'BÖ6öæ6W'G2ö&W7BÖöbÖÖ÷¦'BÖf÷'G&W72Ö6öæ6W'BÓ#ò"ÒÀ¢²æÖS¢$Ö÷¦'BFææW"6öæ6W'B"Â6÷7C¢sRÂÆö3¢%6Ç¦'W&r"Â6öã¢/	øëb"Â6÷W&6S¢%7FgG6¶VÆÆW"7BâWFW"(	Bî(*Ãc"ÂW&Ã¢&GG3¢ò÷wwræÖ÷¦'BÖFææW"Ö6öæ6W'B×6Ç¦'W&ræ6öÒò"ÒÀ¢²æÖS¢$Æ¶R&ÆVBÆWFæ&öB"Â6÷7C¢#"ÂÆö3¢%6Æ÷fVæ"Â6öã¢/	ùª2"Â6÷W&6S¢'ÆWFæç6(	B(*Ã#&÷VæBG&##R&FR"ÂW&Ã¢&GG3¢ò÷ÆWFæç6öVâööÖRò"ÒÀ¢²æÖS¢$&ÆVB67FÆRVçG'"Â6÷7C¢rÂÆö3¢%6Æ÷fVæ"Â6öã¢/	øû"Â6÷W&6S¢&&ÆV§6¶Öw&Bç6(	B(*Ãbw&÷W&FR²"ÂW&Ã¢&GG3¢ò÷wwræ&ÆV§6¶Öw&Bç6öVâ÷Æâ×÷W"×f6B÷&6RÖÆ7Bò"ÒÀ¢²æÖS¢$GV'&÷fæ²6GvÆÇ2"Â6÷7C¢CBÂÆö3¢$GV'&÷fæ²"Â6öã¢/	ú{"Â6÷W&6S¢&6GvÆÇ6GV'&÷fæ²æ"(	B(*ÃCÖ"Ôö7B6V6öâ"ÂW&Ã¢&GG3¢ò÷6÷æ6GvÆÇ6GV'&÷fæ²æ"öVâö'W×F6¶WG2Öf÷"×FRÖföÆÆ÷værÖÆö6Föç2"ÒÀ¢²æÖS¢%6V¶²GV'&÷fæ²"Â6÷7C¢3ÂÆö3¢$GV'&÷fæ²"Â6öã¢/	ù»b"Â6÷W&6S¢$GfVçGW&RGV'&÷fæ²(	Bî(*Ã3R"ÂW&Ã¢&GG3¢ò÷wwræGfVçGW&VGV'&÷fæ²æ6öÒ÷6VÖ¶¶ærÖGV'&÷fæ²"ÒÀ¢²æÖS¢$Fö6ÆWFâw2Æ6RF÷W""Â6÷7C¢RÂÆö3¢%7ÆB"Â6öã¢/	øù¾ûò"Â6÷W&6S¢$wVFVBvÆ¶ærF÷W"g&öÒ(*ÃB"ÂW&Ã¢&GG3¢òöFö6ÆWFçÆ6Ræ6öÒöFö6ÆWFç2×Æ6R×vÆ¶ær×F÷W"ò"ÒÀ¢²æÖS¢$fööBvÆ¶ærF÷W"7ÆB"Â6÷7C¢#ÂÆö3¢%7ÆB"Â6öã¢/	øÙâ"Â6÷W&6S¢$×FFVâ7&öF(	B(*Ãæ6ÂâfööB"ÂW&Ã¢&GG3¢òö×FFVæ7&öFæ6öÒ÷vVâÖâ×7ÆBò"ÒÀ¢²æÖS¢%¦ÆæRöÖZ÷FöæÂ"Â6÷7C¢rÂÆö3¢$æV"7ÆB"Â6öã¢/	ú¨""Â6÷W&6S¢'¦ÆæRÖ7&öFæ6öÒ(	B(*Ã"ÂW&Ã¢&GG3¢ò÷¦ÆæRÖ7&öFæ6öÒöVâò"ÒÀ¥Ó° ¢òòG&âö'W2ÆVw2(	BTDDTBf6VCcæ6öÒÂ9d$"Â5¢Â¥ÂfÆ'W2öff6Â6FW2Ö&6##b¢òò&6W2&VÆ÷rW6R&VÆ7F2Gfæ6RÖ&öö¶ær&FW2"Ó2ÖöçF2÷WBâfÆWf&W26â&R3ÓSRvW"à¢òòöçB×Fò×öçB$TE2WW&Â73¢î(*Ã#÷Gfæ6Rg2(*Ã3cWW&ÂvÆö&ÂrÖF70¦6öç7BG&äÆVw2Ò°¢²g&öÓ¢$×Væ6"ÂFó¢%6Ç¦'W&r"Â'3¢#ãV"Â6÷7C¢#"Â66Væ3¢BÂGS¢,9d$"&Æ¦WB"ÂW&Ã¢&GG3¢ò÷wwræöV&"æBöVâò"ÒÀ¢²g&öÓ¢%6Ç¦'W&r"ÂFó¢$Æ§V&Æ¦æ"Â'3¢#BãV"Â6÷7C¢#Â66Væ3¢RÂGS¢,9d$"WW&ô6G"ÂW&Ã¢&GG3¢ò÷wwræöV&"æBöVâò"ÒÀ¢²g&öÓ¢$Æ§V&Æ¦æ"ÂFó¢$&ÆVB¦W¦W&ò"Â'3¢#ãV"Â6÷7C¢rÂ66Væ3¢BÂGS¢%5¢G&âf¦W6Væ6R"ÂW&Ã¢&GG3¢ò÷÷Fæ6¶ç7¢ç6öVâò"ÒÀ¢²g&öÓ¢$&ÆVB¦W¦W&ò"ÂFó¢$Æ§V&Æ¦æ"Â'3¢#ãV"Â6÷7C¢rÂ66Væ3¢BÂGS¢%5¢G&âf¦W6Væ6R"ÂW&Ã¢&GG3¢ò÷÷Fæ6¶ç7¢ç6öVâò"ÒÀ¢²g&öÓ¢$Æ§V&Æ¦æ"ÂFó¢%¦w&V""Â'3¢#"ãV"Â6÷7C¢Â66Væ3¢2ÂGS¢%5¢ô[ÒF&V7B"ÂW&Ã¢&GG3¢ò÷÷Fæ6¶ç7¢ç6öVâò"ÒÀ¢²g&öÓ¢%¦w&V""ÂFó¢%7ÆB"Â'3¢#bÓ"Â6÷7C¢Â66Væ3¢BÂGS¢$¥G&â"ÂW&Ã¢&GG3¢ò÷wwræ§æ"öVâ"ÒÀ¢²g&öÓ¢%7ÆB"ÂFó¢$GV'&÷fæ²"Â'3¢#BÓV"Â6÷7C¢bÂ66Væ3¢RÂGS¢$fÆ'W2æò&Â÷Föâ"ÂW&Ã¢&GG3¢ò÷wwræfÆ'W2æ6öÒò"ÒÀ¥Ó° ¢òòw&÷W&VfW&Væ6W2vw&VvFVBæöçÖ÷W6Çg&öÒÆÂçW@¦6öç7Bw&÷W&VfW&Væ6W2Ò°¢²6FVv÷'¢%F÷FW7FæFöç2"ÂFV×3¢²$W7G&õ6Ç¦'W&r"Â$7&öFôGV'&÷fæ²"Â$vW&Öçô&f&"Â%7vG¦W&ÆæB"Â%&wVR"Â$FÇõ&öÖR"Â%6Æ÷fVæ"Â$w&VV6R%ÒÒÀ¢²6FVv÷'¢%G&fVÂ7GÆR"ÂFV×3¢²%'W&Â6ÖÆÂF÷vç2²6öÖRÆæFÖ&·2"Â$67FÆW2b6÷VçG'6FR"Â$Ö÷VçFç2b6ÆÂ&VÆFöâ"Â$æGW&RÖVBvF7F÷'"Â%66Væ2fWw2b6FVG&Ç2"Â$6ö7Bb7F÷'"Â$Ö¦ær&6FV7GW&Rbut7F÷'"Â$WfW'Fær(	BÆÂöbB%ÒÒÀ¢²6FVv÷'¢$×W7BÔfW2"ÂFV×3¢²$vööB'&V¶f7BWfW'F"Â$&¶W&W2bÆö6ÂfööB"Â$ÖöÒÖæB×÷&W7FW&çG2"Â$÷W&÷"6Æ766Â6öæ6W'B"Â%6÷VæBöb×W62WW&Væ6R"Â%66Væ2G&â&FW2"Â$6ö&&ÆW7FöæRF÷vâWÆ÷&ær"Â$67FÆR÷"6FVG&Â7F"Â$6FVG&Ç2böÆB'VÆFæw2"Â%&fFR÷Væ7&÷vFVBWW&Væ6W2%ÒÒÀ¢²6FVv÷'¢$×W7BÔföG2"ÂFV×3¢²$æò÷7FVÇ2"Â$æòV&ÇÖ÷&ææw2"Â$æò7&÷vFVBF÷W&7BG&2"Â$æ÷BVwW7B"Â$æò6V6¶VBÇVvvvR"Â$æ÷BFöò÷B÷"Föò&ç%ÒÒÀ¥Ó° ¦6öç7BvVFW"Ò°¢²6G¢$×Væ6"Âd¢cÂdÃ¢C2Â4¢c"Â4Ã¢C"Âe#¢Â5#¢ÒÀ¢²6G¢%6Ç¦'W&r"Âd¢SÂdÃ¢CÂ4¢SÂ4Ã¢CÂe#¢Â5#¢"ÒÀ¢²6G¢$Æ¶R&ÆVB"Âd¢SÂdÃ¢C"Â4¢cÂ4Ã¢CÂe#¢Â5#¢"ÒÀ¢²6G¢%7ÆB"Âd¢s"ÂdÃ¢SrÂ4¢cÂ4Ã¢S"Âe#¢rÂ5#¢ÒÀ¢²6G¢$GV'&÷fæ²"Âd¢s2ÂdÃ¢SÂ4¢cÂ4Ã¢SBÂe#¢Â5#¢ÒÀ¥Ó° ¢òò66öÖÖöFFöâFF(	B$TÂ&&æ"6V&6&W7VÇG2f÷"bwVW7G2Ö&6##b¢òòfÆÆ&6W2ÒW"ævBf÷"TåD$R&÷W'GÆÂbwVW7G2ÂW"Ö6÷WÆR6Æ7VÆFVBWFöÖF6ÆÇ¦6öç7B66öÔFFÒ°¢²Æö3¢$×Væ6ò&f&"Âã¢"ÂfÆÆ¢³CS"Â#ÒÂ÷FVÃ¢³cRÂ3ÒÀ¢VæVS¢/	øûÖöæ7FW'&W6FVæ6RC"Ã#3öçB"À¢&V3¢$&f&â÷W6R+r%"+rC÷öçB"À¢&&æ#¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2ó#cS##C33c"À¢&&æ$æÖS¢$ÖöFW&â&f&â÷W6RÂÆVævVæfVÆB"À¢67FÆT÷Föã¢²æÖS¢%FW&WFVâÖöæ7FW'&W6FVæ6R"ÂW&Ã¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2ó#cCCsCSCscB"Â&6S¢##3Â&VG3¢#t%"òb&VG2"Âæ÷FS¢$7GVÂÖöæ7FW'(	Bæ7&VF&ÆRf÷"FRw&÷W"ÒÀ¢ÒÀ¢²Æö3¢%6Ç¦'W&r&Vvöâ"Âã¢2ÂfÆÆ¢³sÂcSÒÂ÷FVÃ¢³SÂ#ÒÀ¢VæVS¢/	øû'W&vÆöFvRCÃsRöçB67FÆR"À¢&V3¢$f÷'7FW2æWV&W&r+r%"+rCS÷öçB"À¢&&æ#¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2óCsCS#"À¢&&æ$æÖS¢$f÷'7FW2æWV&W&rwVW7BfbÂBãN)R"À¢67FÆT÷Föã¢²æÖS¢$'W&vÆöFvRf66W&¶WW66R"ÂW&Ã¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2ó3c##3S3#CssccB"Â&6S¢sRÂ&VG3¢#4%"ò#B&VG2"Âæ÷FS¢$67FÆRÆöFvRf÷"WFò3R(	BFRw&÷WG&VÒ7F"ÒÀ¢ÒÀ¢²Æö3¢$Æ¶R&ÆVB"Âã¢"ÂfÆÆ¢³S3Â#SÒÂ÷FVÃ¢³#RÂUÒÀ¢VæVS¢/	úhRVvÆRw2æW7BÆ¶WfWrCÃS3öçB"À¢&V3¢$VvÆRw2æW7B+r%"+rCb÷öçB"À¢&&æ#¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2óS#sSs3#scc#S#b"À¢&&æ$æÖS¢#%"Æ¶WfWrVvÆRw2æW7BÇW2Rã)R"À¢67FÆT÷Föã¢çVÆÂÀ¢ÒÀ¢²Æö3¢%7ÆBòFÆÖF"Âã¢"ÂfÆÆ¢³ccRÂSCÒÂ÷FVÃ¢³#ÂÒÀ¢VæVS¢/	øêÂfÆÆFÆÖ7&ö+r6æVÖ+rCÃsRöçB"À¢&V3¢$'FÖVçG2¶¦+rt%"+rCC"÷öçB"À¢&&æ#¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2óC3SSc#3##C"À¢&&æ$æÖS¢$æWr'FÖVçG2¶¦Rã)RÂ#Â"À¢67FÆT÷Föã¢²æÖS¢%fÆÆFÆÖ7&ö%"²6æVÖ&ööÒ"ÂW&Ã¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2óCSC#CB"Â&6S¢sRÂ&VG3¢#%"òb&VG2"Âæ÷FS¢%&fFRfÆÆrò6æVÖÂööÂ(	Bw&÷W6÷w7F÷W""ÒÀ¢ÒÀ¢²Æö3¢$GV'&÷fæ²"Âã¢"ÂfÆÆ¢³ScbÂCSÒÂ÷FVÃ¢³CÂUÒÀ¢VæVS¢/	øø¢fÆÆ6öæ¦+r#"wVW7G2+rööÂ+rCÃBöçB"À¢&V3¢%fÆÆVvG2+rd%"+rC3R÷öçB"À¢&&æ#¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2ó3S#sR"À¢&&æ$æÖS¢%fÆÆVvG27WW&÷7BÂööÂ´¦7W§¦"À¢67FÆT÷Föã¢²æÖS¢%fÆÆ6öæ¦t%"ÂööÂÂ#"wVW7G2"ÂW&Ã¢&GG3¢ò÷wwræ&&æ"æ6öÒ÷&öö×2ócC3sS3sc3s#CC"Â&6S¢BÂ&VG3¢#t%"ò#"&VG2"Âæ÷FS¢$fG2WfW'öæRvF&ööÒFò7&R(	BööÂ²fWw2"ÒÀ¢ÒÀ¥Ó° ¢òòFFVâvV×2(	BÆW76W"Ö¶æ÷vâ7÷G2Æö6Ç2Æ÷fRÂ&W6V&6VBg&öÒG&fVÂf÷'V×2ÂFÆ2ö'67W&ÂæBÆö6Â&Æöw0¦6öç7BFFVävV×2Ò°¢²&Vvöã¢$&f&"ÂvV×3¢°¢²æÖS¢$ÖGFVçvÆB"ÂFW63¢%FçföÆâÖÖ¶ærfÆÆvRâFRÇ2vFçFVBf6FW2öâWfW'÷W6RâfVVÇ2Æ¶R7FWærçFò7F÷'&öö²â"ÂGS¢'fÆÆvR"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôÖGFVçvÆBÂ´vW&Öç"ÒÀ¢²æÖS¢$vV7FW&¶ÆÖÒ7&Bv÷&vR"ÂFW63¢$G&ÖF2v÷&vR¶RvF7W7VæFVBvÆ·v2&WGvVVâvW&ÖçæBW7G&âV7vÆ²Â7GVæææröfbâ"ÂGS¢&æGW&R"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôvV7FW&¶ÆÖÒ"ÒÀ¢²æÖS¢$l;Ç76VâöÆBF÷vâ"ÂFW63¢$Ö÷7BV÷ÆRöæÇ6VRæWW66vç7FVâ(	B'WBFRÖVFWfÂF÷vâ&VÆ÷r26ö&&ÆW7FöæRÆæW2ÂçFVB'VÆFæw2ÂæB¦W&ò7&÷vG2â"ÂGS¢'fÆÆvR"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôbT32T$776VâÂ´vW&Öç"ÒÀ¢²æÖS¢%'Fæ6¶ÆÖÒ"ÂFW63¢#sÒv÷&vRæV"v&Ö66vF&ö&ærvFW&fÆÇ2æB&ö6²GVææVÇ2â3ÖÖâvÆ²FBfVVÇ2÷FW'v÷&ÆFÇâ"ÂGS¢&æGW&R"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rõ'Fæ6¶ÆÖÒ"ÒÀ¢×ÒÀ¢²&Vvöã¢%6Ç¦'W&r"ÂvV×3¢°¢²æÖS¢%7FVæv76R"ÂFW63¢%FRæ'&÷rÖVFWfÂÆæR7&÷72FR&fW"g&öÒFRF÷W&7BöÆBF÷vââFç&'2Â¦W&òF÷W"w&÷W2ÂcV'2öb7F÷'â"ÂGS¢'7G&VWB"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rõ7FVæv76RÂµ6Ç¦'W&r"ÒÀ¢²æÖS¢%66&ææRÖ&¶WBFW'2"ÂFW63¢%6Ç¦'W&rw2vVV¶Çf&ÖW"w2Ö&¶WBBÖ&&VÆÂâÆö6Â6VW6W2ÂÖVG2Â7G&W2ÂfÆ÷vW'2(	BW7FÇFRWFVçF2fööBWW&Væ6RFRfÖÇvçG2â"ÂGS¢&Ö&¶WB"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rõ66&ææR´Ö&¶WBµ6Ç¦'W&r"ÒÀ¢²æÖS¢%7FgG6,:F6¶W&V7BâWFW""ÂFW63¢$öÆFW7B&¶W'â6Ç¦'W&r6æ6RcâvööBÖf&VB'&VBâÖöæ7FW'6÷W'G&BâFR&VÂFVÂf÷"&¶W'Æ÷fW'2â"ÂGS¢&fööB"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rõ7FgG6"T32TF6¶W&Vµ7BâµWFW""ÒÀ¢²æÖS¢$ÖöæG6VR6÷VæBöb×W626W&6"ÂFW63¢%FR7GVÂvVFFær6W&6g&öÒFRfÆÒâ#ÖÖâG&fRg&öÒ6Ç¦'W&r(	BÆ¶W6FRF÷vâÂæò7&÷vG2Âv÷&vV÷W2â"ÂGS¢&ÆæFÖ&²"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôÖöæG6VRÂ´W7G&"ÒÀ¢×ÒÀ¢²&Vvöã¢%6Æ÷fVæ"ÂvV×3¢°¢²æÖS¢%fçFv"v÷&vR"ÂFW63¢#ãf¶Ò&ö&GvÆ²F&÷VvGW'Vö6R&fW"v÷&vRâÆö6Ç26öç6FW"BÖ÷&R&VWFgVÂFâFRF÷W&7BfW'6öââ&ÆVBâ"ÂGS¢&æGW&R"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RõfçFv"´v÷&vR"ÒÀ¢²æÖS¢$Æ¶R&öæ¢"ÂFW63¢$&ÆVBw2VWFW"ÂvÆFW"6÷W6â(	B7'7FÂvFW"Â§VÆâÇ2&6¶G&÷Âg&7FöâöbFRf6F÷'2âW&fV7Bf÷"Ö÷&æærvÆ²â"ÂGS¢&æGW&R"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôÆ¶R´&öæ¢"ÒÀ¢²æÖS¢%ö¶Æ§V¶v÷&vR"ÂFW63¢$FFVâf÷&W7Bv÷&vR#Öâg&öÒ&ÆVBâÖ÷72Ö6÷fW&VB6Æfg2ÂvööFVâ'&FvW2Âf'GVÆÇV×GWfVââV²6V6öââ"ÂGS¢&æGW&R"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rõö¶Æ§V¶´v÷&vR"ÒÀ¢²æÖS¢$&ÆVB7&VÒ6¶RB&²÷FVÂ"ÂFW63¢%FR·&VÜZæF7&VÒ6¶Rv2çfVçFVBW&RâS2âVBBöâFRÆ¶Vg&öçBFW'&6R(	BCBf÷"6Æ6RöbVfVââ"ÂGS¢&fööB"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rõ&²´÷FVÂ´&ÆVB"ÒÀ¢×ÒÀ¢²&Vvöã¢%7ÆBòFÆÖF"ÂvV×3¢°¢²æÖS¢%G&öv"öÆBF÷vâ"ÂFW63¢$VçF&R6ÆæB2TäU44òv÷&ÆBW&FvR6FRâRÖâg&öÒ7ÆB'WBfVVÇ2v÷&ÆBv(	B&öÖæW7VR6FVG&ÂÂæò7'V6R62â"ÂGS¢'fÆÆvR"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RõG&öv"Â´7&öF"ÒÀ¢²æÖS¢$öÖZ"ÂFW63¢%&FRF÷vâBFRÖ÷WFöbG&ÖF26çöââöÖRFòFR¦ÆæRÂ&fW"&gFærÂæBf÷'G&W72'Vç2vFfWw2f÷"F2â"ÂGS¢'fÆÆvR"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôöÖT3RTÂ´7&öF"ÒÀ¢²æÖS¢$Ö&¦âÆÂ"ÂFW63¢%7ÆBw2vÇVærr(	Bf÷&W7FVBVæç7VÆvFG&Ç2ÂFFVâ&V6W2ÂæB3c+æ÷&ÖöbFR6GæB6ÆæG2â"ÂGS¢&æGW&R"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôÖ&¦â´ÆÂ"ÒÀ¢²æÖS¢$w&VVâÖ&¶WB¦""ÂFW63¢$FÇ÷VâÖ"Ö&¶WB&vB&VæBFö6ÆWFâw2Æ6RâÆö6Âg'VG2ÂÆfVæFW"öæWÂ6VW6RÂöÆfRöÂâFR&W7B6÷WfVæ'2â"ÂGS¢&Ö&¶WB"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rõ¦"µ7ÆB"ÒÀ¢×ÒÀ¢²&Vvöã¢$GV'&÷fæ²"ÂvV×3¢°¢²æÖS¢$VÆfF6ÆæG2FG&"ÂFW63¢%F&VR6"Ög&VR6ÆæG2#Öâ'fW''âæRf÷&W7G2ÂFFVâ6÷fW2Âg&W6w&ÆÆVBf6âÆ¶R7&öF3V'2vòâ"ÂGS¢&æGW&R"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôVÆfF´6ÆæG2"ÒÀ¢²æÖS¢$Æö·'VÒ6ÆæB"ÂFW63¢#ÖÖâfW''g&öÒöÆBF÷vââ&÷Fæ6Âv&FVâÂÖöæ7FW''Vç2ÂV6ö6·2&öÖærWfW'vW&RâV6VgVÂÆbÖFW66Râ"ÂGS¢&æGW&R"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6RôÆö·'VÒ´6ÆæB"ÒÀ¢²æÖS¢$'\[æ&""ÂFW63¢$6Æfb&"ÆFW&ÆÇ6'fVBçFòFR6GvÆÇ2âæò6vâÂ§W7BöÆRâFRvÆÂâG&æ·2vF7Vç6WB÷fW"FRG&F2â"ÂGS¢&fööB"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rô'RT3RT$V´&"´GV'&÷fæ²"ÒÀ¢²æÖS¢%v"÷FòÆÖFVB"ÂFW63¢%÷vW&gVÂ÷Fö¦÷W&æÆ6ÒvÆÆW'âFRöÆBF÷vââvfW26öçFWBFò7&öFw2&V6VçB7F÷'âg&VRVçG'6öÖRF2â"ÂGS¢&ÆæFÖ&²"ÂW&Ã¢&GG3¢ò÷wwrævöövÆRæ6öÒöÖ2÷Æ6Rõv"µ÷Fò´ÆÖFVB"ÒÀ¢×ÒÀ¥Ó° ¢òòÓÓÓÓÓÓÓÓÓÓÓÒUDÄE4ôÕôäTåE2ÓÓÓÓÓÓÓÓÓÓÓÐ¦gVæ7FöâæÔâ²6ÆG&VâÂFVÆÒÒ°¢6öç7B·6÷rÂ6WE6÷uÒÒW6U7FFRfÇ6R°¢W6TVffV7BÓâ²6öç7BBÒ6WEFÖV÷WBÓâ6WE6÷rG'VRÂFVÆ²&WGW&âÓâ6ÆV%FÖV÷WBB²ÒÂ¶FVÆÒ°¢&WGW&â&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²÷6G¢6÷rò¢ÂG&ç6f÷&Ó¢6÷rò'G&ç6ÆFU"¢'G&ç6ÆFUg"ÂG&ç6Föã¢&ÆÂãW27V&2Ö&W¦W"ãbÃÃã2Ã"ÒÒÂ6ÆG&Vâ°§Ð ¦gVæ7FöâvÆ÷t6&B²6ÆG&VâÂvÆ÷rÂ7GÆRÂöä6Æ6²Ò°¢6öç7B¶÷fW&VBÂ6WD÷fW&VEÒÒW6U7FFRfÇ6R°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²öäÖ÷W6TVçFW#¢Óâ6WD÷fW&VBG'VRÂöäÖ÷W6TÆVfS¢Óâ6WD÷fW&VBfÇ6RÂöä6Æ6³¢öä6Æ6²À¢7GÆS¢²ââævÆ757GÆRÂFFæs¢#BÂ÷6Föã¢'&VÆFfR"Â÷fW&fÆ÷s¢&FFVâ"ÂG&ç6Föã¢&ÆÂã72"Â7W'6÷#¢öä6Æ6²ò'öçFW""¢&FVfVÇB"À¢&÷6F÷s¢÷fW&VBò3G¶vÆ÷rÇÂBæ66VçGÓ#"Â3'&v&ÃÃÃã2¢#G#&v&ÃÃÃã""À¢G&ç6f÷&Ó¢÷fW&VBbböä6Æ6²ò'G&ç6ÆFUÓ'"¢&æöæR"Âââç7GÆRÒÒÀ¢vÆ÷rbb&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²÷6Föã¢&'6öÇWFR"ÂF÷¢ÂÆVgC¢Â&vC¢ÂVvC¢"Â&6¶w&÷VæC¢vÆ÷rÒÒÀ¢6ÆG&Và¢¢°§Ð ¦gVæ7FöâÆÂ²6ÆG&VâÂ6öÆ÷"Â7FfRÂöä6Æ6²Ò°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&'WGFöâ"Â²öä6Æ6³¢öä6Æ6²Â7GÆS¢°¢FFæs¢#"Â&÷&FW%&FW3¢Â&÷&FW#¢ãW6öÆBG¶7FfRò6öÆ÷"¢Bæ&÷&FW'ÖÂ7W'6÷#¢'öçFW""À¢&6¶w&÷VæC¢7FfRòG¶6öÆ÷'Ó¢'G&ç7&VçB"Â6öÆ÷#¢7FfRò6öÆ÷"¢BçFWD×WFVBÀ¢föçE6¦S¢2ÂföçEvVvC¢cÂG&ç6Föã¢&ÆÂã#W2"ÂÆWGFW%76æs¢ã"À¢ÖäVvC¢CBÂvV&¶EFvÆvD6öÆ÷#¢'G&ç7&VçB"À¢ÒÒÂ6ÆG&Vâ¢°§Ð ¦gVæ7FöâÖæ7FB²6öã¢6öâÂÆ&VÂÂfÇVRÂ6öÆ÷"Â7V"Ò°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢"ÂFFæs¢#'g"Â&6¶w&÷VæC¢G¶6öÆ÷'ÓÂ&÷&FW%&FW3¢"Â&÷&FW#¢6öÆBG¶6öÆ÷'Ó#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²vGF¢CÂVvC¢CÂ&÷&FW%&FW3¢Â&6¶w&÷VæC¢G¶6öÆ÷'ÓÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Â§W7Fg6öçFVçC¢&6VçFW""ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB6öâÂ²6¦S¢#Â6öÆ÷#¢6öÆ÷"Ò¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"ÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÂÆWGFW%76æs¢ãRÂFWEG&ç6f÷&Ó¢'WW&66R"ÒÒÂÆ&VÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢#ÂföçEvVvC¢Â6öÆ÷#¢BçFWBÒÒÂfÇVRÀ¢7V"bb&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÒÒÂ7V"¢¢¢°§Ð ¦gVæ7Föâ66Væ4F÷G2²6÷VçBÒ°¢&WGW&â&V7Bæ7&VFTVÆVÖVçB'7â"ÂçVÆÂÂ'&æg&öÒ²ÆVæwF¢RÒÂòÂÓâ&V7Bæ7&VFTVÆVÖVçB'7â"Â²¶W¢Â7GÆS¢²6öÆ÷#¢Â6÷VçBòBæ66VçB¢BçFWDFÒÂföçE6¦S¢BÒÒÂ.)xò"°§Ð ¦6öç7B6öäÖÒ²ÆæS¢ÆæRÂG&ã¢G&âÂ6W&6¢6W&6ÂÖ÷VçFã¢Ö÷VçFâÂ×W63¢×W62Â6ÖW&¢6ÖW&Â6ö×73¢6ö×72ÂV'C¢V'BÓ° ¢òòÓÓÓÓÓÓÓÓÓÓÓÒ4T5Dôå2ÓÓÓÓÓÓÓÓÓÓÓÐ¦gVæ7FöâW&õ6V7Föâ²6V6öâÂ6WE6V6öâÂ6WEF"Ò°¢6öç7B6FW2Ò²$×Væ6"Â%6Ç¦'W&r"Â$Æ¶R&ÆVB"Â%7ÆB"Â$GV'&÷fæ²%Ó°¢6öç7BfÆw2Ò²/	øz	øz¢"Â/	øzo	ø{"Â/	ø{	øzâ"Â/	øzß	ø{r"Â/	øzß	ø{r%Ó°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢&6VçFW""ÂFFæs¢#C#G3'"Â÷6Föã¢'&VÆFfR"Â÷fW&fÆ÷s¢&FFVâ"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²÷6Föã¢&'6öÇWFR"Âç6WC¢Â&6¶w&÷VæC¢'&FÂÖw&FVçBVÆÆ6RBSRRÂ&v&#CÃcÃÃãRÂG&ç7&VçBcR"ÂöçFW$WfVçG3¢&æöæR"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"ÂÆWGFW%76æs¢2Â6öÆ÷#¢Bæ66VçBÂföçEvVvC¢sÂFWEG&ç6f÷&Ó¢'WW&66R"ÂÖ&vä&÷GFöÓ¢ÒÒÂ%FRÇæRÔG&F2&÷WFR"À¢&V7Bæ7&VFTVÆVÖVçB&"Â²7GÆS¢²föçE6¦S¢3bÂföçEvVvC¢Â6öÆ÷#¢BçvFRÂÖ&vã¢#g"ÂÆWGFW%76æs¢ÓÒÒÂ%W&¶ç2fÖÇWW&÷RG&"À¢&V7Bæ7&VFTVÆVÖVçB'"Â²7GÆS¢²6öÆ÷#¢BçFWD×WFVBÂföçE6¦S¢RÂÖ&vã¢##G"ÒÒÂ$6VÆV'&FærSV'2öbÖ'&vR"¢À¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"Â§W7Fg6öçFVçC¢&6VçFW""ÂÆväFV×3¢&6VçFW""Âv¢BÂfÆWw&¢'w&"ÂÖ&vä&÷GFöÓ¢#ÒÒÀ¢6FW2æÖ2ÂÓà¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²¶W¢2Â7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢BÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²&6¶w&÷VæC¢Bæ6&BÂ&÷&FW#¢6öÆBGµBæ&÷&FW'ÖÂ&÷&FW%&FW3¢ÂFFæs¢#gG"ÂföçE6¦S¢2ÂföçEvVvC¢cÂ6öÆ÷#¢BçFWBÂF7Æ¢&æÆæRÖfÆW"ÂÆväFV×3¢&6VçFW""Âv¢bÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"ÂçVÆÂÂfÆw5¶ÒÂ0¢À¢Â6FW2æÆVæwFÒbb&V7Bæ7&VFTVÆVÖVçB6Wg&öå&vBÂ²6¦S¢BÂ6öÆ÷#¢BçFWDFÒÒ¢¢¢¢À¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢#ÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&æÆæRÖfÆW"Â&6¶w&÷VæC¢Bæ6&BÂ&÷&FW#¢6öÆBGµBæ&÷&FW'ÖÂ&÷&FW%&FW3¢ÂFFæs¢BÂv¢BÒÒÀ¢²&fÆÂ"Â'7&ær%ÒæÖ2Óà¢&V7Bæ7&VFTVÆVÖVçB&'WGFöâ"Â²¶W¢2Âöä6Æ6³¢Óâ6WE6V6öâ2Â7GÆS¢°¢FFæs¢##"Â&÷&FW%&FW3¢Â&÷&FW#¢&æöæR"Â7W'6÷#¢'öçFW""ÂföçEvVvC¢sÂföçE6¦S¢BÂG&ç6Föã¢&ÆÂã72"ÂÖäVvC¢CBÂvV&¶EFvÆvD6öÆ÷#¢'G&ç7&VçB"À¢&6¶w&÷VæC¢6V6öâÓÓÒ2ò2ÓÓÒ&fÆÂ"òBæw&FVçC¢Bæw&FVçC2¢'G&ç7&VçB"À¢6öÆ÷#¢6V6öâÓÓÒ2òBçvFR¢BçFWD×WFVBÀ¢&÷6F÷s¢6V6öâÓÓÒ2òGWG·2ÓÓÒ&fÆÂ"ò'&v&#CÃcÃÃã2"¢'&v&sBÃ##"Ã#Ãã2'Ö¢&æöæR"À¢ÒÒÀ¢2ÓÓÒ&fÆÂ"ò/	øØ"fÆÂ##b"¢/	øËr7&ær##r ¢¢¢¢¢¢°§Ð ¦gVæ7Föâ÷fW'fWuF"²6V6öâÒ°¢6öç7BFW'2Ò'VFvWEFW'5·6V6öåÓ°¢6öç7BFW$¶W2Ò²'fÇVR"Â&ÖB"Â'&VÖVÒ%Ó°¢6öç7BFW$6öÆ÷'2ÒµBæw&VVâÂBæ66VçBÂBçW'ÆUÓ°¢6öç7B2ÒFæW&'·6V6öåÓ° ¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&w&B"Âw&EFV×ÆFT6öÇVÖç3¢'&WVBWFòÖfBÂÖæÖSÂg""Âv¢"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBÖæ7FBÂ²6öã¢6ÆVæF"ÂÆ&VÃ¢$GW&Föâ"ÂfÇVS¢G·2æw&÷VæDF7ÒævG6Â6öÆ÷#¢Bæ66VçBÂ7V#¢"²"G&fVÂF2"ÒÀ¢&V7Bæ7&VFTVÆVÖVçBÖæ7FBÂ²6öã¢vÆö&RÂÆ&VÃ¢$6÷VçG&W2"ÂfÇVS¢#B"Â6öÆ÷#¢Bæ&ÇVRÂ7V#¢$DR+rB+r4+r""ÒÀ¢&V7Bæ7&VFTVÆVÖVçBÖæ7FBÂ²6öã¢W6W'2ÂÆ&VÃ¢%G&fVÆW'2"ÂfÇVS¢#b"Â6öÆ÷#¢Bæw&VVâÂ7V#¢#6÷WÆW2"ÒÀ¢&V7Bæ7&VFTVÆVÖVçBÖæ7FBÂ²6öã¢ÖâÂÆ&VÃ¢$6FW2"ÂfÇVS¢#b"Â6öÆ÷#¢BçW'ÆRÂ7V#¢$×Væ6(i"GV'&÷fæ²"ÒÀ¢&V7Bæ7&VFTVÆVÖVçBÖæ7FBÂ²6öã¢G&âÂÆ&VÃ¢%G&âÆVw2"ÂfÇVS¢#r"Â6öÆ÷#¢Bæ7âÂ7V#¢%öçB×Fò×öçB"ÒÀ¢&V7Bæ7&VFTVÆVÖVçBÖæ7FBÂ²6öã¢FöÆÆ%6vâÂÆ&VÃ¢$&6RvgB"ÂfÇVS¢"C4²"Â6öÆ÷#¢Bæ66VçBÂ7V#¢'W"6÷WÆR"Ò¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&w&B"Âw&EFV×ÆFT6öÇVÖç3¢'&WVBWFòÖfBÂÖæÖ#cÂg""Âv¢bÒÒÀ¢FW$¶W2æÖ²ÂÓâ°¢6öç7BBÒFW'5¶µÓ°¢6öç7BÒ6Æ5B°¢6öç7B6÷WÆRÒ6Æ46÷WÆRB°¢6öç7Bö÷Ò6÷WÆRÒ3°¢6öç7B4ÖBÒ²ÓÓÒ&ÖB#°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²¶W¢²ÂvÆ÷s¢FW$6öÆ÷'5¶ÒÂ7GÆS¢4ÖBò²&÷&FW#¢'6öÆBGµBæ66VçGÓCÂ&÷6F÷s¢CGµBæ66VçGÓVÒ¢·ÒÒÀ¢4ÖBbb&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²÷6Föã¢&'6öÇWFR"ÂF÷¢"Â&vC¢bÂ&6¶w&÷VæC¢Bæw&FVçCÂ&÷&FW%&FW3¢ÂFFæs¢#7'"ÂföçE6¦S¢ÂföçEvVvC¢Â6öÆ÷#¢BçvFRÂÆWGFW%76æs¢ãRÒÒÂ%$T4ôÔÔTäDTB"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢#ÂÖ&vä&÷GFöÓ¢BÒÒÂBæVÖö¦À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢2ÂföçEvVvC¢sÂ6öÆ÷#¢FW$6öÆ÷'5¶ÒÂFWEG&ç6f÷&Ó¢'WW&66R"ÂÆWGFW%76æs¢ÒÒÂBæÆ&VÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢CÂföçEvVvC¢Â6öÆ÷#¢BçvFRÂÖ&vã¢#'"ÂÆWGFW%76æs¢ÓÒÒÂBG·çFôÆö6ÆU7G&ærÖÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ'W"W'6öâ"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²Ö&vã¢#g"ÂFFæs¢#'"Â&÷&FW%F÷¢6öÆBGµBæ&÷&FW'ÖÂ&÷&FW$&÷GFöÓ¢6öÆBGµBæ&÷&FW'ÖÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢#"ÂföçEvVvC¢Â6öÆ÷#¢FW$6öÆ÷'5¶ÒÒÒÂBG¶6÷WÆRçFôÆö6ÆU7G&ærÒÂ&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢"ÂföçEvVvC¢SÂ6öÆ÷#¢BçFWD×WFVBÒÒÂ"ò6÷WÆR"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢BÂföçEvVvC¢sÂ6öÆ÷#¢Bæw&VVâÂÖ&våF÷¢BÒÒÂ÷WBöbö6¶WC¢BG¶ö÷çFôÆö6ÆU7G&ærÖ¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢bÂföçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÀ¢µ²$fÆvG2"ÂBG·BæfÆvG7ÖÒÂ¶ÆöFværG´ätE7ÖâÂBG·Bæ66öÖÖöFFöâ¢ätE7ÖÒÂ¶fööBG´ätE7ÖBÂBG·BæfööB¢ätE7ÖÒÂ²%G&ç7÷'B"ÂBG·BçG&ç7ÖÒÂ²$7FfFW2"ÂBG·Bæ7FfFW7ÖÕÒæÖ¶ÂÂeÒÓà¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²¶W¢ÂÂ7GÆS¢²F7Æ¢&fÆW"Â§W7Fg6öçFVçC¢'76RÖ&WGvVVâ"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"ÂçVÆÂÂÂÂ&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢BçFWBÂföçEvVvC¢cÒÒÂb¢¢¢¢¢°¢Ò¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢#ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ&ÇVRÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#g"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÒÒÂ%vW&RFRÖöæWvöW2(	BÖBÕFW""À¢&V7Bæ7&VFTVÆVÖVçB&W7öç6fT6öçFæW"Â²vGF¢#R"ÂVvC¢#cÒÀ¢&V7Bæ7&VFTVÆVÖVçBT6'BÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçBRÂ²FF¢°¢²æÖS¢$fÆvG2"ÂfÇVS¢FW'2æÖBæfÆvG2ÒÀ¢²æÖS¢ÆöFvævÂfÇVS¢FW'2æÖBæ66öÖÖöFFöâ¢ätE2ÒÀ¢²æÖS¢fööFÂfÇVS¢FW'2æÖBæfööB¢ätE2ÒÀ¢²æÖS¢%G&ç7÷'B"ÂfÇVS¢FW'2æÖBçG&ç2ÒÀ¢²æÖS¢$7FfFW2"ÂfÇVS¢FW'2æÖBæ7FfFW2ÒÀ¢²æÖS¢Ö66ÂfÇVS¢FW'2æÖBæÖ62¢ätE2ÒÀ¢ÒÂ7¢#SR"Â7¢#SR"ÂææW%&FW3¢cÂ÷WFW%&FW3¢ÂFFætævÆS¢2ÂFF¶W¢'fÇVR"À¢Æ&VÃ¢²æÖRÂfÇVRÒÓâG¶æÖWÒBG·fÇVWÖÂÆ&VÄÆæS¢²7G&ö¶S¢BçFWDFÒÒÒÀ¢4%Eô4ôÄõ%2æÖ2ÂÓâ&V7Bæ7&VFTVÆVÖVçB6VÆÂÂ²¶W¢ÂfÆÃ¢2Ò¢À¢&V7Bæ7&VFTVÆVÖVçBFööÇFÂ²6öçFVçE7GÆS¢²&6¶w&÷VæC¢Bæ6&BÂ&÷&FW#¢6öÆBGµBæ&÷&FW'ÖÂ&÷&FW%&FW3¢Â6öÆ÷#¢BçFWBÒÂf÷&ÖGFW#¢bÓâBG·gÖÒ¢¢¢¢¢¢°§Ð ¦gVæ7FöâFæW&'F"²6V6öâÒ°¢6öç7B¶WæFVBÂ6WDWæFVEÒÒW6U7FFRçVÆÂ°¢6öç7B2ÒFæW&'·6V6öåÓ°¢6öç7BGT6öÆ÷'2Ò²G&fVÃ¢BçFWDFÒÂ6G¢Bæ&ÇVRÂæGW&S¢Bæw&VVâÂG&ã¢Bæ7âÂvÆvC¢Bæ66VçBÓ°¢6öç7B6÷VçG'6öÆ÷'2Ò²G&ç6C¢BçFWDFÒÂvW&Öç¢"6f&&c#B"ÂW7G&¢Bç&÷6RÂ6Æ÷fVæ¢Bæw&VVâÂ7&öF¢Bæ&ÇVRÓ° ¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢Â÷6Föã¢'&VÆFfR"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²÷6Föã¢&'6öÇWFR"ÂÆVgC¢#ÂF÷¢#BÂ&÷GFöÓ¢#BÂvGF¢"Â&6¶w&÷VæC¢ÆæV"Öw&FVçBFò&÷GFöÒÂGµBæ66VçGÒÂGµBæ&ÇVWÒÂGµBæw&VVçÒÂ&÷&FW%&FW3¢"Â¤æFW¢ÒÒÀ¢2æÆVw2æÖÆVrÂÓâ°¢6öç7B6öâÒ6öäÖ¶ÆVræ6öåÒÇÂÖã°¢6öç7B6öÆ÷"ÒGT6öÆ÷'5¶ÆVrçGUÓ°¢6öç7B4WæFVBÒWæFVBÓÓÒ°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²¶W¢ÂFVÆ¢¢SÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²öä6Æ6³¢Óâ6WDWæFVB4WæFVBòçVÆÂ¢Â7GÆS¢²F7Æ¢&fÆW"Âv¢bÂFFæs¢#'"Â7W'6÷#¢'öçFW""Â÷6Föã¢'&VÆFfR"Â¤æFW¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢°¢vGF¢SbÂVvC¢SbÂ&÷&FW%&FW3¢bÂ&6¶w&÷VæC¢G¶6öÆ÷'ÓÂ&÷&FW#¢'6öÆBG¶6öÆ÷'ÓCÀ¢F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Â§W7Fg6öçFVçC¢&6VçFW""ÂfÆW6&æ³¢ÂG&ç6Föã¢&ÆÂã72"À¢&÷6F÷s¢4WæFVBò#G¶6öÆ÷'Ó3¢&æöæR"À¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB6öâÂ²6¦S¢#"Â6öÆ÷#¢6öÆ÷"Ò¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²fÆW¢ÂÖåvGF¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢ÂfÆWw&¢'w&"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢ÂföçEvVvC¢Â6öÆ÷#¢BçFWD×WFVBÂÆWGFW%76æs¢ÒÒÂDG¶ÆVræFÖÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWDFÒÒÒÂÆVræFFRÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢ÂföçEvVvC¢sÂ6öÆ÷#¢6÷VçG'6öÆ÷'5¶ÆVræ6÷VçG'ÒÂ&6¶w&÷VæC¢G¶6÷VçG'6öÆ÷'5¶ÆVræ6÷VçG'×ÓVÂFFæs¢#'"Â&÷&FW%&FW3¢ÒÒÂÆVræ6÷VçG'¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢rÂföçEvVvC¢sÂ6öÆ÷#¢BçvFRÂÖ&våF÷¢"ÒÒÂÆVræÆö6FöâÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢°¢föçE6¦S¢2Â6öÆ÷#¢BçFWD×WFVBÂÆæTVvC¢ãbÂÖ&våF÷¢BÀ¢ÖVvC¢4WæFVBò#¢#"Â÷fW&fÆ÷s¢&FFVâ"ÂG&ç6Föã¢&ÖÖVvBãG2V6R"À¢ÒÒÂÆVræFW62¢À¢ÆVræævG2âbb&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWDFÒÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢BÂfÆW6&æ³¢ÒÒÂ&V7Bæ7&VFTVÆVÖVçBÖööâÂ²6¦S¢"ÒÂG¶ÆVræævG7Öæ¢¢¢°¢ÒÀ ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢cÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ7âÂ7GÆS¢²Ö&våF÷¢#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#G"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢ÒÒÂ&V7Bæ7&VFTVÆVÖVçBG&âÂ²6¦S¢Â6öÆ÷#¢Bæ7âÒÂ"G&â&÷WFR"À¢&V7Bæ7&VFTVÆVÖVçB'"Â²7GÆS¢²Ö&vã¢#g"ÂföçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ%öçB×Fò×öçB6fW2âCRÃg2âWW&Â72f÷"bV÷ÆR"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢ÒÒÀ¢G&äÆVw2æÖÆVrÂÓà¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²¶W¢Â7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢"ÂFFæs¢#G"Â&6¶w&÷VæC¢GµBæ7çÓÂ&÷&FW%&FW3¢Â&÷&FW#¢6öÆBGµBæ7çÓVÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²fÆW¢ÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢bÂföçE6¦S¢2ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçEvVvC¢sÂ6öÆ÷#¢BçFWBÒÒÂÆVræg&öÒÀ¢&V7Bæ7&VFTVÆVÖVçB'&÷u&vBÂ²6¦S¢BÂ6öÆ÷#¢BçFWDFÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçEvVvC¢sÂ6öÆ÷#¢BçFWBÒÒÂÆVrçFòÀ¢ÆVrçW&Âbb&V7Bæ7&VFTVÆVÖVçB&"Â²&Vc¢ÆVrçW&ÂÂF&vWC¢%ö&Ææ²"Â&VÃ¢&æö÷VæW"æ÷&VfW'&W""Â7GÆS¢²föçE6¦S¢Â6öÆ÷#¢Bæ7âÂFWDFV6÷&Föã¢&æöæR"Â&6¶w&÷VæC¢GµBæ7çÓVÂFFæs¢#g'"Â&÷&FW%&FW3¢ÂF7Æ¢&æÆæRÖfÆW"ÂÆväFV×3¢&6VçFW""ÂvV&¶EFvÆvD6öÆ÷#¢'G&ç7&VçB"ÒÒÂÆVrçGR¢À¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÂÖåvGF¢CRÒÒÂÆVræ'2À¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢"ÂföçEvVvC¢sÂ6öÆ÷#¢Bæ7âÂÖåvGF¢3RÂFWDÆvã¢'&vB"ÒÒÂ(*ÂG¶ÆVræ6÷7GÖÀ¢&V7Bæ7&VFTVÆVÖVçB66Væ4F÷G2Â²6÷VçC¢ÆVrç66Væ2Ò¢¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"Â§W7Fg6öçFVçC¢&fÆWÖVæB"Âv¢bÂFFæs¢#G"ÂföçE6¦S¢2ÂföçEvVvC¢sÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢BçFWD×WFVBÒÒÂ%F÷FÂW"W'6öã¢"À¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢Bæ7âÒÒÂ(*ÂG·G&äÆVw2ç&VGV6R2ÂÂÓâ2²Âæ6÷7BÂÒâBG´ÖFç&÷VæBG&äÆVw2ç&VGV6R2ÂÂÓâ2²Âæ6÷7BÂ¢ãÒ¢¢¢¢¢¢°§Ð ¦gVæ7Föâ7F5F"²6V6öâÒ°¢6öç7B6Ò6V6öâÓÓÒ&fÆÂ"ò¢°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢bÒÒÀ¢66öÔFFæÖÂÓà¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²¶W¢ÂFVÆ¢¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢4%Eô4ôÄõ%5¶ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"Â§W7Fg6öçFVçC¢'76RÖ&WGvVVâ"ÂÆväFV×3¢&fÆW×7F'B"ÂfÆWw&¢'w&"Âv¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"ÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢Â6öÆ÷#¢BçvFRÂföçE6¦S¢ÒÒÂæÆö2À¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂG¶æçÒævBG¶æââò'2"¢"'Ö¢À¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢Â&6¶w&÷VæC¢G´4%Eô4ôÄõ%5¶×ÓÂ6öÆ÷#¢4%Eô4ôÄõ%5¶ÒÂFFæs¢#G'"Â&÷&FW%&FW3¢ÂföçEvVvC¢sÒÒÂç&V2¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&w&B"Âw&EFV×ÆFT6öÇVÖç3¢'&WVBWFòÖfBÂÖæÖCÂg""Âv¢"ÂÖ&våF÷¢bÒÒÀ¢°¢²Æ&VÃ¢$&&æ"ÆÂb"ÂfÃ¢BG¶çfÆÆ·6ÒçFôÆö6ÆU7G&ærÒöçFÂ7V#¢BG´ÖFç&÷VæBçfÆÆ·6ÒòÒö6÷WÆRöçFÒÀ¢²Æ&VÃ¢$÷FVÂW"&ööÒ"ÂfÃ¢BG¶æ÷FVÅ·6×ÒöçFÂ7V#¢BG¶æ÷FVÅ·6Ò¢æçÒF÷FÂf÷"G¶æçÖæÒÀ¢²Æ&VÃ¢%7FæF÷WB÷Föâ"ÂfÃ¢çVæVRÂ7V#¢""ÒÀ¢ÒæÖ÷BÂ¢Óà¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²¶W¢¢Â7GÆS¢²&6¶w&÷VæC¢GµBæ&wÓÂ&÷&FW%&FW3¢ÂFFæs¢"Â&÷&FW#¢6öÆBGµBæ&÷&FW'ÖÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÂÖ&vä&÷GFöÓ¢BÒÒÂ÷BæÆ&VÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢RÂföçEvVvC¢sÂ6öÆ÷#¢BçvFRÒÒÂ÷BçfÂÀ¢÷Bç7V"bb&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÂÖ&våF÷¢"ÒÒÂ÷Bç7V"¢¢¢À¢æ&&æ"bb¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²Ö&våF÷¢"ÂFFæs¢#G"Â&6¶w&÷VæC¢G´4%Eô4ôÄõ%5¶×ÓÂ&÷&FW%&FW3¢Â&÷&FW#¢6öÆBG´4%Eô4ôÄõ%5¶×ÓVÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Â§W7Fg6öçFVçC¢'76RÖ&WGvVVâ"ÂfÆWw&¢'w&"Âv¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWBÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçEvVvC¢sÒÒÂ%F÷6³¢"À¢&V7Bæ7&VFTVÆVÖVçB&"Â²&Vc¢æ&&æ"ÂF&vWC¢%ö&Ææ²"Â&VÃ¢&æö÷VæW"æ÷&VfW'&W""Â7GÆS¢²6öÆ÷#¢4%Eô4ôÄõ%5¶ÒÂFWDFV6÷&Föã¢&æöæR"ÒÒÂæ&&æ$æÖR¢¢¢À¢æ67FÆT÷Föâbb¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²Ö&våF÷¢ÂFFæs¢#G"Â&6¶w&÷VæC¢GµBæ66VçGÓÂ&÷&FW%&FW3¢Â&÷&FW#¢6öÆBGµBæ66VçGÓ#VÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Â§W7Fg6öçFVçC¢'76RÖ&WGvVVâ"ÂfÆWw&¢'w&"Âv¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWBÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢bÂÖ&vå&vC¢bÒÒÂ/	øû"À¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçEvVvC¢sÂ6öÆ÷#¢Bæ66VçBÒÒÂ$67FÆR÷Föã¢"À¢&V7Bæ7&VFTVÆVÖVçB&"Â²&Vc¢æ67FÆT÷FöâçW&ÂÂF&vWC¢%ö&Ææ²"Â&VÃ¢&æö÷VæW"æ÷&VfW'&W""Â7GÆS¢²6öÆ÷#¢Bæ66VçBÂFWDFV6÷&Föã¢&æöæR"ÒÒÂæ67FÆT÷FöâææÖRÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢BçFWD×WFVBÒÒÂ(	BG¶æ67FÆT÷Föâæ&VG7Ò+rBG¶æ67FÆT÷Föâç&6WÒöçB+rG¶æ67FÆT÷Föâææ÷FWÖ¢¢¢¢¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢SÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ66VçBÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#g"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÒÒÂ$fÆÂg27&ær(	BævFÇ&FW2"À¢&V7Bæ7&VFTVÆVÖVçB&W7öç6fT6öçFæW"Â²vGF¢#R"ÂVvC¢#SÒÀ¢&V7Bæ7&VFTVÆVÖVçB&$6'BÂ²FF¢66öÔFFæÖÓâ²Æö3¢æÆö2ÂfÆÃ¢æ÷FVÅ³ÒÂ7&æs¢æ÷FVÅ³ÒÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB6'FW6äw&BÂ²7G&ö¶TF6'&¢#22"Â7G&ö¶S¢Bæ&÷&FW"ÒÀ¢&V7Bæ7&VFTVÆVÖVçB2Â²FF¶W¢&Æö2"ÂF6³¢²fÆÃ¢BçFWD×WFVBÂföçE6¦S¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB2Â²F6´f÷&ÖGFW#¢bÓâBG·gÖÂF6³¢²fÆÃ¢BçFWD×WFVBÂföçE6¦S¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBFööÇFÂ²6öçFVçE7GÆS¢²&6¶w&÷VæC¢Bæ6&BÂ&÷&FW#¢6öÆBGµBæ&÷&FW'ÖÂ&÷&FW%&FW3¢Â6öÆ÷#¢BçFWBÒÂf÷&ÖGFW#¢bÓâBG·gÒ÷&ööÖÒÀ¢&V7Bæ7&VFTVÆVÖVçBÆVvVæBÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&"Â²FF¶W¢$fÆÂ"ÂfÆÃ¢Bæ66VçBÂ&FW3¢³bÂbÂÂÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&"Â²FF¶W¢%7&ær"ÂfÆÃ¢Bæw&VVâÂ&FW3¢³bÂbÂÂÒÒ¢¢¢¢¢¢°§Ð ¦gVæ7FöâfööEF"°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ66VçBÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#g"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢ÒÒÂ&V7Bæ7&VFTVÆVÖVçB6öffVRÂ²6¦S¢Â6öÆ÷#¢Bæ66VçBÒÂ"FÇfööB'VFvWB'6÷VçG'"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&w&B"Âw&EFV×ÆFT6öÇVÖç3¢'&WVBWFòÖfBÂÖæÖÂg""Âv¢BÒÒÀ¢fööD'6÷VçG'æÖ2ÂÓâ°¢6öç7BF÷FÂÒ2æ'&V¶f7B²2æÇVæ6²2æFææW"²2ç6æ6·3°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²¶W¢Â7GÆS¢²&6¶w&÷VæC¢G´4%Eô4ôÄõ%5¶×ÓÂ&÷&FW%&FW3¢BÂFFæs¢bÂ&÷&FW#¢6öÆBG´4%Eô4ôÄõ%5¶×Ó#VÂFWDÆvã¢&6VçFW""ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢3"ÒÒÂ2æfÆrÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢BÂföçEvVvC¢sÂ6öÆ÷#¢BçvFRÂÖ&våF÷¢BÒÒÂ2æ6÷VçG'À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢#ÂföçEvVvC¢Â6öÆ÷#¢4%Eô4ôÄõ%5¶ÒÂÖ&vã¢#"ÒÒÂBG·F÷FÇÖÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÒÒÂ'W"W'6öâòF"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²Ö&våF÷¢ÂföçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÂF7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢2ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"ÂçVÆÂÂ.)ûò'&V¶f7BB"Â2æ'&V¶f7BÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"ÂçVÆÂÂ/	úYbÇVæ6B"Â2æÇVæ6À¢&V7Bæ7&VFTVÆVÖVçB&Fb"ÂçVÆÂÂ/	øÛrFææW"B"Â2æFææW"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"ÂçVÆÂÂ.)R6æ6·2B"Â2ç6æ6·2¢¢¢°¢Ò¢¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ&ÇVRÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#g"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢ÒÒÂ&V7Bæ7&VFTVÆVÖVçB6ÖW&Â²6¦S¢Â6öÆ÷#¢Bæ&ÇVRÒÂ"7FfFW2bWW&Væ6W2"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢bÒÒÀ¢7FfFW2æÖÂÓà¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²¶W¢Â7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢"ÂFFæs¢#G"Â&6¶w&÷VæC¢R"ÓÓÒòGµBæ&ÇVWÓf¢'G&ç7&VçB"Â&÷&FW%&FW3¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢#ÂvGF¢3"ÂFWDÆvã¢&6VçFW""ÒÒÂæ6öâÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²fÆW¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢BÂföçEvVvC¢cÒÒÀ¢çW&Âò&V7Bæ7&VFTVÆVÖVçB&"Â²&Vc¢çW&ÂÂF&vWC¢%ö&Ææ²"Â&VÃ¢&æö÷VæW"æ÷&VfW'&W""Â7GÆS¢²6öÆ÷#¢BçFWBÂFWDFV6÷&Föã¢&æöæR"Â&÷&FW$&÷GFöÓ¢F6VBGµBçFWDF×ÖÒÒÂææÖR¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢BçFWBÒÒÂææÖR¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÒÒÂæÆö2Âç6÷W&6Rò+rG¶ç6÷W&6WÖ¢""¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢'&vB"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢RÂföçEvVvC¢sÂ6öÆ÷#¢æ6÷7BÓÓÒòBæw&VVâ¢BçvFRÒÒÂæ6÷7BÓÓÒò$g&VR"¢BG¶æ6÷7GÖÀ¢æ6÷7Bâbb&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÒÒÂ9rbÒBG¶æ6÷7B¢gÖ¢¢¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"Â§W7Fg6öçFVçC¢&fÆWÖVæB"ÂFFæs¢#'G"Â&÷&FW%F÷¢6öÆBGµBæ&÷&FW'ÖÂÖ&våF÷¢BÂföçE6¦S¢BÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢BçFWD×WFVBÂÖ&vå&vC¢"ÒÒÂ$ÆÂ7FfFW2W"W'6öã¢"À¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçEvVvC¢Â6öÆ÷#¢Bæ66VçBÒÒÂBG¶7FfFW2ç&VGV6R2ÂÓâ2²æ6÷7BÂÖ¢¢¢¢¢¢°§Ð ¦gVæ7FöâvV×5F"°¢6öç7BGT6öç2Ò²fÆÆvS¢/	øùûò"ÂæGW&S¢/	øËò"Â7G&VWC¢/	ù«b"ÂÖ&¶WC¢/	ú{¢"ÂfööC¢/	úY"ÂÆæFÖ&³¢/	øù¾ûò"Ó°¢6öç7B&Vvöä6öÆ÷'2Ò²&f&¢"6f&&c#B"Â6Ç¦'W&s¢Bç&÷6RÂ6Æ÷fVæ¢Bæw&VVâÂ%7ÆBòFÆÖF#¢Bæ&ÇVRÂGV'&÷fæ³¢Bæ7âÓ°¢6öç7B&VvöäfÆw2Ò²&f&¢/	øz	øz¢"Â6Ç¦'W&s¢/	øzo	ø{"Â6Æ÷fVæ¢/	ø{	øzâ"Â%7ÆBòFÆÖF#¢/	øzß	ø{r"ÂGV'&÷fæ³¢/	øzß	ø{r"Ó°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢bÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢&6VçFW""ÂÖ&vä&÷GFöÓ¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢2Â6öÆ÷#¢Bæ66VçBÂföçEvVvC¢sÂÆWGFW%76æs¢ÂFWEG&ç6f÷&Ó¢'WW&66R"ÒÒÂ$öfbFR&VFVâF"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢2Â6öÆ÷#¢BçFWD×WFVBÂÖ&våF÷¢BÒÒÂ%FR7÷G2Æö6Ç2Æ÷fRFBÖ÷7BF÷W&7G2vÆ²&vB7B"¢¢À¢FFVävV×2æÖ&VvöâÂ&Óâ°¢6öç7B6öÆ÷"Ò&Vvöä6öÆ÷'5·&Vvöâç&VvöåÒÇÂBæ66VçC°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²¶W¢&ÂFVÆ¢&¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢6öÆ÷"ÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢ÂÖ&vä&÷GFöÓ¢BÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢#BÒÒÂ&VvöäfÆw5·&Vvöâç&VvöåÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢Â6öÆ÷#¢BçvFRÂföçE6¦S¢rÂföçEvVvC¢ÒÒÂ&Vvöâç&Vvöâ¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&w&B"Âw&EFV×ÆFT6öÇVÖç3¢'&WVBWFòÖfBÂÖæÖ##Âg""Âv¢ÒÒÀ¢&VvöâævV×2æÖvVÒÂvÓà¢&V7Bæ7&VFTVÆVÖVçB&"Â²¶W¢vÂ&Vc¢vVÒçW&ÂÂF&vWC¢%ö&Ææ²"Â&VÃ¢&æö÷VæW"æ÷&VfW'&W""Â7GÆS¢²FWDFV6÷&Föã¢&æöæR"ÂvV&¶EFvÆvD6öÆ÷#¢'G&ç7&VçB"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²&6¶w&÷VæC¢G¶6öÆ÷'ÓÂ&÷&FW%&FW3¢"ÂFFæs¢BÂ&÷&FW#¢6öÆBG¶6öÆ÷'ÓÂG&ç6Föã¢&ÆÂã#W2"Â7W'6÷#¢'öçFW""ÒÀ¢öäÖ÷W6TVçFW#¢RÓâ²Ræ7W'&VçEF&vWBç7GÆRæ&6¶w&÷VæBÒG¶6öÆ÷'ÓV²Ræ7W'&VçEF&vWBç7GÆRçG&ç6f÷&ÒÒ'G&ç6ÆFUÓ'#²ÒÀ¢öäÖ÷W6TÆVfS¢RÓâ²Ræ7W'&VçEF&vWBç7GÆRæ&6¶w&÷VæBÒG¶6öÆ÷'Ó²Ræ7W'&VçEF&vWBç7GÆRçG&ç6f÷&ÒÒ&æöæR#²ÒÀ¢öåF÷V67F'C¢RÓâ²Ræ7W'&VçEF&vWBç7GÆRæ&6¶w&÷VæBÒG¶6öÆ÷'ÓV²ÒÀ¢öåF÷V6VæC¢RÓâ²Ræ7W'&VçEF&vWBç7GÆRæ&6¶w&÷VæBÒG¶6öÆ÷'Ó²ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢bÂÖ&vä&÷GFöÓ¢bÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢bÒÒÂGT6öç5¶vVÒçGUÒÇÂ/	ù8Ò"À¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢BÂföçEvVvC¢sÂ6öÆ÷#¢BçvFRÒÒÂvVÒææÖR¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÂÆæTVvC¢ãbÒÒÂvVÒæFW62¢¢¢¢¢¢¢°¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢SÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ66VçBÂ7GÆS¢²FWDÆvã¢&6VçFW""ÂFFæs¢#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢BÂ6öÆ÷#¢Bæ66VçBÂföçEvVvC¢sÂÖ&vä&÷GFöÓ¢BÒÒÂ%&òFf÷"FRw&÷W"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢2Â6öÆ÷#¢BçFWD×WFVBÂÆæTVvC¢ãrÂÖvGF¢cÂÖ&vã¢#WFò"ÒÒÀ¢%FW6RFFVâvV×2&RW&fV7Bf÷"Â&g&VRgFW&æööåÂ"FÖR(	B6÷WÆW26â6²7÷BFBçFW&W7G2FVÒæBWÆ÷&RöâFV"÷vâÂFVâ&Vw&÷Wf÷"FææW"âæòöæRæVVG2Fòw&VRöâWfW'Færâ ¢¢¢¢¢°§Ð ¦gVæ7FöâfÖÇF"°¢6öç7B&Vd6öÆ÷'2ÒµBæ66VçBÂBæ&ÇVRÂBæw&VVâÂBçW'ÆUÓ°¢6öç7B&Vd6öç2Ò´vÆö&RÂ6ö×72ÂV'BÂ6VÆEÓ°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ66VçBÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#G"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÒÒÂ$FW7FæFöâ÷VÆ&G"À¢&V7Bæ7&VFTVÆVÖVçB'"Â²7GÆS¢²Ö&vã¢#g"ÂföçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ$÷rÖçFÖW2V6FW7FæFöâv2ÖVçFöæVB7&÷72ÆÂçWBæöçÖ÷W2vw&VvFR"À¢&V7Bæ7&VFTVÆVÖVçB&W7öç6fT6öçFæW"Â²vGF¢#R"ÂVvC¢#ÒÀ¢&V7Bæ7&VFTVÆVÖVçB&$6'BÂ²FF¢FW7FæFöåf÷FW2ÂÆ÷WC¢'fW'F6Â"ÒÀ¢&V7Bæ7&VFTVÆVÖVçB6'FW6äw&BÂ²7G&ö¶TF6'&¢#22"Â7G&ö¶S¢Bæ&÷&FW"ÒÀ¢&V7Bæ7&VFTVÆVÖVçB2Â²GS¢&çVÖ&W""ÂFöÖã¢³ÂÒÂF6³¢²fÆÃ¢BçFWD×WFVBÂföçE6¦S¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB2Â²FF¶W¢&æÖR"ÂGS¢&6FVv÷'"ÂvGF¢CÂF6³¢²fÆÃ¢BçFWD×WFVBÂföçE6¦S¢"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBFööÇFÂ²6öçFVçE7GÆS¢²&6¶w&÷VæC¢Bæ6&BÂ&÷&FW#¢6öÆBGµBæ&÷&FW'ÖÂ&÷&FW%&FW3¢Â6öÆ÷#¢BçFWBÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&"Â²FF¶W¢'f÷FW2"ÂæÖS¢$ÖVçFöç2"Â&FW3¢³ÂÂÂÒÒÀ¢FW7FæFöåf÷FW2æÖòÂÓâ&V7Bæ7&VFTVÆVÖVçB6VÆÂÂ²¶W¢ÂfÆÃ¢4%Eô4ôÄõ%5¶R4%Eô4ôÄõ%2æÆVæwFÒÒ¢¢¢¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢BçW'ÆRÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#G"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÒÒÂ$WW&Væ6R&÷&FW2"À¢&V7Bæ7&VFTVÆVÖVçB'"Â²7GÆS¢²Ö&vã¢#g"ÂföçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ%vVvFVB×÷'Fæ6R7&÷72ÆÂfÖÇçWB(	BvBÖGFW'2Ö÷7BFòFRw&÷W6öÆÆV7FfVÇ"À¢&V7Bæ7&VFTVÆVÖVçB&W7öç6fT6öçFæW"Â²vGF¢#R"ÂVvC¢3#ÒÀ¢&V7Bæ7&VFTVÆVÖVçB&F$6'BÂ²FF¢WW&Væ6TFFÒÀ¢&V7Bæ7&VFTVÆVÖVçBöÆ$w&BÂ²7G&ö¶S¢Bæ&÷&FW"ÒÀ¢&V7Bæ7&VFTVÆVÖVçBöÆ$ævÆT2Â²FF¶W¢&W"ÂF6³¢²fÆÃ¢BçFWD×WFVBÂföçE6¦S¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBöÆ%&FW42Â²FöÖã¢³ÂÒÂF6³¢²fÆÃ¢BçFWDFÒÂföçE6¦S¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&F"Â²æÖS¢%&÷&G"ÂFF¶W¢'66÷&R"Â7G&ö¶S¢Bæ66VçBÂfÆÃ¢Bæ66VçBÂfÆÄ÷6G¢ã"Â7G&ö¶UvGF¢"Ò¢¢¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢#ÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&w&B"Âw&EFV×ÆFT6öÇVÖç3¢'&WVBWFòÖfBÂÖæÖ#Âg""Âv¢BÒÒÀ¢w&÷W&VfW&Væ6W2æÖwÂÓâ°¢6öç7B6öâÒ&Vd6öç5¶Ó°¢6öç7B6öÆ÷"Ò&Vd6öÆ÷'5¶Ó°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²¶W¢ÂvÆ÷s¢6öÆ÷"Â7GÆS¢²FFæs¢#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢ÂÖ&vä&÷GFöÓ¢BÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²vGF¢3bÂVvC¢3bÂ&÷&FW%&FW3¢Â&6¶w&÷VæC¢G¶6öÆ÷'ÓÂF7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Â§W7Fg6öçFVçC¢&6VçFW""ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB6öâÂ²6¦S¢Â6öÆ÷#¢6öÆ÷"Ò¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢RÂföçEvVvC¢Â6öÆ÷#¢BçvFRÒÒÂwæ6FVv÷'¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWw&¢'w&"Âv¢bÒÒÀ¢wæFV×2æÖFVÒÂ¢Óà¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²¶W¢¢Â7GÆS¢²föçE6¦S¢"ÂFFæs¢#W'"Â&÷&FW%&FW3¢Â&6¶w&÷VæC¢G¶6öÆ÷'Ó&Â&÷&FW#¢6öÆBG¶6öÆ÷'Ó#VÂ6öÆ÷#¢BçFWBÂföçEvVvC¢SÒÒÂFVÒ¢¢¢¢°¢Ò¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢3ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ7âÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#G"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÒÒÂ$'VFvWB&ævRæöçÖ÷W2"À¢&V7Bæ7&VFTVÆVÖVçB'"Â²7GÆS¢²Ö&vã¢#g"ÂföçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ%vBFRw&÷W6öÆÆV7FfVÇæF6FVBFWw&R6öÖf÷'F&ÆR7VæFærW"6÷WÆR"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"Âv¢bÂ§W7Fg6öçFVçC¢&6VçFW""ÂfÆWw&¢'w&"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢&6VçFW""Â&6¶w&÷VæC¢Bæ66VçE6ögBÂ&÷&FW%&FW3¢"ÂFFæs¢bÂÖåvGF¢CÂ&÷&FW#¢6öÆBGµBæ66VçGÓ#VÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÂÖ&vä&÷GFöÓ¢BÒÒÂ$&6RvgFVB"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢#BÂföçEvVvC¢Â6öÆ÷#¢Bæ66VçBÒÒÂ"C2Ã"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÒÒÂ'W"6÷WÆR"¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢&6VçFW""Â&6¶w&÷VæC¢Bæ&ÇVU6ögBÂ&÷&FW%&FW3¢"ÂFFæs¢bÂÖåvGF¢CÂ&÷&FW#¢6öÆBGµBæ&ÇVWÓ#VÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÂÖ&vä&÷GFöÓ¢BÒÒÂ$FFFöæÂ÷WBÖöbÕö6¶WB"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢#BÂföçEvVvC¢Â6öÆ÷#¢Bæ&ÇVRÒÒÂ"C4¾(	2CT²"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÒÒÂ&Ö÷7B6öÖÖöâ&ævR"¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢&6VçFW""Â&6¶w&÷VæC¢Bæw&VVå6ögBÂ&÷&FW%&FW3¢"ÂFFæs¢bÂÖåvGF¢CÂ&÷&FW#¢6öÆBGµBæw&VVçÓ#VÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÂÖ&vä&÷GFöÓ¢BÒÒÂ%F÷FÂF&vWB"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢#BÂföçEvVvC¢Â6öÆ÷#¢Bæw&VVâÒÒÂ"Cd¾(	2C²"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢Â6öÆ÷#¢BçFWD×WFVBÒÒÂ'W"6÷WÆRÆÂÖâ"¢¢¢¢¢¢°§Ð ¦gVæ7Föâ6ö×&UF"°¢6öç7BdÖBÒ6Æ46÷WÆR'VFvWEFW'2æfÆÂæÖB°¢6öç7B4ÖBÒ6Æ46÷WÆR'VFvWEFW'2ç7&æræÖB°¢6öç7B6fRÒdÖBÒ4ÖC° ¢6öç7B66÷&V6&BÒ°¢²f7F÷#¢%&6R"ÂfÆÃ¢$vW"ãRR"Â7&æs¢$Æ÷vW""ÂvææW#¢'7&ær"Â6öã¢FöÆÆ%6vâÒÀ¢²f7F÷#¢$7&öFvVFW""ÂfÆÃ¢%v&Òs<+b"Â7&æs¢$ÖÆBvc2"ÂvææW#¢&fÆÂ"Â6öã¢7VâÒÀ¢²f7F÷#¢$Ç2vVFW""ÂfÆÃ¢$7&7b6öÆ÷&gVÂ"Â7&æs¢$w&VVâÂÖ÷&R&â"ÂvææW#¢&fÆÂ"Â6öã¢Ö÷VçFâÒÀ¢²f7F÷#¢$7&÷vBÆWfVÂ"ÂfÆÃ¢$Æ÷r6÷VÆFW""Â7&æs¢$Æ÷r6÷VÆFW""ÂvææW#¢'FR"Â6öã¢W6W'2ÒÀ¢²f7F÷#¢%66VGVÆRfB"ÂfÆÃ¢$Ö÷7B&VfW""Â7&æs¢$fWvW"&VfW""ÂvææW#¢&fÆÂ"Â6öã¢6ÆVæF"ÒÀ¢²f7F÷#¢$ææfW'6'"ÂfÆÃ¢$6VÆV'&FRöâG&"Â7&æs¢$Ç&VG76VB"ÂvææW#¢&fÆÂ"Â6öã¢V'BÒÀ¢²f7F÷#¢$6ÆF6&R"ÂfÆÃ¢$¶G26ÆvFÇ÷VævW""Â7&æs¢$¶G2öÆFW"ÒV6W""ÂvææW#¢'7&ær"Â6öã¢6VÆBÒÀ¢Ó° ¢6öç7BfÆÅrÒ66÷&V6&BæfÇFW"2Óâ2çvææW"ÓÓÒ&fÆÂ"æÆVæwF°¢6öç7B7&æurÒ66÷&V6&BæfÇFW"2Óâ2çvææW"ÓÓÒ'7&ær"æÆVæwF°¢6öç7BFW2Ò66÷&V6&BæfÇFW"2Óâ2çvææW"ÓÓÒ'FR"æÆVæwF° ¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂfÆWF&V7Föã¢&6öÇVÖâ"Âv¢#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&w&B"Âw&EFV×ÆFT6öÇVÖç3¢#g"WFòg""Âv¢bÂÆväFV×3¢&6VçFW""ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ66VçBÂ7GÆS¢²FWDÆvã¢&6VçFW""ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ/	øØ"fÆÂ##b"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢3bÂföçEvVvC¢Â6öÆ÷#¢Bæ66VçBÒÒÂBG¶dÖBçFôÆö6ÆU7G&ærÖÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ'W"6÷WÆRÖB×FW""À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢BÂföçEvVvC¢sÂ6öÆ÷#¢Bæw&VVâÂÖ&våF÷¢BÒÒÂôõ¢BG²dÖBÒ3çFôÆö6ÆU7G&ærÖ¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢&6VçFW""ÂFFæs¢#"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ%7&ær6fW2"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢#BÂföçEvVvC¢Â6öÆ÷#¢Bæw&VVâÒÒÂBG·6fRçFôÆö6ÆU7G&ærÖÀ¢&V7Bæ7&VFTVÆVÖVçBG&VæFætF÷vâÂ²6¦S¢#Â6öÆ÷#¢Bæw&VVâÂ7GÆS¢²Ö&vã¢#GWFò"ÒÒ¢À¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæw&VVâÂ7GÆS¢²FWDÆvã¢&6VçFW""ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ/	øËr7&ær##r"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢3bÂföçEvVvC¢Â6öÆ÷#¢Bæw&VVâÒÒÂBG·4ÖBçFôÆö6ÆU7G&ærÖÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÒÒÂ'W"6÷WÆRÖB×FW""À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢BÂföçEvVvC¢sÂ6öÆ÷#¢Bæw&VVâÂÖ&våF÷¢BÒÒÂôõ¢BG²4ÖBÒ3çFôÆö6ÆU7G&ærÖ¢¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢BçW'ÆRÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"Â§W7Fg6öçFVçC¢'76RÖ&WGvVVâ"ÂÆväFV×3¢&6VçFW""ÂÖ&vä&÷GFöÓ¢bÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÒÒÂ%6V6öâ66÷&V6&B"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"Âv¢"ÂföçE6¦S¢2ÂföçEvVvC¢sÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢Bæ66VçBÒÒÂ	øØ"G¶fÆÅwÖÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢BçFWDFÒÒÒÂFRG·FW7ÖÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢Bæw&VVâÒÒÂ	øËrG·7&æuwÖ¢¢À¢66÷&V6&BæÖ&÷rÂÓâ°¢6öç7B6öâÒ&÷ræ6öã°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²¶W¢Â7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢"ÂFFæs¢#"Â&÷&FW$&÷GFöÓ¢Â66÷&V6&BæÆVæwFÒò6öÆBGµBæ&÷&FW'Ö¢&æöæR"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB6öâÂ²6¦S¢bÂ6öÆ÷#¢BçFWDFÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²vGF¢#ÂföçE6¦S¢2ÂföçEvVvC¢cÂ6öÆ÷#¢BçFWBÒÒÂ&÷ræf7F÷"À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²fÆW¢ÂföçE6¦S¢"Â6öÆ÷#¢&÷rçvææW"ÓÓÒ&fÆÂ"òBæ66VçB¢BçFWD×WFVBÂFWDÆvã¢&6VçFW""ÂföçEvVvC¢&÷rçvææW"ÓÓÒ&fÆÂ"òs¢CÒÒÂ&÷ræfÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²vGF¢3"ÂFWDÆvã¢&6VçFW""ÒÒÀ¢&÷rçvææW"ÓÓÒ&fÆÂ"bb&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢Bæ66VçBÒÒÂ/	øØ""À¢&÷rçvææW"ÓÓÒ'7&ær"bb&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢Bæw&VVâÒÒÂ/	øËr"À¢&÷rçvææW"ÓÓÒ'FR"bb&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²6öÆ÷#¢BçFWDFÒÒÒÂ.(	B"¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²fÆW¢ÂföçE6¦S¢"Â6öÆ÷#¢&÷rçvææW"ÓÓÒ'7&ær"òBæw&VVâ¢BçFWD×WFVBÂFWDÆvã¢&6VçFW""ÂföçEvVvC¢&÷rçvææW"ÓÓÒ'7&ær"òs¢CÒÒÂ&÷rç7&ær¢¢°¢ÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢&6VçFW""ÂÖ&våF÷¢bÂFFæs¢BÂ&6¶w&÷VæC¢Bæ66VçE6ögBÂ&÷&FW%&FW3¢"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'"Â²7GÆS¢²Ö&vã¢ÂföçE6¦S¢BÂ6öÆ÷#¢Bæ66VçBÂföçEvVvC¢sÒÒÂfÆÂ##bvç2G¶fÆÅwÞ(	2G·7&æuwÞ(	2G·FW7Òâ6÷7G2ãRRÖ÷&R'WB6VÆV'&FW2FRææfW'6'öâFRG&æBfG2Ö÷&R66VGVÆW2æ¢¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢#ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæ7âÒÀ¢&V7Bæ7&VFTVÆVÖVçB&2"Â²7GÆS¢²Ö&vã¢#g"Â6öÆ÷#¢BçvFRÂföçE6¦S¢bÒÒÂ%vVFW"6ö×&6öâ"À¢&V7Bæ7&VFTVÆVÖVçB&W7öç6fT6öçFæW"Â²vGF¢#R"ÂVvC¢#SÒÀ¢&V7Bæ7&VFTVÆVÖVçB&$6'BÂ²FF¢vVFW"æÖrÓâ²6G¢ræ6GÂ$fÆÂv#¢rædÂ%7&ærv#¢rç4Â$fÆÂÆ÷r#¢rædÂÂ%7&ærÆ÷r#¢rç4ÂÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB6'FW6äw&BÂ²7G&ö¶TF6'&¢#22"Â7G&ö¶S¢Bæ&÷&FW"ÒÀ¢&V7Bæ7&VFTVÆVÖVçB2Â²FF¶W¢&6G"ÂF6³¢²fÆÃ¢BçFWD×WFVBÂföçE6¦S¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB2Â²FöÖã¢³3ÂÒÂF6³¢²fÆÃ¢BçFWD×WFVBÂföçE6¦S¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBFööÇFÂ²6öçFVçE7GÆS¢²&6¶w&÷VæC¢Bæ6&BÂ&÷&FW#¢6öÆBGµBæ&÷&FW'ÖÂ&÷&FW%&FW3¢Â6öÆ÷#¢BçFWBÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBÆVvVæBÂçVÆÂÀ¢&V7Bæ7&VFTVÆVÖVçB&"Â²FF¶W¢$fÆÂv"ÂfÆÃ¢Bæ66VçBÂ&FW3¢³BÂBÂÂÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&"Â²FF¶W¢%7&ærv"ÂfÆÃ¢Bæw&VVâÂ&FW3¢³BÂBÂÂÒÒ¢¢¢¢À ¢&V7Bæ7&VFTVÆVÖVçBæÔâÂ²FVÆ¢3ÒÀ¢&V7Bæ7&VFTVÆVÖVçBvÆ÷t6&BÂ²vÆ÷s¢Bæw&VVâÂ7GÆS¢²FWDÆvã¢&6VçFW""ÂFFæs¢#ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Â§W7Fg6öçFVçC¢&6VçFW""Âv¢ÂÖ&vä&÷GFöÓ¢bÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB6V6²Â²6¦S¢Â6öÆ÷#¢Bæw&VVâÒÀ¢&V7Bæ7&VFTVÆVÖVçB'7â"Â²7GÆS¢²föçE6¦S¢BÂföçEvVvC¢sÂ6öÆ÷#¢Bæw&VVâÒÒÂ%&öÖRFV×ÆR6FRG&(	B6¶VB"¢À¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²föçE6¦S¢"Â6öÆ÷#¢BçFWD×WFVBÂÆæTVvC¢ãbÒÒÂ%6fW2âC#S÷æBgVÆÂG&fVÂFâ¶VW2b×W'6öâÆöv7F726×ÆRæBvfW2WG&FÖRâGV'&÷fæ²÷"&ÆVBç7FVBâ"¢¢¢¢°§Ð ¢òòÓÓÓÓÓÓÓÓÓÓÓÒÔâÓÓÓÓÓÓÓÓÓÓÓÐ¦gVæ7Föâ°¢6öç7B·6V6öâÂ6WE6V6öåÒÒW6U7FFR&fÆÂ"°¢6öç7B·F"Â6WEF%ÒÒW6U7FFR&÷fW'fWr"° ¢6öç7BF'2Ò°¢²C¢&÷fW'fWr"ÂÆ&VÃ¢$'VFvWB"Â6öã¢FöÆÆ%6vâÒÀ¢²C¢&FæW&'"ÂÆ&VÃ¢$FæW&'"Â6öã¢ÖâÒÀ¢²C¢'7F2"ÂÆ&VÃ¢%7F2"Â6öã¢&VBÒÀ¢²C¢&fööB"ÂÆ&VÃ¢$fööBbgVâ"Â6öã¢WFVç6Ç2ÒÀ¢²C¢&vV×2"ÂÆ&VÃ¢$FFVâvV×2"Â6öã¢7F"ÒÀ¢²C¢&fÖÇ"ÂÆ&VÃ¢$fÖÇ"Â6öã¢W6W'2ÒÀ¢²C¢&6ö×&R"ÂÆ&VÃ¢$6ö×&R"Â6öã¢6ö×72ÒÀ¢Ó° ¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢°¢ÖäVvC¢#Gf"À¢&6¶w&÷VæC¢Bæ&rÂ6öÆ÷#¢BçFWBÀ¢föçDfÖÇ¢"tçFW"rÂÖÆR×77FVÒÂ77FVÒ×VÂ6ç2×6W&b"À¢vV&¶DföçE6Öö÷Fæs¢&çFÆ6VB"ÂÖ÷¤÷7föçE6Öö÷Fæs¢&w&66ÆR"À¢vV&¶EFWE6¦TF§W7C¢#R"À¢vV&¶EFvÆvD6öÆ÷#¢'G&ç7&VçB"À¢÷fW&fÆ÷u¢&FFVâ"À¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²ÖvGF¢ÂÖ&vã¢#WFò"ÂFFæs¢#g6Æ2C²Vçb6fRÖ&VÖç6WBÖ&÷GFöÒÂ"ÂFFæuF÷¢&Vçb6fRÖ&VÖç6WB×F÷Â"ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçBW&õ6V7FöâÂ²6V6öã¢6V6öâÂ6WE6V6öã¢6WE6V6öâÂ6WEF#¢6WEF"ÒÀ ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢°¢F7Æ¢&fÆW"Âv¢BÂ§W7Fg6öçFVçC¢&6VçFW""ÂfÆWw&¢'w&"À¢FFæs¢#g"À¢÷6Föã¢'7F6·"ÂF÷¢Â¤æFW¢#À¢&6¶w&÷VæC¢GµBæ&wÖVVÀ¢vV&¶D&6¶G&÷fÇFW#¢&&ÇW""Â&6¶G&÷fÇFW#¢&&ÇW""À¢÷fW&fÆ÷u¢&WFò"ÂvV&¶D÷fW&fÆ÷u67&öÆÆæs¢'F÷V6"À¢×4÷fW&fÆ÷u7GÆS¢&æöæR"Â67&öÆÆ&%vGF¢&æöæR"À¢ÒÒÀ¢F'2æÖBÓâ°¢6öç7B6öâÒBæ6öã°¢&WGW&â¢&V7Bæ7&VFTVÆVÖVçB&'WGFöâ"Â²¶W¢BæBÂöä6Æ6³¢Óâ6WEF"BæBÂ7GÆS¢°¢F7Æ¢&fÆW"ÂÆväFV×3¢&6VçFW""Âv¢RÀ¢FFæs¢#G"Â&÷&FW%&FW3¢Â&÷&FW#¢&æöæR"Â7W'6÷#¢'öçFW""À¢G&ç6Föã¢&ÆÂã#W2"À¢&6¶w&÷VæC¢F"ÓÓÒBæBòGµBæ66VçGÓ¢'G&ç7&VçB"À¢6öÆ÷#¢F"ÓÓÒBæBòBæ66VçB¢BçFWD×WFVBÀ¢föçEvVvC¢F"ÓÓÒBæBòs¢SÂföçE6¦S¢"À¢vFU76S¢&æ÷w&"ÂfÆW6&æ³¢À¢ÖäVvC¢CBÀ¢vV&¶EFvÆvD6öÆ÷#¢'G&ç7&VçB"À¢ÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB6öâÂ²6¦S¢BÒÀ¢BæÆ&VÀ¢¢°¢Ò¢À ¢F"ÓÓÒ&÷fW'fWr"bb&V7Bæ7&VFTVÆVÖVçB÷fW'fWuF"Â²6V6öã¢6V6öâÒÀ¢F"ÓÓÒ&FæW&'"bb&V7Bæ7&VFTVÆVÖVçBFæW&'F"Â²6V6öã¢6V6öâÒÀ¢F"ÓÓÒ'7F2"bb&V7Bæ7&VFTVÆVÖVçB7F5F"Â²6V6öã¢6V6öâÒÀ¢F"ÓÓÒ&fööB"bb&V7Bæ7&VFTVÆVÖVçBfööEF"ÂçVÆÂÀ¢F"ÓÓÒ&vV×2"bb&V7Bæ7&VFTVÆVÖVçBvV×5F"ÂçVÆÂÀ¢F"ÓÓÒ&fÖÇ"bb&V7Bæ7&VFTVÆVÖVçBfÖÇF"ÂçVÆÂÀ¢F"ÓÓÒ&6ö×&R"bb&V7Bæ7&VFTVÆVÖVçB6ö×&UF"ÂçVÆÂÀ ¢&V7Bæ7&VFTVÆVÖVçB&Fb"Â²7GÆS¢²FWDÆvã¢&6VçFW""ÂFFæs¢#3'"ÂföçE6¦S¢Â6öÆ÷#¢BçFWDFÒÒÒÀ¢&V7Bæ7&VFTVÆVÖVçB'"ÂçVÆÂÂ$6ö×ÆVBg&öÒ"fÖÇ6ÆÇ2²rfö6RÖVÖ÷2g&öÒ"6öçG&'WF÷'2+rÆÂ&VfW&Væ6W2æöçÖ¦VB"À¢&V7Bæ7&VFTVÆVÖVçB'"Â²7GÆS¢²Ö&våF÷¢BÒÒÂ%&6ærfW&fVBf¶vÂ&&æ"ÂæBöff6Â&öö¶ær6FW2+rÖ&6##b"À¢&V7Bæ7&VFTVÆVÖVçB'"Â²7GÆS¢²Ö&våF÷¢BÒÒÂ%7FÆÂæVVFVC¢&B&Æ6¶÷WBFFW2g&öÒÆÂ6÷WÆW2"¢¢¢¢°§Ð ¢òò&VæFW ¦×÷'B&V7DDôÒg&öÒ&GG3¢òöW6Òç6÷&V7BÖFöÔã2ãö6ÆVçB#°¥&V7DDôÒæ7&VFU&ö÷BFö7VÖVçBævWDVÆVÖVçD'B'&ö÷B"ç&VæFW"&V7Bæ7&VFTVÆVÖVçB°¢Â÷67&Cà¢Âö&öGà£ÂöFÖÃà 
+    { name: "Mittenwald", desc: "Tiny violin-making village in the Alps with painted facades on every house. Feels like stepping into a storybook.", type: "village", url: "https://www.google.com/maps/place/Mittenwald,+Germany" },
+    { name: "Geisterklamm (Spirit Gorge)", desc: "Dramatic gorge hike with suspended walkways between Germany and Austria. Easy walk, stunning payoff.", type: "nature", url: "https://www.google.com/maps/place/Geisterklamm" },
+    { name: "Füssen Old Town", desc: "Most people only see Neuschwanstein — but the medieval town below has cobblestone lanes, painted buildings, and zero crowds.", type: "village", url: "https://www.google.com/maps/place/F%C3%BCssen,+Germany" },
+    { name: "Partnachklamm", desc: "700m gorge near Garmisch with roaring waterfalls and rock tunnels. A 30-min walk that feels otherworldly.", type: "nature", url: "https://www.google.com/maps/place/Partnachklamm" },
+  ]},
+  { region: "Salzburg", gems: [
+    { name: "Steingasse", desc: "The narrow medieval lane across the river from the tourist Old Town. Tiny bars, zero tour groups, 600 years of history.", type: "street", url: "https://www.google.com/maps/place/Steingasse,+Salzburg" },
+    { name: "Schranne Market (Thurs)", desc: "Salzburg's weekly farmer's market at Mirabell. Local cheeses, meats, pastries, flowers — exactly the authentic food experience the family wants.", type: "market", url: "https://www.google.com/maps/place/Schranne+Market+Salzburg" },
+    { name: "Stiftsbäckerei St. Peter", desc: "Oldest bakery in Salzburg (since 1160). Wood-fired bread in a monastery courtyard. The real deal for bakery lovers.", type: "food", url: "https://www.google.com/maps/place/Stiftsb%C3%A4ckerei+St.+Peter" },
+    { name: "Mondsee (Sound of Music church)", desc: "The actual wedding church from the film. A 20-min drive from Salzburg — lakeside town, no crowds, gorgeous.", type: "landmark", url: "https://www.google.com/maps/place/Mondsee,+Austria" },
+  ]},
+  { region: "Slovenia", gems: [
+    { name: "Vintgar Gorge", desc: "1.6km boardwalk through a turquoise river gorge. Locals consider it more beautiful than the tourist version in Bled.", type: "nature", url: "https://www.google.com/maps/place/Vintgar+Gorge" },
+    { name: "Lake Bohinj", desc: "Bled's quieter, wilder cousin — crystal water, Julian Alps backdrop, a fraction of the visitors. Perfect for a morning walk.", type: "nature", url: "https://www.google.com/maps/place/Lake+Bohinj" },
+    { name: "Pokljuka Gorge", desc: "Hidden forest gorge 20 min from Bled. Moss-covered cliffs, wooden bridges, virtually empty even in peak season.", type: "nature", url: "https://www.google.com/maps/place/Pokljuka+Gorge" },
+    { name: "Bled Cream Cake at Park Hotel", desc: "The kremšnita (cream cake) was invented here in 1953. Eat it on the lakefront terrace — $4 for a slice of heaven.", type: "food", url: "https://www.google.com/maps/place/Park+Hotel+Bled" },
+  ]},
+  { region: "Split / Dalmatia", gems: [
+    { name: "Trogir Old Town", desc: "Entire island is a UNESCO World Heritage site. 15 min from Split but feels a world away — Romanesque cathedral, no cruise ships.", type: "village", url: "https://www.google.com/maps/place/Trogir,+Croatia" },
+    { name: "Omiš", desc: "Pirate town at the mouth of a dramatic canyon. Home to the zipline, river rafting, and fortress ruins with views for days.", type: "village", url: "https://www.google.com/maps/place/Omi%C5%A1,+Croatia" },
+    { name: "Marjan Hill", desc: "Split's 'lung' — a forested peninsula with trails, hidden beaches, and a 360° panorama of the city and islands.", type: "nature", url: "https://www.google.com/maps/place/Marjan+Hill" },
+    { name: "Green Market (Pazar)", desc: "Daily open-air market right behind Diocletian's Palace. Local fruits, lavender honey, cheese, olive oil. The best souvenirs.", type: "market", url: "https://www.google.com/maps/place/Pazar+Split" },
+  ]},
+  { region: "Dubrovnik", gems: [
+    { name: "Elafiti Islands day trip", desc: "Three car-free islands 20 min by ferry. Pine forests, hidden coves, fresh grilled fish. Like Croatia 30 years ago.", type: "nature", url: "https://www.google.com/maps/place/Elafiti+Islands" },
+    { name: "Lokrum Island", desc: "10-min ferry from Old Town. Botanical garden, monastery ruins, peacocks roaming everywhere. A peaceful half-day escape.", type: "nature", url: "https://www.google.com/maps/place/Lokrum+Island" },
+    { name: "Buža Bar", desc: "Cliff bar literally carved into the city walls. No sign, just a hole in the wall. Drinks with a sunset over the Adriatic.", type: "food", url: "https://www.google.com/maps/place/Bu%C5%BEa+Bar+Dubrovnik" },
+    { name: "War Photo Limited", desc: "Powerful photojournalism gallery in the Old Town. Gives context to Croatia's recent history. Free entry some days.", type: "landmark", url: "https://www.google.com/maps/place/War+Photo+Limited" },
+  ]},
+];
+
+// ============ UTILITY COMPONENTS ============
+function AnimIn({ children, delay = 0 }) {
+  const [show, setShow] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setShow(true), delay); return () => clearTimeout(t); }, [delay]);
+  return React.createElement("div", { style: { opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(16px)", transition: "all 0.5s cubic-bezier(0.16,1,0.3,1)" } }, children);
+}
+
+function GlowCard({ children, glow, style, onClick }) {
+  const [hovered, setHovered] = useState(false);
+  return (
+    React.createElement("div", { onMouseEnter: () => setHovered(true), onMouseLeave: () => setHovered(false), onClick: onClick,
+      style: { ...glassStyle, padding: 24, position: "relative", overflow: "hidden", transition: "all 0.3s", cursor: onClick ? "pointer" : "default",
+        boxShadow: hovered ? `0 0 30px ${glow || T.accent}22, 0 8px 32px rgba(0,0,0,0.3)` : "0 4px 20px rgba(0,0,0,0.2)",
+        transform: hovered && onClick ? "translateY(-2px)" : "none", ...style } },
+      glow && React.createElement("div", { style: { position: "absolute", top: 0, left: 0, right: 0, height: 2, background: glow } }),
+      children
+    )
+  );
+}
+
+function Pill({ children, color, active, onClick }) {
+  return (
+    React.createElement("button", { onClick: onClick, style: {
+      padding: "8px 18px", borderRadius: 99, border: `1.5px solid ${active ? color : T.border}`, cursor: "pointer",
+      background: active ? `${color}18` : "transparent", color: active ? color : T.textMuted,
+      fontSize: 13, fontWeight: 600, transition: "all 0.25s", letterSpacing: 0.2,
+      minHeight: 44, WebkitTapHighlightColor: "transparent",
+    } }, children)
+  );
+}
+
+function MiniStat({ icon: Icon, label, value, color, sub }) {
+  return (
+    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: `${color}10`, borderRadius: 12, border: `1px solid ${color}20` } },
+      React.createElement("div", { style: { width: 40, height: 40, borderRadius: 10, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center" } },
+        React.createElement(Icon, { size: 20, color: color })
+      ),
+      React.createElement("div", null,
+        React.createElement("div", { style: { fontSize: 11, color: T.textMuted, letterSpacing: 0.5, textTransform: "uppercase" } }, label),
+        React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: T.text } }, value),
+        sub && React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, sub)
+      )
+    )
+  );
+}
+
+function ScenicDots({ count }) {
+  return React.createElement("span", null, Array.from({ length: 5 }, (_, i) => React.createElement("span", { key: i, style: { color: i < count ? T.accent : T.textDim, fontSize: 14 } }, "●")));
+}
+
+const iconMap = { plane: Plane, train: Train, church: Church, mountain: Mountain, music: Music, camera: Camera, compass: Compass, heart: Heart };
+
+// ============ SECTIONS ============
+function HeroSection({ season, setSeason, setTab }) {
+  const cities = ["Munich", "Salzburg", "Lake Bled", "Split", "Dubrovnik"];
+  const flags = ["🇩🇪", "🇦🇹", "🇸🇮", "🇭🇷", "🇭🇷"];
+  return (
+    React.createElement("div", { style: { textAlign: "center", padding: "48px 24px 32px", position: "relative", overflow: "hidden" } },
+      React.createElement("div", { style: { position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%, rgba(240,160,80,0.08) 0%, transparent 60%)", pointerEvents: "none" } }),
+      React.createElement(AnimIn, null,
+        React.createElement("div", { style: { fontSize: 12, letterSpacing: 3, color: T.accent, fontWeight: 700, textTransform: "uppercase", marginBottom: 8 } }, "The Alpine-Adriatic Route"),
+        React.createElement("h1", { style: { fontSize: 36, fontWeight: 900, color: T.white, margin: "0 0 6px", letterSpacing: -1 } }, "Perkins Family Europe Trip"),
+        React.createElement("p", { style: { color: T.textMuted, fontSize: 15, margin: "0 0 24px" } }, "Celebrating 50 Years of Marriage")
+      ),
+      React.createElement(AnimIn, { delay: 100 },
+        React.createElement("div", { style: { display: "flex", justifyContent: "center", alignItems: "center", gap: 4, flexWrap: "wrap", marginBottom: 28 } },
+          cities.map((c, i) =>
+            React.createElement("div", { key: c, style: { display: "flex", alignItems: "center", gap: 4 } },
+              React.createElement("span", { style: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 99, padding: "6px 14px", fontSize: 13, fontWeight: 600, color: T.text, display: "inline-flex", alignItems: "center", gap: 6 } },
+                React.createElement("span", null, flags[i]), c
+              ),
+              i < cities.length - 1 && React.createElement(ChevronRight, { size: 14, color: T.textDim })
+            )
+          )
+        )
+      ),
+      React.createElement(AnimIn, { delay: 200 },
+        React.createElement("div", { style: { display: "inline-flex", background: T.card, border: `1px solid ${T.border}`, borderRadius: 99, padding: 4, gap: 4 } },
+          ["fall", "spring"].map(s =>
+            React.createElement("button", { key: s, onClick: () => setSeason(s), style: {
+              padding: "10px 28px", borderRadius: 99, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 14, transition: "all 0.3s", minHeight: 44, WebkitTapHighlightColor: "transparent",
+              background: season === s ? (s === "fall" ? T.gradient1 : T.gradient3) : "transparent",
+              color: season === s ? T.white : T.textMuted,
+              boxShadow: season === s ? `0 4px 15px ${s === "fall" ? "rgba(240,160,80,0.3)" : "rgba(74,222,128,0.3)"}` : "none",
+            } },
+              s === "fall" ? "🍂 Fall 2026" : "🌷 Spring 2027"
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function OverviewTab({ season }) {
+  const tiers = budgetTiers[season];
+  const tierKeys = ["value", "mid", "premium"];
+  const tierColors = [T.green, T.accent, T.purple];
+  const s = itinerary[season];
+
+  return (
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } },
+      React.createElement(AnimIn, null,
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 } },
+          React.createElement(MiniStat, { icon: Calendar, label: "Duration", value: `${s.groundDays} nights`, color: T.accent, sub: "+ 2 travel days" }),
+          React.createElement(MiniStat, { icon: Globe, label: "Countries", value: "4", color: T.blue, sub: "DE · AT · SI · HR" }),
+          React.createElement(MiniStat, { icon: Users, label: "Travelers", value: "16", color: T.green, sub: "8 couples" }),
+          React.createElement(MiniStat, { icon: MapPin, label: "Cities", value: "6", color: T.purple, sub: "Munich → Dubrovnik" }),
+          React.createElement(MiniStat, { icon: Train, label: "Train Legs", value: "7", color: T.cyan, sub: "Point-to-point" }),
+          React.createElement(MiniStat, { icon: DollarSign, label: "Base Gift", value: "$3K", color: T.accent, sub: "per couple" })
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 100 },
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 } },
+          tierKeys.map((k, i) => {
+            const t = tiers[k];
+            const pp = calcPP(t);
+            const couple = calcCouple(t);
+            const oop = couple - 3000;
+            const isMid = k === "mid";
+            return (
+              React.createElement(GlowCard, { key: k, glow: tierColors[i], style: isMid ? { border: `2px solid ${T.accent}40`, boxShadow: `0 0 40px ${T.accent}15` } : {} },
+                isMid && React.createElement("div", { style: { position: "absolute", top: 12, right: 16, background: T.gradient1, borderRadius: 99, padding: "3px 12px", fontSize: 10, fontWeight: 800, color: T.white, letterSpacing: 0.5 } }, "RECOMMENDED"),
+                React.createElement("div", { style: { fontSize: 28, marginBottom: 4 } }, t.emoji),
+                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: tierColors[i], textTransform: "uppercase", letterSpacing: 1 } }, t.label),
+                React.createElement("div", { style: { fontSize: 40, fontWeight: 900, color: T.white, margin: "8px 0 2px", letterSpacing: -1 } }, `$${pp.toLocaleString()}`),
+                React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "per person"),
+                React.createElement("div", { style: { margin: "16px 0", padding: "12px 0", borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}` } },
+                  React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: tierColors[i] } }, `$${couple.toLocaleString()} `, React.createElement("span", { style: { fontSize: 12, fontWeight: 500, color: T.textMuted } }, "/ couple")),
+                  React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: T.green, marginTop: 4 } }, `Out of pocket: $${oop.toLocaleString()}`)
+                ),
+                React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6, fontSize: 12, color: T.textMuted } },
+                  [["Flights", `$${t.flights}`], [`Lodging (${NIGHTS}n)`, `$${t.accommodation * NIGHTS}`], [`Food (${NIGHTS}d)`, `$${t.food * NIGHTS}`], ["Transport", `$${t.trains}`], ["Activities", `$${t.activities}`]].map(([l, v]) =>
+                    React.createElement("div", { key: l, style: { display: "flex", justifyContent: "space-between" } },
+                      React.createElement("span", null, l), React.createElement("span", { style: { color: T.text, fontWeight: 600 } }, v)
+                    )
+                  )
+                )
+              )
+            );
+          })
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 200 },
+        React.createElement(GlowCard, { glow: T.blue },
+          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16 } }, "Where the Money Goes — Mid-Tier"),
+          React.createElement(ResponsiveContainer, { width: "99%", height: 260 },
+            React.createElement(PieChart, null,
+              React.createElement(Pie, { data: [
+                { name: "Flights", value: tiers.mid.flights },
+                { name: `Lodging`, value: tiers.mid.accommodation * NIGHTS },
+                { name: `Food`, value: tiers.mid.food * NIGHTS },
+                { name: "Transport", value: tiers.mid.trains },
+                { name: "Activities", value: tiers.mid.activities },
+                { name: `Misc`, value: tiers.mid.misc * NIGHTS },
+              ], cx: "50%", cy: "50%", innerRadius: 60, outerRadius: 100, paddingAngle: 3, dataKey: "value",
+                label: ({ name, value }) => `${name} $${value}`, labelLine: { stroke: T.textDim } },
+                CHART_COLORS.map((c, i) => React.createElement(Cell, { key: i, fill: c }))
+              ),
+              React.createElement(Tooltip, { contentStyle: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text }, formatter: v => `$${v}` })
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function ItineraryTab({ season }) {
+  const [expanded, setExpanded] = useState(null);
+  const s = itinerary[season];
+  const typeColors = { travel: T.textDim, city: T.blue, nature: T.green, train: T.cyan, highlight: T.accent };
+  const countryColors = { Transit: T.textDim, Germany: "#fbbf24", Austria: T.rose, Slovenia: T.green, Croatia: T.blue };
+
+  return (
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 0, position: "relative" } },
+      React.createElement("div", { style: { position: "absolute", left: 28, top: 24, bottom: 24, width: 2, background: `linear-gradient(to bottom, ${T.accent}, ${T.blue}, ${T.green})`, borderRadius: 2, zIndex: 0 } }),
+      s.legs.map((leg, i) => {
+        const Icon = iconMap[leg.icon] || MapPin;
+        const color = typeColors[leg.type];
+        const isExpanded = expanded === i;
+        return (
+          React.createElement(AnimIn, { key: i, delay: i * 50 },
+            React.createElement("div", { onClick: () => setExpanded(isExpanded ? null : i), style: { display: "flex", gap: 16, padding: "12px 0", cursor: "pointer", position: "relative", zIndex: 1 } },
+              React.createElement("div", { style: {
+                width: 56, height: 56, borderRadius: 16, background: `${color}18`, border: `2px solid ${color}40`,
+                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.3s",
+                boxShadow: isExpanded ? `0 0 20px ${color}30` : "none",
+              } },
+                React.createElement(Icon, { size: 22, color: color })
+              ),
+              React.createElement("div", { style: { flex: 1, minWidth: 0 } },
+                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" } },
+                  React.createElement("span", { style: { fontSize: 11, fontWeight: 800, color: T.textMuted, letterSpacing: 1 } }, `DAY ${leg.day}`),
+                  React.createElement("span", { style: { fontSize: 11, color: T.textDim } }, leg.date),
+                  React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: countryColors[leg.country], background: `${countryColors[leg.country]}15`, padding: "2px 8px", borderRadius: 99 } }, leg.country)
+                ),
+                React.createElement("div", { style: { fontSize: 17, fontWeight: 700, color: T.white, marginTop: 2 } }, leg.location),
+                React.createElement("div", { style: {
+                  fontSize: 13, color: T.textMuted, lineHeight: 1.6, marginTop: 4,
+                  maxHeight: isExpanded ? 200 : 22, overflow: "hidden", transition: "max-height 0.4s ease",
+                } }, leg.desc)
+              ),
+              leg.nights > 0 && React.createElement("div", { style: { fontSize: 11, color: T.textDim, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 } }, React.createElement(Moon, { size: 12 }), `${leg.nights}n`)
+            )
+          )
+        );
+      }),
+
+      React.createElement(AnimIn, { delay: 600 },
+        React.createElement(GlowCard, { glow: T.cyan, style: { marginTop: 20 } },
+          React.createElement("h3", { style: { margin: "0 0 4px", color: T.white, fontSize: 16, display: "flex", alignItems: "center", gap: 8 } }, React.createElement(Train, { size: 18, color: T.cyan }), " Train Route"),
+          React.createElement("p", { style: { margin: "0 0 16px", fontSize: 12, color: T.textMuted } }, "Point-to-point saves ~$5,000 vs. Eurail Pass for 16 people"),
+          React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
+            trainLegs.map((leg, i) =>
+              React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: `${T.cyan}08`, borderRadius: 10, border: `1px solid ${T.cyan}15` } },
+                React.createElement("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 6, fontSize: 13 } },
+                  React.createElement("span", { style: { fontWeight: 700, color: T.text } }, leg.from),
+                  React.createElement(ArrowRight, { size: 14, color: T.textDim }),
+                  React.createElement("span", { style: { fontWeight: 700, color: T.text } }, leg.to),
+                  leg.url && React.createElement("a", { href: leg.url, target: "_blank", rel: "noopener noreferrer", style: { fontSize: 10, color: T.cyan, textDecoration: "none", background: `${T.cyan}15`, padding: "6px 12px", borderRadius: 99, display: "inline-flex", alignItems: "center", WebkitTapHighlightColor: "transparent" } }, leg.type)
+                ),
+                React.createElement("span", { style: { fontSize: 12, color: T.textMuted, minWidth: 45 } }, leg.hrs),
+                React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: T.cyan, minWidth: 35, textAlign: "right" } }, `€${leg.cost}`),
+                React.createElement(ScenicDots, { count: leg.scenic })
+              )
+            ),
+            React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", gap: 16, padding: "8px 14px", fontSize: 13, fontWeight: 700 } },
+              React.createElement("span", { style: { color: T.textMuted } }, "Total per person:"),
+              React.createElement("span", { style: { color: T.cyan } }, `€${trainLegs.reduce((s, l) => s + l.cost, 0)} (~$${Math.round(trainLegs.reduce((s, l) => s + l.cost, 0) * 1.08)})`)
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function StaysTab({ season }) {
+  const si = season === "fall" ? 0 : 1;
+  return (
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 16 } },
+      accomData.map((a, i) =>
+        React.createElement(AnimIn, { key: i, delay: i * 80 },
+          React.createElement(GlowCard, { glow: CHART_COLORS[i] },
+            React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 } },
+              React.createElement("div", null,
+                React.createElement("h3", { style: { margin: 0, color: T.white, fontSize: 18 } }, a.loc),
+                React.createElement("span", { style: { fontSize: 12, color: T.textMuted } }, `${a.n} night${a.n > 1 ? "s" : ""}`)
+              ),
+              React.createElement("span", { style: { fontSize: 11, background: `${CHART_COLORS[i]}18`, color: CHART_COLORS[i], padding: "4px 12px", borderRadius: 99, fontWeight: 700 } }, a.rec)
+            ),
+            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginTop: 16 } },
+              [
+                { label: "Airbnb (all 16)", val: `$${a.villa[si].toLocaleString()}/nt`, sub: `$${Math.round(a.villa[si] / 8)}/couple/nt` },
+                { label: "Hotel (per room)", val: `$${a.hotel[si]}/nt`, sub: `$${a.hotel[si] * a.n} total for ${a.n}n` },
+                { label: "Standout Option", val: a.unique, sub: "" },
+              ].map((opt, j) =>
+                React.createElement("div", { key: j, style: { background: `${T.bg}90`, borderRadius: 10, padding: 12, border: `1px solid ${T.border}` } },
+                  React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginBottom: 4 } }, opt.label),
+                  React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: T.white } }, opt.val),
+                  opt.sub && React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginTop: 2 } }, opt.sub)
+                )
+              )
+            ),
+            a.airbnb && (
+              React.createElement("div", { style: { marginTop: 12, padding: "10px 14px", background: `${CHART_COLORS[i]}08`, borderRadius: 10, border: `1px solid ${CHART_COLORS[i]}15`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 } },
+                React.createElement("div", { style: { fontSize: 12, color: T.text } },
+                  React.createElement("span", { style: { fontWeight: 700 } }, "Top Pick: "),
+                  React.createElement("a", { href: a.airbnb, target: "_blank", rel: "noopener noreferrer", style: { color: CHART_COLORS[i], textDecoration: "none" } }, a.airbnbName)
+                )
+              )
+            ),
+            a.castleOption && (
+              React.createElement("div", { style: { marginTop: 8, padding: "10px 14px", background: `${T.accent}10`, borderRadius: 10, border: `1px solid ${T.accent}25`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 } },
+                React.createElement("div", { style: { fontSize: 12, color: T.text } },
+                  React.createElement("span", { style: { fontSize: 16, marginRight: 6 } }, "🏰"),
+                  React.createElement("span", { style: { fontWeight: 700, color: T.accent } }, "Castle Option: "),
+                  React.createElement("a", { href: a.castleOption.url, target: "_blank", rel: "noopener noreferrer", style: { color: T.accent, textDecoration: "none" } }, a.castleOption.name),
+                  React.createElement("span", { style: { color: T.textMuted } }, ` — ${a.castleOption.beds} · $${a.castleOption.price}/nt · ${a.castleOption.note}`)
+                )
+              )
+            )
+          )
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 500 },
+        React.createElement(GlowCard, { glow: T.accent },
+          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16 } }, "Fall vs Spring — Nightly Rates"),
+          React.createElement(ResponsiveContainer, { width: "99%", height: 250 },
+            React.createElement(BarChart, { data: accomData.map(a => ({ loc: a.loc, Fall: a.hotel[0], Spring: a.hotel[1] })) },
+              React.createElement(CartesianGrid, { strokeDasharray: "3 3", stroke: T.border }),
+              React.createElement(XAxis, { dataKey: "loc", tick: { fill: T.textMuted, fontSize: 11 } }),
+              React.createElement(YAxis, { tickFormatter: v => `$${v}`, tick: { fill: T.textMuted, fontSize: 11 } }),
+              React.createElement(Tooltip, { contentStyle: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text }, formatter: v => `$${v}/room` }),
+              React.createElement(Legend, null),
+              React.createElement(Bar, { dataKey: "Fall", fill: T.accent, radius: [6, 6, 0, 0] }),
+              React.createElement(Bar, { dataKey: "Spring", fill: T.green, radius: [6, 6, 0, 0] })
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function FoodTab() {
+  return (
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } },
+      React.createElement(AnimIn, null,
+        React.createElement(GlowCard, { glow: T.accent },
+          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16, display: "flex", alignItems: "center", gap: 8 } }, React.createElement(Coffee, { size: 18, color: T.accent }), " Daily Food Budget by Country"),
+          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 } },
+            foodByCountry.map((c, i) => {
+              const total = c.breakfast + c.lunch + c.dinner + c.snacks;
+              return (
+                React.createElement("div", { key: i, style: { background: `${CHART_COLORS[i]}10`, borderRadius: 14, padding: 16, border: `1px solid ${CHART_COLORS[i]}25`, textAlign: "center" } },
+                  React.createElement("div", { style: { fontSize: 32 } }, c.flag),
+                  React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: T.white, marginTop: 4 } }, c.country),
+                  React.createElement("div", { style: { fontSize: 28, fontWeight: 900, color: CHART_COLORS[i], margin: "8px 0" } }, `$${total}`),
+                  React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, "per person / day"),
+                  React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: T.textMuted, display: "flex", flexDirection: "column", gap: 3 } },
+                    React.createElement("div", null, "☀️ Breakfast $", c.breakfast),
+                    React.createElement("div", null, "🥖 Lunch $", c.lunch),
+                    React.createElement("div", null, "🍷 Dinner $", c.dinner),
+                    React.createElement("div", null, "☕ Snacks $", c.snacks)
+                  )
+                )
+              );
+            })
+          )
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 100 },
+        React.createElement(GlowCard, { glow: T.blue },
+          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16, display: "flex", alignItems: "center", gap: 8 } }, React.createElement(Camera, { size: 18, color: T.blue }), " Activities & Experiences"),
+          React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
+            activities.map((a, i) =>
+              React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: i % 2 === 0 ? `${T.blue}06` : "transparent", borderRadius: 8 } },
+                React.createElement("span", { style: { fontSize: 20, width: 32, textAlign: "center" } }, a.icon),
+                React.createElement("div", { style: { flex: 1 } },
+                  React.createElement("div", { style: { fontSize: 14, fontWeight: 600 } },
+                    a.url ? React.createElement("a", { href: a.url, target: "_blank", rel: "noopener noreferrer", style: { color: T.text, textDecoration: "none", borderBottom: `1px dashed ${T.textDim}` } }, a.name) : React.createElement("span", { style: { color: T.text } }, a.name)
+                  ),
+                  React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, a.loc, a.source ? ` · ${a.source}` : "")
+                ),
+                React.createElement("div", { style: { textAlign: "right" } },
+                  React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: a.cost === 0 ? T.green : T.white } }, a.cost === 0 ? "Free" : `$${a.cost}`),
+                  a.cost > 0 && React.createElement("div", { style: { fontSize: 10, color: T.textMuted } }, `× 16 = $${a.cost * 16}`)
+                )
+              )
+            ),
+            React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", padding: "12px 14px", borderTop: `1px solid ${T.border}`, marginTop: 4, fontSize: 14 } },
+              React.createElement("span", { style: { color: T.textMuted, marginRight: 12 } }, "All activities per person:"),
+              React.createElement("span", { style: { fontWeight: 800, color: T.accent } }, `$${activities.reduce((s, a) => s + a.cost, 0)}`)
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function GemsTab() {
+  const typeIcons = { village: "🏘️", nature: "🌿", street: "🚶", market: "🧺", food: "🥐", landmark: "🏛️" };
+  const regionColors = { Bavaria: "#fbbf24", Salzburg: T.rose, Slovenia: T.green, "Split / Dalmatia": T.blue, Dubrovnik: T.cyan };
+  const regionFlags = { Bavaria: "🇩🇪", Salzburg: "🇦🇹", Slovenia: "🇸🇮", "Split / Dalmatia": "🇭🇷", Dubrovnik: "🇭🇷" };
+  return (
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 16 } },
+      React.createElement(AnimIn, null,
+        React.createElement("div", { style: { textAlign: "center", marginBottom: 8 } },
+          React.createElement("div", { style: { fontSize: 13, color: T.accent, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" } }, "Off the Beaten Path"),
+          React.createElement("div", { style: { fontSize: 13, color: T.textMuted, marginTop: 4 } }, "The spots locals love that most tourists walk right past")
+        )
+      ),
+      hiddenGems.map((region, ri) => {
+        const color = regionColors[region.region] || T.accent;
+        return (
+          React.createElement(AnimIn, { key: ri, delay: ri * 80 },
+            React.createElement(GlowCard, { glow: color },
+              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } },
+                React.createElement("span", { style: { fontSize: 24 } }, regionFlags[region.region]),
+                React.createElement("h3", { style: { margin: 0, color: T.white, fontSize: 17, fontWeight: 800 } }, region.region)
+              ),
+              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 } },
+                region.gems.map((gem, gi) =>
+                  React.createElement("a", { key: gi, href: gem.url, target: "_blank", rel: "noopener noreferrer", style: { textDecoration: "none", WebkitTapHighlightColor: "transparent" } },
+                    React.createElement("div", { style: { background: `${color}08`, borderRadius: 12, padding: 14, border: `1px solid ${color}18`, transition: "all 0.25s", cursor: "pointer" },
+                      onMouseEnter: (e) => { e.currentTarget.style.background = `${color}15`; e.currentTarget.style.transform = "translateY(-2px)"; },
+                      onMouseLeave: (e) => { e.currentTarget.style.background = `${color}08`; e.currentTarget.style.transform = "none"; },
+                      onTouchStart: (e) => { e.currentTarget.style.background = `${color}15`; },
+                      onTouchEnd: (e) => { e.currentTarget.style.background = `${color}08`; } },
+                      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
+                        React.createElement("span", { style: { fontSize: 16 } }, typeIcons[gem.type] || "📍"),
+                        React.createElement("span", { style: { fontSize: 14, fontWeight: 700, color: T.white } }, gem.name)
+                      ),
+                      React.createElement("div", { style: { fontSize: 12, color: T.textMuted, lineHeight: 1.6 } }, gem.desc)
+                    )
+                  )
+                )
+              )
+            )
+          )
+        );
+      }),
+      React.createElement(AnimIn, { delay: 500 },
+        React.createElement(GlowCard, { glow: T.accent, style: { textAlign: "center", padding: 20 } },
+          React.createElement("div", { style: { fontSize: 14, color: T.accent, fontWeight: 700, marginBottom: 4 } }, "Pro Tip for the Group"),
+          React.createElement("div", { style: { fontSize: 13, color: T.textMuted, lineHeight: 1.7, maxWidth: 600, margin: "0 auto" } },
+            "These hidden gems are perfect for \"free afternoon\" time — couples can pick a spot that interests them and explore on their own, then regroup for dinner. No one needs to agree on everything."
+          )
+        )
+      )
+    )
+  );
+}
+
+function FamilyTab() {
+  const prefColors = [T.accent, T.blue, T.green, T.purple];
+  const prefIcons = [Globe, Compass, Heart, Shield];
+  return (
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } },
+      React.createElement(AnimIn, null,
+        React.createElement(GlowCard, { glow: T.accent },
+          React.createElement("h3", { style: { margin: "0 0 4px", color: T.white, fontSize: 16 } }, "Destination Popularity"),
+          React.createElement("p", { style: { margin: "0 0 16px", fontSize: 12, color: T.textMuted } }, "How many times each destination was mentioned across all input (anonymous aggregate)"),
+          React.createElement(ResponsiveContainer, { width: "99%", height: 280 },
+            React.createElement(BarChart, { data: destinationVotes, layout: "vertical" },
+              React.createElement(CartesianGrid, { strokeDasharray: "3 3", stroke: T.border }),
+              React.createElement(XAxis, { type: "number", domain: [0, 10], tick: { fill: T.textMuted, fontSize: 11 } }),
+              React.createElement(YAxis, { dataKey: "name", type: "category", width: 140, tick: { fill: T.textMuted, fontSize: 12 } }),
+              React.createElement(Tooltip, { contentStyle: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text } }),
+              React.createElement(Bar, { dataKey: "votes", name: "Mentions", radius: [0, 8, 8, 0] },
+                destinationVotes.map((_, i) => React.createElement(Cell, { key: i, fill: CHART_COLORS[i % CHART_COLORS.length] }))
+              )
+            )
+          )
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 100 },
+        React.createElement(GlowCard, { glow: T.purple },
+          React.createElement("h3", { style: { margin: "0 0 4px", color: T.white, fontSize: 16 } }, "Experience Priorities"),
+          React.createElement("p", { style: { margin: "0 0 16px", fontSize: 12, color: T.textMuted } }, "Weighted importance across all family input — what matters most to the group collectively"),
+          React.createElement(ResponsiveContainer, { width: "99%", height: 320 },
+            React.createElement(RadarChart, { data: experienceData },
+              React.createElement(PolarGrid, { stroke: T.border }),
+              React.createElement(PolarAngleAxis, { dataKey: "exp", tick: { fill: T.textMuted, fontSize: 11 } }),
+              React.createElement(PolarRadiusAxis, { domain: [0, 10], tick: { fill: T.textDim, fontSize: 10 } }),
+              React.createElement(Radar, { name: "Priority", dataKey: "score", stroke: T.accent, fill: T.accent, fillOpacity: 0.2, strokeWidth: 2 })
+            )
+          )
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 200 },
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 } },
+          groupPreferences.map((gp, i) => {
+            const Icon = prefIcons[i];
+            const color = prefColors[i];
+            return (
+              React.createElement(GlowCard, { key: i, glow: color, style: { padding: 20 } },
+                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } },
+                  React.createElement("div", { style: { width: 36, height: 36, borderRadius: 10, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center" } },
+                    React.createElement(Icon, { size: 18, color: color })
+                  ),
+                  React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: T.white } }, gp.category)
+                ),
+                React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
+                  gp.items.map((item, j) =>
+                    React.createElement("span", { key: j, style: { fontSize: 12, padding: "5px 12px", borderRadius: 99, background: `${color}12`, border: `1px solid ${color}25`, color: T.text, fontWeight: 500 } }, item)
+                  )
+                )
+              )
+            );
+          })
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 300 },
+        React.createElement(GlowCard, { glow: T.cyan },
+          React.createElement("h3", { style: { margin: "0 0 4px", color: T.white, fontSize: 16 } }, "Budget Range (Anonymous)"),
+          React.createElement("p", { style: { margin: "0 0 16px", fontSize: 12, color: T.textMuted } }, "What the group collectively indicated they're comfortable spending per couple"),
+          React.createElement("div", { style: { display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" } },
+            React.createElement("div", { style: { textAlign: "center", background: T.accentSoft, borderRadius: 12, padding: 16, minWidth: 140, border: `1px solid ${T.accent}25` } },
+              React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginBottom: 4 } }, "Base (Gifted)"),
+              React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: T.accent } }, "$3,000"),
+              React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, "per couple")
+            ),
+            React.createElement("div", { style: { textAlign: "center", background: T.blueSoft, borderRadius: 12, padding: 16, minWidth: 140, border: `1px solid ${T.blue}25` } },
+              React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginBottom: 4 } }, "Additional Out-of-Pocket"),
+              React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: T.blue } }, "$3K–$5K"),
+              React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, "most common range")
+            ),
+            React.createElement("div", { style: { textAlign: "center", background: T.greenSoft, borderRadius: 12, padding: 16, minWidth: 140, border: `1px solid ${T.green}25` } },
+              React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginBottom: 4 } }, "Total Target"),
+              React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: T.green } }, "$6K–$8K"),
+              React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, "per couple all-in")
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function CompareTab() {
+  const fMid = calcCouple(budgetTiers.fall.mid);
+  const sMid = calcCouple(budgetTiers.spring.mid);
+  const save = fMid - sMid;
+
+  const scorecard = [
+    { factor: "Price", fall: "Higher (~15%)", spring: "Lower", winner: "spring", icon: DollarSign },
+    { factor: "Croatia Weather", fall: "Warm 70s°F", spring: "Mild high 60s", winner: "fall", icon: Sun },
+    { factor: "Alps Weather", fall: "Crisp & colorful", spring: "Green, more rain", winner: "fall", icon: Mountain },
+    { factor: "Crowd Level", fall: "Low shoulder", spring: "Low shoulder", winner: "tie", icon: Users },
+    { factor: "Schedule Fit", fall: "Most prefer", spring: "Fewer prefer", winner: "fall", icon: Calendar },
+    { factor: "Anniversary", fall: "Celebrate on trip!", spring: "Already passed", winner: "fall", icon: Heart },
+    { factor: "Childcare", fall: "Kids slightly younger", spring: "Kids older = easier", winner: "spring", icon: Shield },
+  ];
+
+  const fallW = scorecard.filter(s => s.winner === "fall").length;
+  const springW = scorecard.filter(s => s.winner === "spring").length;
+  const ties = scorecard.filter(s => s.winner === "tie").length;
+
+  return (
+    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } },
+      React.createElement(AnimIn, null,
+        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, alignItems: "center" } },
+          React.createElement(GlowCard, { glow: T.accent, style: { textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "🍂 Fall 2026"),
+            React.createElement("div", { style: { fontSize: 36, fontWeight: 900, color: T.accent } }, `$${fMid.toLocaleString()}`),
+            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "per couple (mid-tier)"),
+            React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: T.green, marginTop: 4 } }, `OOP: $${(fMid - 3000).toLocaleString()}`)
+          ),
+          React.createElement("div", { style: { textAlign: "center", padding: "0 8px" } },
+            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "Spring saves"),
+            React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: T.green } }, `$${save.toLocaleString()}`),
+            React.createElement(TrendingDown, { size: 20, color: T.green, style: { margin: "4px auto 0" } })
+          ),
+          React.createElement(GlowCard, { glow: T.green, style: { textAlign: "center" } },
+            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "🌷 Spring 2027"),
+            React.createElement("div", { style: { fontSize: 36, fontWeight: 900, color: T.green } }, `$${sMid.toLocaleString()}`),
+            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "per couple (mid-tier)"),
+            React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: T.green, marginTop: 4 } }, `OOP: $${(sMid - 3000).toLocaleString()}`)
+          )
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 100 },
+        React.createElement(GlowCard, { glow: T.purple },
+          React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 } },
+            React.createElement("h3", { style: { margin: 0, color: T.white, fontSize: 16 } }, "Season Scorecard"),
+            React.createElement("div", { style: { display: "flex", gap: 12, fontSize: 13, fontWeight: 700 } },
+              React.createElement("span", { style: { color: T.accent } }, `🍂 ${fallW}`),
+              React.createElement("span", { style: { color: T.textDim } }, `Tie ${ties}`),
+              React.createElement("span", { style: { color: T.green } }, `🌷 ${springW}`)
+            )
+          ),
+          scorecard.map((row, i) => {
+            const Icon = row.icon;
+            return (
+              React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < scorecard.length - 1 ? `1px solid ${T.border}` : "none" } },
+                React.createElement(Icon, { size: 16, color: T.textDim }),
+                React.createElement("div", { style: { width: 120, fontSize: 13, fontWeight: 600, color: T.text } }, row.factor),
+                React.createElement("div", { style: { flex: 1, fontSize: 12, color: row.winner === "fall" ? T.accent : T.textMuted, textAlign: "center", fontWeight: row.winner === "fall" ? 700 : 400 } }, row.fall),
+                React.createElement("div", { style: { width: 32, textAlign: "center" } },
+                  row.winner === "fall" && React.createElement("span", { style: { color: T.accent } }, "🍂"),
+                  row.winner === "spring" && React.createElement("span", { style: { color: T.green } }, "🌷"),
+                  row.winner === "tie" && React.createElement("span", { style: { color: T.textDim } }, "—")
+                ),
+                React.createElement("div", { style: { flex: 1, fontSize: 12, color: row.winner === "spring" ? T.green : T.textMuted, textAlign: "center", fontWeight: row.winner === "spring" ? 700 : 400 } }, row.spring)
+              )
+            );
+          }),
+          React.createElement("div", { style: { textAlign: "center", marginTop: 16, padding: 14, background: T.accentSoft, borderRadius: 12 } },
+            React.createElement("p", { style: { margin: 0, fontSize: 14, color: T.accent, fontWeight: 700 } }, `Fall 2026 wins ${fallW}–${springW}–${ties}. Costs ~15% more but celebrates the anniversary on the trip and fits more schedules.`)
+          )
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 200 },
+        React.createElement(GlowCard, { glow: T.cyan },
+          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16 } }, "Weather Comparison"),
+          React.createElement(ResponsiveContainer, { width: "99%", height: 250 },
+            React.createElement(BarChart, { data: weather.map(w => ({ city: w.city, "Fall High": w.fH, "Spring High": w.sH, "Fall Low": w.fL, "Spring Low": w.sL })) },
+              React.createElement(CartesianGrid, { strokeDasharray: "3 3", stroke: T.border }),
+              React.createElement(XAxis, { dataKey: "city", tick: { fill: T.textMuted, fontSize: 11 } }),
+              React.createElement(YAxis, { domain: [30, 80], tick: { fill: T.textMuted, fontSize: 11 } }),
+              React.createElement(Tooltip, { contentStyle: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text } }),
+              React.createElement(Legend, null),
+              React.createElement(Bar, { dataKey: "Fall High", fill: T.accent, radius: [4, 4, 0, 0] }),
+              React.createElement(Bar, { dataKey: "Spring High", fill: T.green, radius: [4, 4, 0, 0] })
+            )
+          )
+        )
+      ),
+
+      React.createElement(AnimIn, { delay: 300 },
+        React.createElement(GlowCard, { glow: T.green, style: { textAlign: "center", padding: 20 } },
+          React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 6 } },
+            React.createElement(Check, { size: 18, color: T.green }),
+            React.createElement("span", { style: { fontSize: 14, fontWeight: 700, color: T.green } }, "Rome Temple Side Trip — Skipped")
+          ),
+          React.createElement("div", { style: { fontSize: 12, color: T.textMuted, lineHeight: 1.6 } }, "Saves ~$250/pp and a full travel day. Keeps 16-person logistics simple and gives extra time in Dubrovnik or Bled instead.")
+        )
+      )
+    )
+  );
+}
+
+// ============ MAIN ============
+function App() {
+  const [season, setSeason] = useState("fall");
+  const [tab, setTab] = useState("overview");
+
+  const tabs = [
+    { id: "overview", label: "Budget", icon: DollarSign },
+    { id: "itinerary", label: "Itinerary", icon: MapPin },
+    { id: "stays", label: "Stays", icon: Bed },
+    { id: "food", label: "Food & Fun", icon: Utensils },
+    { id: "gems", label: "Hidden Gems", icon: Star },
+    { id: "family", label: "Family", icon: Users },
+    { id: "compare", label: "Compare", icon: Compass },
+  ];
+
+  return (
+    React.createElement("div", { style: {
+      minHeight: "100dvh",
+      background: T.bg, color: T.text,
+      fontFamily: "'Inter', -apple-system, system-ui, sans-serif",
+      WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale",
+      WebkitTextSizeAdjust: "100%",
+      WebkitTapHighlightColor: "transparent",
+      overflowX: "hidden",
+    } },
+      React.createElement("div", { style: { maxWidth: 900, margin: "0 auto", padding: "0 16px calc(40px + env(safe-area-inset-bottom, 0px))", paddingTop: "env(safe-area-inset-top, 0px)" } },
+        React.createElement(HeroSection, { season: season, setSeason: setSeason, setTab: setTab }),
+
+        React.createElement("div", { style: {
+          display: "flex", gap: 4, justifyContent: "center", flexWrap: "wrap",
+          padding: "8px 8px 16px",
+          position: "sticky", top: 0, zIndex: 20,
+          background: `${T.bg}ee`,
+          WebkitBackdropFilter: "blur(8px)", backdropFilter: "blur(8px)",
+          overflowX: "auto", WebkitOverflowScrolling: "touch",
+          msOverflowStyle: "none", scrollbarWidth: "none",
+        } },
+          tabs.map(t => {
+            const Icon = t.icon;
+            return (
+              React.createElement("button", { key: t.id, onClick: () => setTab(t.id), style: {
+                display: "flex", alignItems: "center", gap: 5,
+                padding: "10px 14px", borderRadius: 99, border: "none", cursor: "pointer",
+                transition: "all 0.25s",
+                background: tab === t.id ? `${T.accent}18` : "transparent",
+                color: tab === t.id ? T.accent : T.textMuted,
+                fontWeight: tab === t.id ? 700 : 500, fontSize: 12,
+                whiteSpace: "nowrap", flexShrink: 0,
+                minHeight: 44,
+                WebkitTapHighlightColor: "transparent",
+              } },
+                React.createElement(Icon, { size: 14 }),
+                t.label
+              )
+            );
+          })
+        ),
+
+        tab === "overview" && React.createElement(OverviewTab, { season: season }),
+        tab === "itinerary" && React.createElement(ItineraryTab, { season: season }),
+        tab === "stays" && React.createElement(StaysTab, { season: season }),
+        tab === "food" && React.createElement(FoodTab, null),
+        tab === "gems" && React.createElement(GemsTab, null),
+        tab === "family" && React.createElement(FamilyTab, null),
+        tab === "compare" && React.createElement(CompareTab, null),
+
+        React.createElement("div", { style: { textAlign: "center", padding: "32px 0 0", fontSize: 11, color: T.textDim } },
+          React.createElement("p", null, "Compiled from 2 family calls + 17 voice memos from 12 contributors · All preferences anonymized"),
+          React.createElement("p", { style: { marginTop: 4 } }, "Pricing verified via Kiwi, Airbnb, and official booking sites · March 2026"),
+          React.createElement("p", { style: { marginTop: 4 } }, "Still needed: Hard blackout dates from all couples")
+        )
+      )
+    )
+  );
+}
+
+// Render
+import ReactDOM from "https://esm.sh/react-dom@18.3.1/client";
+ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
+    </script>
+  </body>
+</html>
+
