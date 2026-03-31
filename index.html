@@ -19,6 +19,9 @@
       .route-tooltip { background: #151929 !important; color: #e8eaf0 !important; border: 1px solid #1e2540 !important; border-radius: 8px !important; padding: 4px 10px !important; font-family: 'Inter', sans-serif !important; font-size: 12px !important; font-weight: 600 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important; }
       .route-tooltip::before { border-top-color: #1e2540 !important; }
       .leaflet-container { background: #0c0f1a !important; }
+      @media (max-width: 640px) {
+        .route-tooltip { font-size: 10px !important; padding: 2px 6px !important; }
+      }
     </style>
   </head>
   <body>
@@ -91,24 +94,24 @@ const ROUTES = [
     }
   },
   trainLegs: [
-    {from:"Munich",to:"Salzburg",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet"},
-    {from:"Salzburg",to:"Ljubljana",hrs:"4.5h",cost:29,scenic:5,type:"ÖBB EuroCity"},
-    {from:"Ljubljana",to:"Bled Jezero",hrs:"1.5h",cost:7,scenic:4,type:"SZ Train"},
-    {from:"Bled Jezero",to:"Ljubljana",hrs:"1.5h",cost:7,scenic:4,type:"SZ Train"},
-    {from:"Ljubljana",to:"Zagreb",hrs:"2.5h",cost:18,scenic:3,type:"SZ/HŽ Direct"},
-    {from:"Zagreb",to:"Split",hrs:"6-8h",cost:18,scenic:4,type:"HZPP Train"},
-    {from:"Split",to:"Dubrovnik",hrs:"4-5h",cost:16,scenic:5,type:"FlixBus"},
+    {from:"Munich",to:"Salzburg",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
+    {from:"Salzburg",to:"Ljubljana",hrs:"4.5h",cost:29,scenic:5,type:"ÖBB EuroCity",url:"https://www.oebb.at/en/"},
+    {from:"Ljubljana",to:"Bled Jezero",hrs:"1.5h",cost:7,scenic:4,type:"SZ Train",url:"https://potfrg.sz.si/en/"},
+    {from:"Bled Jezero",to:"Ljubljana",hrs:"1.5h",cost:7,scenic:4,type:"SZ Train",url:"https://potfrg.sz.si/en/"},
+    {from:"Ljubljana",to:"Zagreb",hrs:"2.5h",cost:18,scenic:3,type:"SZ/HŽ Direct",url:"https://potfrg.sz.si/en/"},
+    {from:"Zagreb",to:"Split",hrs:"6-8h",cost:18,scenic:4,type:"HZPP Train",url:"https://www.hzpp.hr/en"},
+    {from:"Split",to:"Dubrovnik",hrs:"4-5h",cost:16,scenic:5,type:"FlixBus",url:"https://www.flixbus.com/"},
   ],
   activities: [
-    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰"},
-    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵"},
-    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯"},
-    {name:"Mozart Fortress Concert",cost:51,loc:"Salzburg",icon:"🎻"},
-    {name:"Lake Bled Pletna Boat",cost:22,loc:"Slovenia",icon:"🚣"},
-    {name:"Bled Castle Entry",cost:17,loc:"Slovenia",icon:"🏰"},
-    {name:"Dubrovnik City Walls",cost:44,loc:"Dubrovnik",icon:"🧱"},
-    {name:"Sea Kayak Dubrovnik",cost:38,loc:"Dubrovnik",icon:"🛶"},
-    {name:"Diocletian's Palace Tour",cost:15,loc:"Split",icon:"🏛️"},
+    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰",url:"https://www.neuschwanstein.de/englisch/tourist/"},
+    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵",url:"https://www.originalsoundofmusictour.com/"},
+    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯",url:"https://www.salzburg-burgen.at/en/hohensalzburg-castle/"},
+    {name:"Mozart Fortress Concert",cost:51,loc:"Salzburg",icon:"🎻",url:"https://www.salzburghighlights.at/en/mozart-concert-fortress/"},
+    {name:"Lake Bled Pletna Boat",cost:22,loc:"Slovenia",icon:"🚣",url:"https://www.bled.si/en/what-to-see/bled-island/pletna-boat/"},
+    {name:"Bled Castle Entry",cost:17,loc:"Slovenia",icon:"🏰",url:"https://www.blejski-grad.si/en/"},
+    {name:"Dubrovnik City Walls",cost:44,loc:"Dubrovnik",icon:"🧱",url:"https://wallsofdubrovnik.com/"},
+    {name:"Sea Kayak Dubrovnik",cost:38,loc:"Dubrovnik",icon:"🛶",url:"https://www.adventuredubrovnik.com/"},
+    {name:"Diocletian's Palace Tour",cost:15,loc:"Split",icon:"🏛️",url:"https://visitsplit.com/en/1227/diocletians-palace"},
   ],
   foodByCountry: [
     {country:"Germany",breakfast:14,lunch:20,dinner:30,snacks:8,flag:"🇩🇪"},
@@ -117,32 +120,32 @@ const ROUTES = [
     {country:"Croatia",breakfast:10,lunch:15,dinner:24,snacks:6,flag:"🇭🇷"},
   ],
   accomData: [
-    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt"},
-    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge $1,175/nt (castle!)"},
-    {loc:"Lake Bled",n:1,rate:[96,85],rec:"Eagle's Nest · 9BR · $96/pp/nt",unique:"🦅 Lakeview 5.0★"},
-    {loc:"Split / Dalmatia",n:2,rate:[42,35],rec:"Apartments Kaja · 7BR · $42/pp/nt",unique:"🎬 Villa Dalmacroa · cinema"},
-    {loc:"Dubrovnik",n:2,rate:[35,30],rec:"Villa Heights · 6BR · $35/pp/nt",unique:"🏊 Villa Sonja · pool · $1,084/nt"},
+    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt",url:"https://www.airbnb.com/s/Munich--Germany/homes?adults=16&checkin=2026-09-27&checkout=2026-09-29&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
+    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge $1,175/nt (castle!)",url:"https://www.airbnb.com/s/Salzburg--Austria/homes?adults=16&checkin=2026-09-29&checkout=2026-10-01&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
+    {loc:"Lake Bled",n:1,rate:[96,85],rec:"Eagle's Nest · 9BR · $96/pp/nt",unique:"🦅 Lakeview 5.0★",url:"https://www.airbnb.com/s/Bled--Slovenia/homes?adults=16&checkin=2026-10-01&checkout=2026-10-02&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
+    {loc:"Split / Dalmatia",n:2,rate:[42,35],rec:"Apartments Kaja · 7BR · $42/pp/nt",unique:"🎬 Villa Dalmacroa · cinema",url:"https://www.airbnb.com/s/Split--Croatia/homes?adults=16&checkin=2026-10-02&checkout=2026-10-04&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
+    {loc:"Dubrovnik",n:2,rate:[35,30],rec:"Villa Heights · 6BR · $35/pp/nt",unique:"🏊 Villa Sonja · pool · $1,084/nt",url:"https://www.airbnb.com/s/Dubrovnik--Croatia/homes?adults=16&checkin=2026-10-04&checkout=2026-10-06&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
   ],
   hiddenGems: [
     {region:"Bavaria",color:"#fbbf24",flag:"🇩🇪",gems:[
-      {name:"Mittenwald",desc:"Tiny violin-making village with painted facades. Feels like a storybook."},
-      {name:"Partnachklamm",desc:"700m gorge with roaring waterfalls and rock tunnels. 30-min otherworldly walk."},
-      {name:"Füssen Old Town",desc:"Medieval town below Neuschwanstein. Cobblestone lanes, zero crowds."},
+      {name:"Mittenwald",desc:"Tiny violin-making village with painted facades. Feels like a storybook.",url:"https://www.google.com/maps/place/Mittenwald,+Germany/"},
+      {name:"Partnachklamm",desc:"700m gorge with roaring waterfalls and rock tunnels. 30-min otherworldly walk.",url:"https://www.google.com/maps/place/Partnach+Gorge/"},
+      {name:"Füssen Old Town",desc:"Medieval town below Neuschwanstein. Cobblestone lanes, zero crowds.",url:"https://www.google.com/maps/place/F%C3%BCssen,+Germany/"},
     ]},
     {region:"Salzburg",color:T.rose,flag:"🇦🇹",gems:[
-      {name:"Steingasse",desc:"Narrow medieval lane across the river. Tiny bars, 600 years of history."},
-      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery in Salzburg (since 1160). Wood-fired bread in a monastery courtyard."},
-      {name:"Schranne Market (Thurs)",desc:"Weekly farmer's market at Mirabell. Local cheeses, pastries, flowers."},
+      {name:"Steingasse",desc:"Narrow medieval lane across the river. Tiny bars, 600 years of history.",url:"https://www.google.com/maps/place/Steingasse,+Salzburg,+Austria/"},
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery in Salzburg (since 1160). Wood-fired bread in a monastery courtyard.",url:"https://www.google.com/maps/place/Stiftsb%C3%A4ckerei+St.+Peter/"},
+      {name:"Schranne Market (Thurs)",desc:"Weekly farmer's market at Mirabell. Local cheeses, pastries, flowers.",url:"https://www.google.com/maps/place/Schranne+Salzburg/"},
     ]},
     {region:"Slovenia",color:T.green,flag:"🇸🇮",gems:[
-      {name:"Vintgar Gorge",desc:"1.6km boardwalk through a turquoise river gorge. More beautiful than the tourist version."},
-      {name:"Lake Bohinj",desc:"Bled's quieter, wilder cousin — crystal water, Julian Alps, fraction of visitors."},
-      {name:"Bled Cream Cake at Park Hotel",desc:"The kremšnita was invented here in 1953. $4 for a slice of heaven on the lakefront."},
+      {name:"Vintgar Gorge",desc:"1.6km boardwalk through a turquoise river gorge. More beautiful than the tourist version.",url:"https://www.vintgar.si/en/"},
+      {name:"Lake Bohinj",desc:"Bled's quieter, wilder cousin — crystal water, Julian Alps, fraction of visitors.",url:"https://www.google.com/maps/place/Lake+Bohinj/"},
+      {name:"Bled Cream Cake at Park Hotel",desc:"The kremšnita was invented here in 1953. $4 for a slice of heaven on the lakefront.",url:"https://www.google.com/maps/place/Park+Hotel+Bled/"},
     ]},
     {region:"Dubrovnik / Split",color:T.blue,flag:"🇭🇷",gems:[
-      {name:"Trogir Old Town",desc:"Entire island is UNESCO. 15 min from Split but feels a world away."},
-      {name:"Buža Bar",desc:"Cliff bar carved into the city walls. No sign, just a hole in the wall. Sunset drinks."},
-      {name:"Elafiti Islands",desc:"Three car-free islands 20 min by ferry. Pine forests, hidden coves, fresh grilled fish."},
+      {name:"Trogir Old Town",desc:"Entire island is UNESCO. 15 min from Split but feels a world away.",url:"https://www.google.com/maps/place/Trogir,+Croatia/"},
+      {name:"Buža Bar",desc:"Cliff bar carved into the city walls. No sign, just a hole in the wall. Sunset drinks.",url:"https://www.google.com/maps/place/Bu%C5%BEa+Bar/"},
+      {name:"Elafiti Islands",desc:"Three car-free islands 20 min by ferry. Pine forests, hidden coves, fresh grilled fish.",url:"https://www.google.com/maps/place/Elafiti+Islands/"},
     ]},
   ],
   weather: [
@@ -215,23 +218,23 @@ const ROUTES = [
     }
   },
   trainLegs: [
-    {from:"Munich",to:"Salzburg",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet"},
-    {from:"Salzburg",to:"Innsbruck",hrs:"2h",cost:25,scenic:5,type:"ÖBB Railjet"},
-    {from:"Innsbruck",to:"Zürich",hrs:"3.5h",cost:39,scenic:4,type:"ÖBB/SBB EuroCity"},
-    {from:"Zürich",to:"Lucerne",hrs:"0.75h",cost:15,scenic:3,type:"SBB IR"},
-    {from:"Lucerne",to:"Interlaken",hrs:"2h",cost:35,scenic:5,type:"GoldenPass Express"},
-    {from:"Interlaken",to:"Zürich",hrs:"2h",cost:35,scenic:4,type:"SBB IC"},
+    {from:"Munich",to:"Salzburg",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
+    {from:"Salzburg",to:"Innsbruck",hrs:"2h",cost:25,scenic:5,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
+    {from:"Innsbruck",to:"Zürich",hrs:"3.5h",cost:39,scenic:4,type:"ÖBB/SBB EuroCity",url:"https://www.sbb.ch/en"},
+    {from:"Zürich",to:"Lucerne",hrs:"0.75h",cost:15,scenic:3,type:"SBB IR",url:"https://www.sbb.ch/en"},
+    {from:"Lucerne",to:"Interlaken",hrs:"2h",cost:35,scenic:5,type:"GoldenPass Express",url:"https://www.goldenpassexpress.ch/en/"},
+    {from:"Interlaken",to:"Zürich",hrs:"2h",cost:35,scenic:4,type:"SBB IC",url:"https://www.sbb.ch/en"},
   ],
   activities: [
-    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰"},
-    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵"},
-    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯"},
-    {name:"Nordkette Cable Car",cost:45,loc:"Innsbruck",icon:"🚡"},
-    {name:"Swarovski Crystal Worlds",cost:22,loc:"Innsbruck",icon:"💎"},
-    {name:"Mt. Pilatus Golden Round Trip",cost:95,loc:"Lucerne",icon:"⛰️"},
-    {name:"Swiss Chocolate Workshop",cost:65,loc:"Interlaken",icon:"🍫"},
-    {name:"Harder Kulm Viewpoint",cost:35,loc:"Interlaken",icon:"🔭"},
-    {name:"Trümmelbach Falls",cost:14,loc:"Lauterbrunnen",icon:"💦"},
+    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰",url:"https://www.neuschwanstein.de/englisch/tourist/"},
+    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵",url:"https://www.originalsoundofmusictour.com/"},
+    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯",url:"https://www.salzburg-burgen.at/en/hohensalzburg-castle/"},
+    {name:"Nordkette Cable Car",cost:45,loc:"Innsbruck",icon:"🚡",url:"https://www.nordkette.com/en"},
+    {name:"Swarovski Crystal Worlds",cost:22,loc:"Innsbruck",icon:"💎",url:"https://kristallwelten.swarovski.com/"},
+    {name:"Mt. Pilatus Golden Round Trip",cost:95,loc:"Lucerne",icon:"⛰️",url:"https://www.pilatus.ch/en"},
+    {name:"Swiss Chocolate Workshop",cost:65,loc:"Interlaken",icon:"🍫",url:"https://www.funky-chocolate.ch/"},
+    {name:"Harder Kulm Viewpoint",cost:35,loc:"Interlaken",icon:"🔭",url:"https://www.jungfrau.ch/en-gb/harder-kulm/"},
+    {name:"Trümmelbach Falls",cost:14,loc:"Lauterbrunnen",icon:"💦",url:"https://www.truemmelbachfaelle.ch/en/"},
   ],
   foodByCountry: [
     {country:"Germany",breakfast:14,lunch:20,dinner:30,snacks:8,flag:"🇩🇪"},
@@ -239,33 +242,33 @@ const ROUTES = [
     {country:"Switzerland",breakfast:18,lunch:28,dinner:42,snacks:12,flag:"🇨🇭"},
   ],
   accomData: [
-    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt"},
-    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge Castle $1,175/nt"},
-    {loc:"Innsbruck",n:1,rate:[70,60],rec:"Alpine Chalet · shared · $70/pp/nt",unique:"🏔️ Boutique in Old Town"},
-    {loc:"Lucerne",n:2,rate:[95,82],rec:"Lakeside apartment · $95/pp/nt",unique:"🏔️ Pilatus view penthouse"},
-    {loc:"Interlaken",n:2,rate:[85,72],rec:"Chalet with Jungfrau views · $85/pp/nt",unique:"🏔️ Swiss A-frame cabin"},
+    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt",url:"https://www.airbnb.com/s/Munich--Germany/homes?adults=16&checkin=2026-09-27&checkout=2026-09-29&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
+    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge Castle $1,175/nt",url:"https://www.airbnb.com/s/Salzburg--Austria/homes?adults=16&checkin=2026-09-29&checkout=2026-10-01&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
+    {loc:"Innsbruck",n:1,rate:[70,60],rec:"Alpine Chalet · shared · $70/pp/nt",unique:"🏔️ Boutique in Old Town",url:"https://www.airbnb.com/s/Innsbruck--Austria/homes?adults=16&checkin=2026-10-01&checkout=2026-10-02&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=5"},
+    {loc:"Lucerne",n:2,rate:[95,82],rec:"Lakeside apartment · $95/pp/nt",unique:"🏔️ Pilatus view penthouse",url:"https://www.airbnb.com/s/Lucerne--Switzerland/homes?adults=16&checkin=2026-10-02&checkout=2026-10-04&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=5"},
+    {loc:"Interlaken",n:2,rate:[85,72],rec:"Chalet with Jungfrau views · $85/pp/nt",unique:"🏔️ Swiss A-frame cabin",url:"https://www.airbnb.com/s/Interlaken--Switzerland/homes?adults=16&checkin=2026-10-04&checkout=2026-10-06&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=5"},
   ],
   hiddenGems: [
     {region:"Bavaria",color:"#fbbf24",flag:"🇩🇪",gems:[
-      {name:"Mittenwald",desc:"Violin-making village in the Alps. Painted facades on every house."},
-      {name:"Partnachklamm",desc:"700m gorge near Garmisch. Roaring waterfalls and rock tunnels."},
-      {name:"Füssen Old Town",desc:"Medieval town below Neuschwanstein. Cobblestone lanes, zero crowds."},
+      {name:"Mittenwald",desc:"Violin-making village in the Alps. Painted facades on every house.",url:"https://www.google.com/maps/place/Mittenwald,+Germany/"},
+      {name:"Partnachklamm",desc:"700m gorge near Garmisch. Roaring waterfalls and rock tunnels.",url:"https://www.google.com/maps/place/Partnach+Gorge/"},
+      {name:"Füssen Old Town",desc:"Medieval town below Neuschwanstein. Cobblestone lanes, zero crowds.",url:"https://www.google.com/maps/place/F%C3%BCssen,+Germany/"},
     ]},
     {region:"Salzburg",color:T.rose,flag:"🇦🇹",gems:[
-      {name:"Steingasse",desc:"Narrow medieval lane. Tiny bars, zero tour groups, 600 years of history."},
-      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery in Salzburg (since 1160). Wood-fired monastery bread."},
-      {name:"Schranne Market",desc:"Thursday farmer's market at Mirabell. Cheeses, pastries, flowers."},
+      {name:"Steingasse",desc:"Narrow medieval lane. Tiny bars, zero tour groups, 600 years of history.",url:"https://www.google.com/maps/place/Steingasse,+Salzburg,+Austria/"},
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery in Salzburg (since 1160). Wood-fired monastery bread.",url:"https://www.google.com/maps/place/Stiftsb%C3%A4ckerei+St.+Peter/"},
+      {name:"Schranne Market",desc:"Thursday farmer's market at Mirabell. Cheeses, pastries, flowers.",url:"https://www.google.com/maps/place/Schranne+Salzburg/"},
     ]},
     {region:"Innsbruck",color:T.purple,flag:"🇦🇹",gems:[
-      {name:"Bergisel Ski Jump",desc:"Zaha Hadid-designed viewpoint. Panoramic view of the Inn Valley."},
-      {name:"Alpenzoo",desc:"Highest-altitude zoo in Europe. Alpine animals with mountain backdrop."},
-      {name:"Maria-Theresien-Straße",desc:"Baroque boulevard with mountain views at every turn."},
+      {name:"Bergisel Ski Jump",desc:"Zaha Hadid-designed viewpoint. Panoramic view of the Inn Valley.",url:"https://www.bergisel.info/en"},
+      {name:"Alpenzoo",desc:"Highest-altitude zoo in Europe. Alpine animals with mountain backdrop.",url:"https://www.alpenzoo.at/en/"},
+      {name:"Maria-Theresien-Straße",desc:"Baroque boulevard with mountain views at every turn.",url:"https://www.google.com/maps/place/Maria-Theresien-Stra%C3%9Fe,+Innsbruck,+Austria/"},
     ]},
     {region:"Swiss Alps",color:T.cyan,flag:"🇨🇭",gems:[
-      {name:"Trümmelbach Falls",desc:"10 glacial waterfalls INSIDE a mountain. Only accessible in the world."},
-      {name:"Iseltwald",desc:"Tiny lakeside village that went viral. Turquoise water dock photo spot."},
-      {name:"Rigi Kulm",desc:"Sunrise above the clouds. First mountain railway in Europe (1871)."},
-      {name:"Lauterbrunnen",desc:"Valley of 72 waterfalls. Tolkien's inspiration for Rivendell."},
+      {name:"Trümmelbach Falls",desc:"10 glacial waterfalls INSIDE a mountain. Only accessible in the world.",url:"https://www.truemmelbachfaelle.ch/en/"},
+      {name:"Iseltwald",desc:"Tiny lakeside village that went viral. Turquoise water dock photo spot.",url:"https://www.google.com/maps/place/Iseltwald,+Switzerland/"},
+      {name:"Rigi Kulm",desc:"Sunrise above the clouds. First mountain railway in Europe (1871).",url:"https://www.rigi.ch/en"},
+      {name:"Lauterbrunnen",desc:"Valley of 72 waterfalls. Tolkien's inspiration for Rivendell.",url:"https://www.google.com/maps/place/Lauterbrunnen,+Switzerland/"},
     ]},
   ],
   weather: [
@@ -338,23 +341,23 @@ const ROUTES = [
     }
   },
   trainLegs: [
-    {from:"Milan",to:"Varenna (Como)",hrs:"1h",cost:12,scenic:4,type:"Trenord Regional"},
-    {from:"Varenna",to:"Bolzano",hrs:"3h",cost:25,scenic:4,type:"Trenitalia"},
-    {from:"Bolzano",to:"Innsbruck",hrs:"2h",cost:18,scenic:5,type:"ÖBB Brenner"},
-    {from:"Innsbruck",to:"Salzburg",hrs:"2h",cost:25,scenic:5,type:"ÖBB Railjet"},
-    {from:"Salzburg",to:"Munich",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet"},
+    {from:"Milan",to:"Varenna (Como)",hrs:"1h",cost:12,scenic:4,type:"Trenord Regional",url:"https://www.trenord.it/en/"},
+    {from:"Varenna",to:"Bolzano",hrs:"3h",cost:25,scenic:4,type:"Trenitalia",url:"https://www.trenitalia.com/en.html"},
+    {from:"Bolzano",to:"Innsbruck",hrs:"2h",cost:18,scenic:5,type:"ÖBB Brenner",url:"https://www.oebb.at/en/"},
+    {from:"Innsbruck",to:"Salzburg",hrs:"2h",cost:25,scenic:5,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
+    {from:"Salzburg",to:"Munich",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
   ],
   activities: [
-    {name:"Villa Monastero Gardens",cost:12,loc:"Varenna",icon:"🌿"},
-    {name:"Bellagio Ferry & Stroll",cost:15,loc:"Lake Como",icon:"⛴️"},
-    {name:"Ötzi Museum",cost:15,loc:"Bolzano",icon:"🏛️"},
-    {name:"Seceda Cable Car",cost:45,loc:"Dolomites",icon:"🚡"},
-    {name:"Mountain Hut Lunch",cost:25,loc:"Dolomites",icon:"🏔️"},
-    {name:"Nordkette Cable Car",cost:45,loc:"Innsbruck",icon:"🚡"},
-    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵"},
-    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯"},
-    {name:"Mozart Dinner Concert",cost:75,loc:"Salzburg",icon:"🎶"},
-    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰"},
+    {name:"Villa Monastero Gardens",cost:12,loc:"Varenna",icon:"🌿",url:"https://www.villamonastero.eu/"},
+    {name:"Bellagio Ferry & Stroll",cost:15,loc:"Lake Como",icon:"⛴️",url:"https://www.navigazionelaghi.it/eng/como/"},
+    {name:"Ötzi Museum",cost:15,loc:"Bolzano",icon:"🏛️",url:"https://www.iceman.it/en/"},
+    {name:"Seceda Cable Car",cost:45,loc:"Dolomites",icon:"🚡",url:"https://www.seceda.it/en/"},
+    {name:"Mountain Hut Lunch",cost:25,loc:"Dolomites",icon:"🏔️",url:"https://www.google.com/maps/search/rifugio+seceda+dolomites/"},
+    {name:"Nordkette Cable Car",cost:45,loc:"Innsbruck",icon:"🚡",url:"https://www.nordkette.com/en"},
+    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵",url:"https://www.originalsoundofmusictour.com/"},
+    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯",url:"https://www.salzburg-burgen.at/en/hohensalzburg-castle/"},
+    {name:"Mozart Dinner Concert",cost:75,loc:"Salzburg",icon:"🎶",url:"https://www.mozart-dinner-concert-salzburg.com/"},
+    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰",url:"https://www.neuschwanstein.de/englisch/tourist/"},
   ],
   foodByCountry: [
     {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
@@ -362,32 +365,32 @@ const ROUTES = [
     {country:"Germany",breakfast:14,lunch:20,dinner:30,snacks:8,flag:"🇩🇪"},
   ],
   accomData: [
-    {loc:"Lake Como (Varenna)",n:2,rate:[65,55],rec:"Lakeside apartment · $65/pp/nt",unique:"🏡 Villa with terrace view"},
-    {loc:"Bolzano / Dolomites",n:2,rate:[55,45],rec:"Mountain chalet · $55/pp/nt",unique:"🏔️ Agriturismo with vineyard"},
-    {loc:"Innsbruck",n:1,rate:[70,60],rec:"Alpine townhouse · $70/pp/nt",unique:"🏔️ Boutique in Old Town"},
-    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge Castle $1,175/nt"},
-    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt"},
+    {loc:"Lake Como (Varenna)",n:2,rate:[65,55],rec:"Lakeside apartment · $65/pp/nt",unique:"🏡 Villa with terrace view",url:"https://www.airbnb.com/s/Varenna--Italy/homes?adults=16&checkin=2026-09-27&checkout=2026-09-29&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=5"},
+    {loc:"Bolzano / Dolomites",n:2,rate:[55,45],rec:"Mountain chalet · $55/pp/nt",unique:"🏔️ Agriturismo with vineyard",url:"https://www.airbnb.com/s/Bolzano--Italy/homes?adults=16&checkin=2026-09-29&checkout=2026-10-01&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=5"},
+    {loc:"Innsbruck",n:1,rate:[70,60],rec:"Alpine townhouse · $70/pp/nt",unique:"🏔️ Boutique in Old Town",url:"https://www.airbnb.com/s/Innsbruck--Austria/homes?adults=16&checkin=2026-10-01&checkout=2026-10-02&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=5"},
+    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge Castle $1,175/nt",url:"https://www.airbnb.com/s/Salzburg--Austria/homes?adults=16&checkin=2026-10-02&checkout=2026-10-04&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
+    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt",url:"https://www.airbnb.com/s/Munich--Germany/homes?adults=16&checkin=2026-10-04&checkout=2026-10-06&room_types%5B%5D=Entire%20home%2Fapt&min_bedrooms=6"},
   ],
   hiddenGems: [
     {region:"Lake Como",color:T.green,flag:"🇮🇹",gems:[
-      {name:"Varenna",desc:"Quieter than Bellagio. Pastel houses, olive groves, lakeside promenade at sunset."},
-      {name:"Greenway del Lago",desc:"10km lakeside walking path through olive groves and hidden villages."},
-      {name:"Nesso Waterfall Bridge",desc:"Ancient stone bridge over a gorge where a waterfall drops into the lake."},
+      {name:"Varenna",desc:"Quieter than Bellagio. Pastel houses, olive groves, lakeside promenade at sunset.",url:"https://www.google.com/maps/place/Varenna,+Italy/"},
+      {name:"Greenway del Lago",desc:"10km lakeside walking path through olive groves and hidden villages.",url:"https://www.google.com/maps/place/Greenway+del+Lago+di+Como/"},
+      {name:"Nesso Waterfall Bridge",desc:"Ancient stone bridge over a gorge where a waterfall drops into the lake.",url:"https://www.google.com/maps/place/Orrido+di+Nesso/"},
     ]},
     {region:"Dolomites",color:T.cyan,flag:"🇮🇹",gems:[
-      {name:"Val di Funes",desc:"Iconic church meadow with Dolomite peaks. One of the most photographed spots in the Alps."},
-      {name:"Pragser Wildsee",desc:"Hidden emerald lake surrounded by cliffs. Arrive early for mirror reflections."},
-      {name:"Bolzano Farmers Market",desc:"Daily market in Piazza delle Erbe. South Tyrolean cheese, speck, strudel, wine."},
+      {name:"Val di Funes",desc:"Iconic church meadow with Dolomite peaks. One of the most photographed spots in the Alps.",url:"https://www.google.com/maps/place/Val+di+Funes/"},
+      {name:"Pragser Wildsee",desc:"Hidden emerald lake surrounded by cliffs. Arrive early for mirror reflections.",url:"https://www.google.com/maps/place/Pragser+Wildsee/"},
+      {name:"Bolzano Farmers Market",desc:"Daily market in Piazza delle Erbe. South Tyrolean cheese, speck, strudel, wine.",url:"https://www.google.com/maps/place/Piazza+delle+Erbe,+Bolzano/"},
     ]},
     {region:"Innsbruck",color:T.purple,flag:"🇦🇹",gems:[
-      {name:"Bergisel Ski Jump",desc:"Zaha Hadid viewpoint. Panoramic views of the entire Inn Valley."},
-      {name:"Café Sacher Innsbruck",desc:"The original Sachertorte. Quieter than the Vienna location."},
-      {name:"Alpenzoo",desc:"Highest-altitude zoo in Europe. Alpine animals in natural settings."},
+      {name:"Bergisel Ski Jump",desc:"Zaha Hadid viewpoint. Panoramic views of the entire Inn Valley.",url:"https://www.bergisel.info/en"},
+      {name:"Café Sacher Innsbruck",desc:"The original Sachertorte. Quieter than the Vienna location.",url:"https://www.google.com/maps/place/Caf%C3%A9+Sacher+Innsbruck/"},
+      {name:"Alpenzoo",desc:"Highest-altitude zoo in Europe. Alpine animals in natural settings.",url:"https://www.alpenzoo.at/en/"},
     ]},
     {region:"Salzburg & Bavaria",color:"#fbbf24",flag:"🇦🇹🇩🇪",gems:[
-      {name:"Steingasse",desc:"Narrow medieval lane. Tiny bars, 600 years of history, zero tourist groups."},
-      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery (since 1160). Wood-fired bread in monastery courtyard."},
-      {name:"Viktualienmarkt Beer Garden",desc:"Munich's secret: communal beer garden hidden inside the daily market."},
+      {name:"Steingasse",desc:"Narrow medieval lane. Tiny bars, 600 years of history, zero tourist groups.",url:"https://www.google.com/maps/place/Steingasse,+Salzburg,+Austria/"},
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery (since 1160). Wood-fired bread in monastery courtyard.",url:"https://www.google.com/maps/place/Stiftsb%C3%A4ckerei+St.+Peter/"},
+      {name:"Viktualienmarkt Beer Garden",desc:"Munich's secret: communal beer garden hidden inside the daily market.",url:"https://www.google.com/maps/place/Viktualienmarkt/"},
     ]},
   ],
   weather: [
@@ -452,6 +455,17 @@ function MiniStat({icon:Icon,label,value,color,sub}) {
 function ScenicDots({count}) {
   return React.createElement("span", null, Array.from({length:5},(_,i) => React.createElement("span", {key:i,style:{color:i<count?T.accent:T.textDim,fontSize:14}}, "●")));
 }
+function LinkBtn({href,label,color,small}) {
+  if (!href) return null;
+  return React.createElement("a", {href,target:"_blank",rel:"noopener noreferrer",style:{
+    display:"inline-flex",alignItems:"center",gap:4,padding:small?"4px 10px":"6px 14px",
+    borderRadius:99,background:`${color||T.accent}18`,border:`1px solid ${color||T.accent}30`,
+    color:color||T.accent,fontSize:small?10:11,fontWeight:700,textDecoration:"none",
+    cursor:"pointer",transition:"all 0.2s",whiteSpace:"nowrap",WebkitTapHighlightColor:"transparent",minHeight:small?28:34,
+  },onMouseEnter:e=>{e.currentTarget.style.background=`${color||T.accent}30`},onMouseLeave:e=>{e.currentTarget.style.background=`${color||T.accent}18`}},
+    label||"View →"
+  );
+}
 
 // ============ MAP COMPONENTS ============
 function RouteMapFull({route}) {
@@ -503,17 +517,17 @@ function MiniMap({route}) {
 
 // ============ OVERVIEW SCREEN ============
 function OverviewScreen({onSelect}) {
-  return React.createElement("div", {style:{maxWidth:1100,margin:"0 auto",padding:"0 16px 60px"}},
+  return React.createElement("div", {style:{maxWidth:1100,margin:"0 auto",padding:"0 12px 60px"}},
     React.createElement(AnimIn, null,
-      React.createElement("div", {style:{textAlign:"center",padding:"48px 24px 32px",position:"relative"}},
+      React.createElement("div", {style:{textAlign:"center",padding:"32px 16px 24px",position:"relative"}},
         React.createElement("div", {style:{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 0%,rgba(240,160,80,0.08) 0%,transparent 60%)",pointerEvents:"none"}}),
-        React.createElement("div", {style:{fontSize:12,letterSpacing:3,color:T.accent,fontWeight:700,textTransform:"uppercase",marginBottom:8}}, "Choose Your Adventure"),
-        React.createElement("h1", {style:{fontSize:36,fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, "Perkins Family Europe Trip"),
-        React.createElement("p", {style:{color:T.textMuted,fontSize:15,margin:"0 0 8px"}}, "Celebrating 50 Years of Marriage"),
-        React.createElement("p", {style:{color:T.textDim,fontSize:13,margin:0}}, "3 curated routes based on everyone's feedback · 16 travelers · 8 couples · Fall 2026 or Spring 2027"),
+        React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.accent,fontWeight:700,textTransform:"uppercase",marginBottom:8}}, "Choose Your Adventure"),
+        React.createElement("h1", {style:{fontSize:"clamp(24px,6vw,36px)",fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, "Perkins Family Europe Trip"),
+        React.createElement("p", {style:{color:T.textMuted,fontSize:14,margin:"0 0 8px"}}, "Celebrating 50 Years of Marriage"),
+        React.createElement("p", {style:{color:T.textDim,fontSize:12,margin:0,lineHeight:1.5}}, "3 curated routes based on everyone's feedback · 16 travelers · 8 couples · Fall 2026 or Spring 2027"),
       )
     ),
-    React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:20}},
+    React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(280px,100%),1fr))",gap:16}},
       ROUTES.map((route,i) => React.createElement(AnimIn, {key:route.id,delay:i*120},
         React.createElement(GlowCard, {glow:route.color,onClick:()=>onSelect(i),style:{padding:0,overflow:"hidden"}},
           React.createElement(MiniMap, {route}),
@@ -551,17 +565,17 @@ function OverviewTab({route,season}) {
   const tierColors = [T.green, route.color, T.purple];
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
     React.createElement(AnimIn, null,
-      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}},
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(140px,100%),1fr))",gap:10}},
         React.createElement(MiniStat, {icon:Calendar,label:"Duration",value:"9 nights",color:route.color,sub:"+2 travel days"}),
         React.createElement(MiniStat, {icon:Globe,label:"Countries",value:String(route.countries.length),color:T.blue,sub:route.countryFlags.join(" ")}),
         React.createElement(MiniStat, {icon:Users,label:"Travelers",value:"16",color:T.green,sub:"8 couples"}),
-        React.createElement(MiniStat, {icon:MapPin,label:"Cities",value:String(route.cities.length),color:T.purple,sub:route.cities[0]+" → "+route.cities[route.cities.length-1]}),
+        React.createElement(MiniStat, {icon:MapPin,label:"Cities",value:String(route.cities.length),color:T.purple,sub:route.cities[0]+" → "+route.cities.at(-1)}),
         React.createElement(MiniStat, {icon:Train,label:"Train Legs",value:String(route.trainLegs.length),color:T.cyan,sub:"Point-to-point"}),
         React.createElement(MiniStat, {icon:DollarSign,label:"Base Gift",value:"$3K",color:T.accent,sub:"per couple"}),
       )
     ),
     React.createElement(AnimIn, {delay:100},
-      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16}},
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(260px,100%),1fr))",gap:14}},
         tierKeys.map((k,i) => {
           const t = tiers[k]; const pp = calcPP(t); const couple = calcCouple(t); const oop = couple - 3000; const isMid = k==="mid";
           return React.createElement(GlowCard, {key:k,glow:tierColors[i],style:isMid?{border:`2px solid ${route.color}40`,boxShadow:`0 0 40px ${route.color}15`}:{}},
@@ -634,16 +648,17 @@ function ItineraryTab({route,season}) {
         React.createElement("p", {style:{margin:"0 0 16px",fontSize:12,color:T.textMuted}}, "Point-to-point advance tickets"),
         React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:8}},
           route.trainLegs.map((leg,i) =>
-            React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:`${T.cyan}08`,borderRadius:10,border:`1px solid ${T.cyan}15`}},
-              React.createElement("div", {style:{flex:1,display:"flex",alignItems:"center",gap:6,fontSize:13}},
+            React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:8,padding:"10px 14px",background:`${T.cyan}08`,borderRadius:10,border:`1px solid ${T.cyan}15`,flexWrap:"wrap"}},
+              React.createElement("div", {style:{flex:1,display:"flex",alignItems:"center",gap:6,fontSize:13,minWidth:0,flexWrap:"wrap"}},
                 React.createElement("span", {style:{fontWeight:700,color:T.text}}, leg.from),
                 React.createElement(ArrowRight, {size:14,color:T.textDim}),
                 React.createElement("span", {style:{fontWeight:700,color:T.text}}, leg.to),
                 React.createElement("span", {style:{fontSize:10,color:T.cyan,background:`${T.cyan}15`,padding:"4px 10px",borderRadius:99}}, leg.type),
               ),
-              React.createElement("span", {style:{fontSize:12,color:T.textMuted,minWidth:45}}, leg.hrs),
-              React.createElement("span", {style:{fontSize:12,fontWeight:700,color:T.cyan,minWidth:35,textAlign:"right"}}, "€"+leg.cost),
+              React.createElement("span", {style:{fontSize:12,color:T.textMuted,minWidth:35}}, leg.hrs),
+              React.createElement("span", {style:{fontSize:12,fontWeight:700,color:T.cyan,minWidth:30,textAlign:"right"}}, "€"+leg.cost),
               React.createElement(ScenicDots, {count:leg.scenic}),
+              leg.url && React.createElement(LinkBtn, {href:leg.url,label:"Book →",color:T.cyan,small:true}),
             )
           ),
           React.createElement("div", {style:{display:"flex",justifyContent:"flex-end",gap:16,padding:"8px 14px",fontSize:13,fontWeight:700}},
@@ -664,11 +679,14 @@ function StaysTab({route,season}) {
         React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}},
           React.createElement("div", null,
             React.createElement("h3", {style:{margin:0,color:T.white,fontSize:18}}, a.loc),
-            React.createElement("span", {style:{fontSize:12,color:T.textMuted}}, a.n+" night"+(a.n>1?"s":""))
+            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginTop:4,flexWrap:"wrap"}},
+              React.createElement("span", {style:{fontSize:12,color:T.textMuted}}, a.n+" night"+(a.n>1?"s":"")),
+              a.url && React.createElement(LinkBtn, {href:a.url,label:"Browse Airbnb →",color:CC[i],small:true})
+            )
           ),
           React.createElement("span", {style:{fontSize:11,background:`${CC[i]}18`,color:CC[i],padding:"4px 12px",borderRadius:99,fontWeight:700}}, a.rec)
         ),
-        React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12,marginTop:16}},
+        React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(140px,100%),1fr))",gap:10,marginTop:14}},
           [{label:"Per Person/Night",val:"$"+a.rate[si]+"/nt",sub:"$"+(a.rate[si]*a.n)+" total"},
            {label:"Per Couple/Night",val:"$"+(a.rate[si]*2)+"/nt",sub:"$"+(a.rate[si]*2*a.n)+" total"},
            {label:"Standout Option",val:a.unique,sub:""}
@@ -704,7 +722,7 @@ function FoodTab({route}) {
     React.createElement(AnimIn, null,
       React.createElement(GlowCard, {glow:route.color},
         React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16,display:"flex",alignItems:"center",gap:8}},React.createElement(Coffee,{size:18,color:route.color})," Daily Food Budget by Country"),
-        React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14}},
+        React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(160px,100%),1fr))",gap:12}},
           route.foodByCountry.map((c,i) => {
             const total = c.breakfast+c.lunch+c.dinner+c.snacks;
             return React.createElement("div", {key:i,style:{background:`${CC[i]}10`,borderRadius:14,padding:16,border:`1px solid ${CC[i]}25`,textAlign:"center"}},
@@ -728,13 +746,16 @@ function FoodTab({route}) {
         React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16,display:"flex",alignItems:"center",gap:8}},React.createElement(Camera,{size:18,color:T.blue})," Activities & Experiences"),
         React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:6}},
           route.activities.map((a,i) =>
-            React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:i%2===0?`${T.blue}06`:"transparent",borderRadius:8}},
-              React.createElement("span", {style:{fontSize:20,width:32,textAlign:"center"}}, a.icon),
-              React.createElement("div", {style:{flex:1}},
-                React.createElement("div", {style:{fontSize:14,fontWeight:600,color:T.text}}, a.name),
+            React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:i%2===0?`${T.blue}06`:"transparent",borderRadius:8,flexWrap:"wrap"}},
+              React.createElement("span", {style:{fontSize:20,width:32,textAlign:"center",flexShrink:0}}, a.icon),
+              React.createElement("div", {style:{flex:1,minWidth:0}},
+                React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}},
+                  React.createElement("span", {style:{fontSize:14,fontWeight:600,color:T.text}}, a.name),
+                  a.url && React.createElement(LinkBtn, {href:a.url,label:"Info →",color:T.blue,small:true})
+                ),
                 React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, a.loc)
               ),
-              React.createElement("div", {style:{textAlign:"right"}},
+              React.createElement("div", {style:{textAlign:"right",flexShrink:0}},
                 React.createElement("div", {style:{fontSize:15,fontWeight:700,color:a.cost===0?T.green:T.white}}, a.cost===0?"Free":"$"+a.cost),
                 a.cost>0 && React.createElement("div", {style:{fontSize:10,color:T.textMuted}}, "×16 = $"+(a.cost*16))
               )
@@ -765,10 +786,13 @@ function GemsTab({route}) {
             React.createElement("span", {style:{fontSize:24}}, region.flag),
             React.createElement("h3", {style:{margin:0,color:T.white,fontSize:17,fontWeight:800}}, region.region)
           ),
-          React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10}},
+          React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(220px,100%),1fr))",gap:10}},
             region.gems.map((gem,gi) =>
               React.createElement("div", {key:gi,style:{background:`${region.color}08`,borderRadius:12,padding:14,border:`1px solid ${region.color}18`}},
-                React.createElement("div", {style:{fontSize:14,fontWeight:700,color:T.white,marginBottom:6}}, gem.name),
+                React.createElement("div", {style:{display:"flex",alignItems:"center",justifyContent:"space-between",gap:8,marginBottom:6,flexWrap:"wrap"}},
+                  React.createElement("span", {style:{fontSize:14,fontWeight:700,color:T.white}}, gem.name),
+                  gem.url && React.createElement(LinkBtn, {href:gem.url,label:"Map →",color:region.color,small:true})
+                ),
                 React.createElement("div", {style:{fontSize:12,color:T.textMuted,lineHeight:1.6}}, gem.desc)
               )
             )
@@ -815,7 +839,7 @@ function FamilyTab({route}) {
       )
     ),
     React.createElement(AnimIn, {delay:200},
-      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14}},
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(260px,100%),1fr))",gap:14}},
         groupPreferences.map((gp,i) => {
           const Icon = prefIcons[i]; const color = prefColors[i];
           return React.createElement(GlowCard, {key:i,glow:color,style:{padding:20}},
@@ -859,7 +883,7 @@ function CompareTab({route,season}) {
   const ties = scorecard.filter(s=>s.winner==="tie").length;
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
     React.createElement(AnimIn, null,
-      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:16,alignItems:"center"}},
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:12,alignItems:"center"}},
         React.createElement(GlowCard, {glow:T.accent,style:{textAlign:"center"}},
           React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"🍂 Fall 2026"),
           React.createElement("div",{style:{fontSize:36,fontWeight:900,color:T.accent}},"$"+fMid.toLocaleString()),
@@ -891,16 +915,16 @@ function CompareTab({route,season}) {
         ),
         scorecard.map((row,i) => {
           const Icon = iconLookup[row.icon]||Info;
-          return React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<scorecard.length-1?"1px solid "+T.border:"none"}},
-            React.createElement(Icon, {size:16,color:T.textDim}),
-            React.createElement("div", {style:{width:120,fontSize:13,fontWeight:600,color:T.text}}, row.factor),
-            React.createElement("div", {style:{flex:1,fontSize:12,color:row.winner==="fall"?T.accent:T.textMuted,textAlign:"center",fontWeight:row.winner==="fall"?700:400}}, row.fall),
-            React.createElement("div", {style:{width:32,textAlign:"center"}},
+          return React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:8,padding:"8px 0",borderBottom:i<scorecard.length-1?"1px solid "+T.border:"none"}},
+            React.createElement(Icon, {size:14,color:T.textDim,style:{flexShrink:0}}),
+            React.createElement("div", {style:{width:90,fontSize:12,fontWeight:600,color:T.text,flexShrink:0}}, row.factor),
+            React.createElement("div", {style:{flex:1,fontSize:11,color:row.winner==="fall"?T.accent:T.textMuted,textAlign:"center",fontWeight:row.winner==="fall"?700:400,minWidth:0}}, row.fall),
+            React.createElement("div", {style:{width:24,textAlign:"center",flexShrink:0}},
               row.winner==="fall"&&React.createElement("span",{style:{color:T.accent}},"🍂"),
               row.winner==="spring"&&React.createElement("span",{style:{color:T.green}},"🌷"),
               row.winner==="tie"&&React.createElement("span",{style:{color:T.textDim}},"—"),
             ),
-            React.createElement("div", {style:{flex:1,fontSize:12,color:row.winner==="spring"?T.green:T.textMuted,textAlign:"center",fontWeight:row.winner==="spring"?700:400}}, row.spring),
+            React.createElement("div", {style:{flex:1,fontSize:11,color:row.winner==="spring"?T.green:T.textMuted,textAlign:"center",fontWeight:row.winner==="spring"?700:400,minWidth:0}}, row.spring),
           );
         }),
         React.createElement("div", {style:{textAlign:"center",marginTop:16,padding:14,background:`${route.color}12`,borderRadius:12}},
@@ -940,27 +964,27 @@ function DetailView({route,routeIndex,onBack}) {
     {id:"family",label:"Family",icon:Users},
     {id:"compare",label:"Compare",icon:Compass},
   ];
-  return React.createElement("div", {style:{maxWidth:900,margin:"0 auto",padding:"0 16px calc(40px + env(safe-area-inset-bottom,0px))"}},
-    React.createElement("button", {onClick:onBack,style:{display:"flex",alignItems:"center",gap:6,background:"transparent",border:"none",color:route.color,fontSize:13,fontWeight:700,cursor:"pointer",padding:"16px 0",marginTop:8}},
+  return React.createElement("div", {style:{maxWidth:900,margin:"0 auto",padding:"0 12px calc(40px + env(safe-area-inset-bottom,0px))"}},
+    React.createElement("button", {onClick:onBack,style:{display:"flex",alignItems:"center",gap:6,background:"transparent",border:"none",color:route.color,fontSize:13,fontWeight:700,cursor:"pointer",padding:"12px 0",marginTop:4,WebkitTapHighlightColor:"transparent"}},
       React.createElement(ChevronLeft, {size:16}), "Back to All Routes"
     ),
-    React.createElement("div", {style:{textAlign:"center",padding:"16px 24px 32px",position:"relative"}},
+    React.createElement("div", {style:{textAlign:"center",padding:"12px 12px 24px",position:"relative"}},
       React.createElement("div", {style:{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 0%,${route.color}14 0%,transparent 60%)`,pointerEvents:"none"}}),
-      React.createElement("div", {style:{fontSize:12,letterSpacing:3,color:route.color,fontWeight:700,textTransform:"uppercase",marginBottom:8}}, route.tagline),
-      React.createElement("h1", {style:{fontSize:32,fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, route.name),
-      React.createElement("p", {style:{color:T.textMuted,fontSize:14,margin:"0 0 20px"}}, "Perkins Family Europe Trip · Route "+(routeIndex+1)+" of 3"),
-      React.createElement("div", {style:{display:"flex",justifyContent:"center",alignItems:"center",gap:4,flexWrap:"wrap",marginBottom:24}},
-        route.cities.map((c,i) => React.createElement("div", {key:c,style:{display:"flex",alignItems:"center",gap:4}},
-          React.createElement("span", {style:{background:T.card,border:"1px solid "+T.border,borderRadius:99,padding:"6px 14px",fontSize:13,fontWeight:600,color:T.text,display:"inline-flex",alignItems:"center",gap:6}},
+      React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:route.color,fontWeight:700,textTransform:"uppercase",marginBottom:6}}, route.tagline),
+      React.createElement("h1", {style:{fontSize:"clamp(24px,6vw,32px)",fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, route.name),
+      React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:"0 0 16px"}}, "Perkins Family Europe Trip · Route "+(routeIndex+1)+" of 3"),
+      React.createElement("div", {className:"hide-scrollbar",style:{display:"flex",justifyContent:"center",alignItems:"center",gap:4,flexWrap:"wrap",marginBottom:20,padding:"0 4px"}},
+        route.cities.map((c,i) => React.createElement("div", {key:c,style:{display:"flex",alignItems:"center",gap:3}},
+          React.createElement("span", {style:{background:T.card,border:"1px solid "+T.border,borderRadius:99,padding:"5px 10px",fontSize:12,fontWeight:600,color:T.text,display:"inline-flex",alignItems:"center",gap:4,whiteSpace:"nowrap"}},
             React.createElement("span",null,route.cityFlags[i]), c
           ),
-          i<route.cities.length-1 && React.createElement(ChevronRight, {size:14,color:T.textDim})
+          i<route.cities.length-1 && React.createElement(ChevronRight, {size:12,color:T.textDim})
         ))
       ),
-      React.createElement("div", {style:{display:"inline-flex",background:T.card,border:"1px solid "+T.border,borderRadius:99,padding:4,gap:4}},
+      React.createElement("div", {style:{display:"inline-flex",background:T.card,border:"1px solid "+T.border,borderRadius:99,padding:3,gap:3}},
         ["fall","spring"].map(s =>
           React.createElement("button", {key:s,onClick:()=>setSeason(s),style:{
-            padding:"10px 28px",borderRadius:99,border:"none",cursor:"pointer",fontWeight:700,fontSize:14,transition:"all 0.3s",minHeight:44,
+            padding:"10px 22px",borderRadius:99,border:"none",cursor:"pointer",fontWeight:700,fontSize:13,transition:"all 0.3s",minHeight:44,WebkitTapHighlightColor:"transparent",
             background:season===s?route.gradient:"transparent",
             color:season===s?T.white:T.textMuted,
             boxShadow:season===s?`0 4px 15px ${route.color}40`:"none",
@@ -969,15 +993,15 @@ function DetailView({route,routeIndex,onBack}) {
       )
     ),
     React.createElement(RouteMapFull, {route}),
-    React.createElement("div", {style:{display:"flex",gap:4,justifyContent:"center",flexWrap:"wrap",padding:"8px 8px 16px",position:"sticky",top:0,zIndex:20,background:`${T.bg}ee`,WebkitBackdropFilter:"blur(8px)",backdropFilter:"blur(8px)"}},
+    React.createElement("div", {className:"hide-scrollbar",style:{display:"flex",gap:3,justifyContent:"flex-start",overflowX:"auto",WebkitOverflowScrolling:"touch",padding:"8px 4px 12px",position:"sticky",top:0,zIndex:20,background:`${T.bg}ee`,WebkitBackdropFilter:"blur(8px)",backdropFilter:"blur(8px)"}},
       tabs.map(t => {
         const Icon = t.icon;
         return React.createElement("button", {key:t.id,onClick:()=>setTab(t.id),style:{
-          display:"flex",alignItems:"center",gap:5,padding:"10px 14px",borderRadius:99,border:"none",cursor:"pointer",transition:"all 0.25s",
+          display:"flex",alignItems:"center",gap:4,padding:"8px 12px",borderRadius:99,border:"none",cursor:"pointer",transition:"all 0.25s",WebkitTapHighlightColor:"transparent",
           background:tab===t.id?`${route.color}18`:"transparent",
           color:tab===t.id?route.color:T.textMuted,
-          fontWeight:tab===t.id?700:500,fontSize:12,whiteSpace:"nowrap",flexShrink:0,minHeight:44,
-        }}, React.createElement(Icon,{size:14}), t.label);
+          fontWeight:tab===t.id?700:500,fontSize:11,whiteSpace:"nowrap",flexShrink:0,minHeight:40,
+        }}, React.createElement(Icon,{size:13}), t.label);
       })
     ),
     tab==="overview" && React.createElement(OverviewTab, {route,season}),
