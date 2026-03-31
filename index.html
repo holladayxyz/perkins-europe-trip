@@ -14,16 +14,7 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-      body {
-        background: #0c0f1a;
-        color: #e8eaf0;
-        font-family: 'Inter', -apple-system, system-ui, sans-serif;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        -webkit-text-size-adjust: 100%;
-        overflow-x: hidden;
-      }
-      /* Hide scrollbar on tab nav */
+      body { background: #0c0f1a; color: #e8eaf0; font-family: 'Inter', -apple-system, system-ui, sans-serif; -webkit-font-smoothing: antialiased; overflow-x: hidden; }
       .hide-scrollbar::-webkit-scrollbar { display: none; }
       .route-tooltip { background: #151929 !important; color: #e8eaf0 !important; border: 1px solid #1e2540 !important; border-radius: 8px !important; padding: 4px 10px !important; font-family: 'Inter', sans-serif !important; font-size: 12px !important; font-weight: 600 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important; }
       .route-tooltip::before { border-top-color: #1e2540 !important; }
@@ -35,578 +26,574 @@
     <script type="module">
 import React, { useState, useEffect, useRef } from "https://esm.sh/react@18.3.1";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "https://esm.sh/recharts@2.12.7?deps=react@18.3.1,react-dom@18.3.1";
-import { Plane, Train, MapPin, Calendar, Users, DollarSign, Utensils, Camera, Sun, Moon, ChevronRight, Star, Heart, Mountain, Building, Music, Church, Backpack, Shield, Coffee, Bed, ArrowRight, Globe, Compass, Check, X as XIcon, TrendingDown, TrendingUp, Info } from "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1";
+import { Plane, Train, MapPin, Calendar, Users, DollarSign, Utensils, Camera, Sun, Moon, ChevronRight, Star, Heart, Mountain, Building, Music, Church, Backpack, Shield, Coffee, Bed, ArrowRight, Globe, Compass, Check, X as XIcon, TrendingDown, TrendingUp, Info, ChevronLeft } from "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1";
 
-// ============ THEME ============
-const T = {
-  bg: "#0c0f1a",
-  card: "#151929",
-  cardHover: "#1a2035",
-  border: "#1e2540",
-  accent: "#f0a050",
-  accentSoft: "rgba(240,160,80,0.12)",
-  blue: "#5b9bf5",
-  blueSoft: "rgba(91,155,245,0.12)",
-  green: "#4ade80",
-  greenSoft: "rgba(74,222,128,0.1)",
-  purple: "#a78bfa",
-  purpleSoft: "rgba(167,139,250,0.1)",
-  rose: "#fb7185",
-  roseSoft: "rgba(251,113,133,0.1)",
-  cyan: "#22d3ee",
-  cyanSoft: "rgba(34,211,238,0.1)",
-  text: "#e8eaf0",
-  textMuted: "#8892a8",
-  textDim: "#505a72",
-  white: "#ffffff",
-  gradient1: "linear-gradient(135deg, #f0a050 0%, #e06830 100%)",
-  gradient2: "linear-gradient(135deg, #5b9bf5 0%, #7c5bf5 100%)",
-  gradient3: "linear-gradient(135deg, #4ade80 0%, #22d3ee 100%)",
-};
-
-const CHART_COLORS = [T.accent, T.blue, T.green, T.purple, T.rose, T.cyan, "#fbbf24", "#f472b6"];
-
-const glassStyle = {
-  background: "rgba(21,25,41,0.7)",
-  WebkitBackdropFilter: "blur(12px)",
-  backdropFilter: "blur(12px)",
-  border: `1px solid ${T.border}`,
-  borderRadius: 16,
-};
-
-// ============ DATA ============
-const itinerary = {
-  fall: {
-    label: "Fall 2026", dates: "Sep 26 – Oct 6, 2026", travelDays: 11, groundDays: 9,
-    legs: [
-      { day: 0, date: "Sep 26", location: "SLC → Munich", type: "travel", icon: "plane", country: "Transit", desc: "Depart SLC afternoon. Overnight flight.", nights: 0, lat: 48.14, lng: 11.58 },
-      { day: 1, date: "Sep 27", location: "Munich", type: "city", icon: "church", country: "Germany", desc: "Arrive morning. LDS church (English available). Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.", nights: 1, lat: 48.14, lng: 11.58 },
-      { day: 2, date: "Sep 28", location: "Neuschwanstein & Bavaria", type: "nature", icon: "mountain", country: "Germany", desc: "Day trip to fairytale castle and Bavarian Alps. Quaint village of Füssen. Bakery crawl. Free evening.", nights: 1, lat: 47.56, lng: 10.75 },
-      { day: 3, date: "Sep 29", location: "Salzburg", type: "train", icon: "train", country: "Austria", desc: "Scenic train (1.5 hrs). Walk Old Town, Getreidegasse. Mozart's birthplace. Evening classical concert or opera.", nights: 1, lat: 47.8, lng: 13.04 },
-      { day: 4, date: "Sep 30", location: "Sound of Music Day", type: "highlight", icon: "music", country: "Austria", desc: "Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress. Bakeries and local restaurants.", nights: 1, lat: 47.8, lng: 13.04 },
-      { day: 5, date: "Oct 1", location: "Lake Bled", type: "nature", icon: "mountain", country: "Slovenia", desc: "Scenic Alpine train to Ljubljana (4.5 hrs), then local train to Bled Jezero (1.5 hrs via Jesenice). Pletna boat to island church. Bled cream cake. Sunset over Julian Alps.", nights: 1, lat: 46.37, lng: 14.09 },
-      { day: 6, date: "Oct 2", location: "→ Split", type: "train", icon: "train", country: "Croatia", desc: "Bled Castle morning. Train back to Ljubljana, then train to Zagreb and onward to Split. Diocletian's Palace by night.", nights: 1, lat: 43.51, lng: 16.44 },
-      { day: 7, date: "Oct 3", location: "Split", type: "city", icon: "camera", country: "Croatia", desc: "Diocletian's Palace, Riva promenade, fresh market. Afternoon: swim, kayak, or explore Trogir. Croatian seafood dinner.", nights: 1, lat: 43.51, lng: 16.44 },
-      { day: 8, date: "Oct 4", location: "Dubrovnik", type: "highlight", icon: "compass", country: "Croatia", desc: "Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls. Rest & explore.", nights: 1, lat: 42.65, lng: 18.09 },
-      { day: 9, date: "Oct 5", location: "Dubrovnik", type: "highlight", icon: "heart", country: "Croatia", desc: "Walk the full city walls. Kayaking optional. Cobblestone exploring, bakeries, local shops. Farewell group dinner.", nights: 1, lat: 42.65, lng: 18.09 },
-      { day: 10, date: "Oct 6", location: "Dubrovnik → Home", type: "travel", icon: "plane", country: "Transit", desc: "Fly home via connecting city. Arrive SLC late evening.", nights: 0, lat: 42.65, lng: 18.09 },
-    ]
-  },
-  spring: {
-    label: "Spring 2027", dates: "Apr 24 – May 4, 2027", travelDays: 11, groundDays: 9,
-    legs: [
-      { day: 0, date: "Apr 24", location: "SLC → Munich", type: "travel", icon: "plane", country: "Transit", desc: "Depart SLC afternoon. Overnight flight.", nights: 0, lat: 48.14, lng: 11.58 },
-      { day: 1, date: "Apr 25", location: "Munich", type: "city", icon: "church", country: "Germany", desc: "Arrive morning. LDS church (English available). Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.", nights: 1, lat: 48.14, lng: 11.58 },
-      { day: 2, date: "Apr 26", location: "Neuschwanstein & Bavaria", type: "nature", icon: "mountain", country: "Germany", desc: "Day trip to fairytale castle and Bavarian Alps. Quaint village of Füssen. Bakery crawl. Free evening.", nights: 1, lat: 47.56, lng: 10.75 },
-      { day: 3, date: "Apr 27", location: "Salzburg", type: "train", icon: "train", country: "Austria", desc: "Scenic train (1.5 hrs). Walk Old Town, Getreidegasse. Mozart's birthplace. Evening classical concert or opera.", nights: 1, lat: 47.8, lng: 13.04 },
-      { day: 4, date: "Apr 28", location: "Sound of Music Day", type: "highlight", icon: "music", country: "Austria", desc: "Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress. Bakeries and local restaurants.", nights: 1, lat: 47.8, lng: 13.04 },
-      { day: 5, date: "Apr 29", location: "Lake Bled", type: "nature", icon: "mountain", country: "Slovenia", desc: "Scenic Alpine train to Ljubljana (4.5 hrs), then local train to Bled Jezero (1.5 hrs via Jesenice). Pletna boat to island church. Bled cream cake. Sunset over Julian Alps.", nights: 1, lat: 46.37, lng: 14.09 },
-      { day: 6, date: "Apr 30", location: "→ Split", type: "train", icon: "train", country: "Croatia", desc: "Bled Castle morning. Train back to Ljubljana, then train to Zagreb and onward to Split. Diocletian's Palace by night.", nights: 1, lat: 43.51, lng: 16.44 },
-      { day: 7, date: "May 1", location: "Split", type: "city", icon: "camera", country: "Croatia", desc: "Diocletian's Palace, Riva promenade, fresh market. Afternoon: swim, kayak, or explore Trogir. Croatian seafood dinner.", nights: 1, lat: 43.51, lng: 16.44 },
-      { day: 8, date: "May 2", location: "Dubrovnik", type: "highlight", icon: "compass", country: "Croatia", desc: "Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls. Rest & explore.", nights: 1, lat: 42.65, lng: 18.09 },
-      { day: 9, date: "May 3", location: "Dubrovnik", type: "highlight", icon: "heart", country: "Croatia", desc: "Walk the full city walls. Kayaking optional. Cobblestone exploring, bakeries, local shops. Farewell group dinner.", nights: 1, lat: 42.65, lng: 18.09 },
-      { day: 10, date: "May 4", location: "Dubrovnik → Home", type: "travel", icon: "plane", country: "Transit", desc: "Fly home via connecting city. Arrive SLC late evening.", nights: 0, lat: 42.65, lng: 18.09 },
-    ]
-  }
-};
-
-// Budget tiers — AUDITED March 2026 against Kiwi, Airbnb, ÖBB, HZPP, FlixBus, and official activity sites
-// Flights: Kiwi SLC→MUC $518/pp cheapest (budget) → main carrier (Delta/Lufthansa) economy ~$850-1,100/pp one-way
-//          DBV→SLC $649/pp cheapest → main carrier ~$800-1,100/pp one-way. RT main carrier ~$1,700-$2,200/pp
-// Accommodation: Airbnb verified for 16 guests — $35/pp/night (Dubrovnik) to $96/pp/night (Bled lakefront)
-// Trains: Point-to-point advance tickets = ~€117/pp (~$126) vs €369 Eurail Global 7-day pass — saves ~$4,000 for group
-// Activities: All 12 verified against official sites. Total if doing everything = $592/pp.
-const budgetTiers = {
-  fall: {
-    value: { label: "Value", emoji: "🎒", flights: 1650, accommodation: 55, trains: 126, food: 55, activities: 235, misc: 25 },
-    mid: { label: "Mid-Tier", emoji: "✨", flights: 2050, accommodation: 75, trains: 126, food: 70, activities: 325, misc: 35 },
-    premium: { label: "Premium", emoji: "👑", flights: 2400, accommodation: 110, trains: 126, food: 95, activities: 415, misc: 50 },
-  },
-  spring: {
-    value: { label: "Value", emoji: "🎒", flights: 1450, accommodation: 45, trains: 126, food: 50, activities: 235, misc: 20 },
-    mid: { label: "Mid-Tier", emoji: "✨", flights: 1800, accommodation: 62, trains: 126, food: 65, activities: 325, misc: 30 },
-    premium: { label: "Premium", emoji: "👑", flights: 2100, accommodation: 95, trains: 126, food: 90, activities: 415, misc: 45 },
-  }
-};
+const T = { bg:"#0c0f1a", card:"#151929", cardHover:"#1a2035", border:"#1e2540", accent:"#f0a050", accentSoft:"rgba(240,160,80,0.12)", blue:"#5b9bf5", blueSoft:"rgba(91,155,245,0.12)", green:"#4ade80", greenSoft:"rgba(74,222,128,0.1)", purple:"#a78bfa", purpleSoft:"rgba(167,139,250,0.1)", rose:"#fb7185", roseSoft:"rgba(251,113,133,0.1)", cyan:"#22d3ee", cyanSoft:"rgba(34,211,238,0.1)", text:"#e8eaf0", textMuted:"#8892a8", textDim:"#505a72", white:"#ffffff", gradient1:"linear-gradient(135deg,#f0a050 0%,#e06830 100%)", gradient2:"linear-gradient(135deg,#5b9bf5 0%,#7c5bf5 100%)", gradient3:"linear-gradient(135deg,#4ade80 0%,#22d3ee 100%)" };
+const CC = [T.accent, T.blue, T.green, T.purple, T.rose, T.cyan, "#fbbf24", "#f472b6"];
+const glass = { background:"rgba(21,25,41,0.7)", WebkitBackdropFilter:"blur(12px)", backdropFilter:"blur(12px)", border:"1px solid "+T.border, borderRadius:16 };
 const NIGHTS = 9;
-const calcPP = (t) => t.flights + t.accommodation * NIGHTS + t.trains + t.food * NIGHTS + t.activities + t.misc * NIGHTS;
-const calcCouple = (t) => calcPP(t) * 2;
+const calcPP = t => t.flights + t.accommodation*NIGHTS + t.trains + t.food*NIGHTS + t.activities + t.misc*NIGHTS;
+const calcCouple = t => calcPP(t)*2;
+const iconMap = { plane:Plane, train:Train, church:Church, mountain:Mountain, music:Music, camera:Camera, compass:Compass, heart:Heart, building:Building, star:Star, coffee:Coffee };
 
+// ===================== ROUTE DATA =====================
+const ROUTES = [
+// --- ROUTE 1: Alpine-Adriatic ---
+{
+  id: "alpine-adriatic",
+  name: "Alpine-Adriatic",
+  tagline: "Alps to Adriatic",
+  color: T.accent,
+  gradient: T.gradient1,
+  countries: ["Germany","Austria","Slovenia","Croatia"],
+  countryFlags: ["🇩🇪","🇦🇹","🇸🇮","🇭🇷"],
+  cities: ["Munich","Salzburg","Lake Bled","Split","Dubrovnik"],
+  cityFlags: ["🇩🇪","🇦🇹","🇸🇮","🇭🇷","🇭🇷"],
+  highlights: ["Adriatic coast + alpine scenery","Sound of Music in Salzburg","Game of Thrones walls","Best weather variety","4 countries, most diverse"],
+  itinerary: {
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+      {day:0,date:"Sep 26",location:"SLC → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight.",nights:0,lat:48.14,lng:11.58},
+      {day:1,date:"Sep 27",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. LDS church. Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Sep 28",location:"Neuschwanstein & Bavaria",type:"nature",icon:"mountain",country:"Germany",desc:"Day trip to fairytale castle and Bavarian Alps. Village of Füssen. Bakery crawl.",nights:1,lat:47.56,lng:10.75},
+      {day:3,date:"Sep 29",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5 hrs). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Sep 30",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress.",nights:1,lat:47.8,lng:13.04},
+      {day:5,date:"Oct 1",location:"Lake Bled",type:"nature",icon:"mountain",country:"Slovenia",desc:"Train via Ljubljana. Pletna boat to island church. Bled cream cake. Julian Alps sunset.",nights:1,lat:46.37,lng:14.09},
+      {day:6,date:"Oct 2",location:"→ Split",type:"train",icon:"train",country:"Croatia",desc:"Bled Castle morning. Train to Ljubljana → Zagreb → Split. Diocletian's Palace by night.",nights:1,lat:43.51,lng:16.44},
+      {day:7,date:"Oct 3",location:"Split",type:"city",icon:"camera",country:"Croatia",desc:"Diocletian's Palace, Riva promenade, fresh market. Swim or explore Trogir. Seafood dinner.",nights:1,lat:43.51,lng:16.44},
+      {day:8,date:"Oct 4",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls.",nights:1,lat:42.65,lng:18.09},
+      {day:9,date:"Oct 5",location:"Dubrovnik",type:"highlight",icon:"heart",country:"Croatia",desc:"Walk full city walls. Kayaking optional. Cobblestone exploring, bakeries. Farewell dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:10,date:"Oct 6",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive SLC late evening.",nights:0,lat:42.65,lng:18.09},
+    ]},
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+      {day:0,date:"Apr 24",location:"SLC → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight.",nights:0,lat:48.14,lng:11.58},
+      {day:1,date:"Apr 25",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. LDS church. Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Apr 26",location:"Neuschwanstein & Bavaria",type:"nature",icon:"mountain",country:"Germany",desc:"Day trip to fairytale castle and Bavarian Alps. Village of Füssen. Bakery crawl.",nights:1,lat:47.56,lng:10.75},
+      {day:3,date:"Apr 27",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5 hrs). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Apr 28",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress.",nights:1,lat:47.8,lng:13.04},
+      {day:5,date:"Apr 29",location:"Lake Bled",type:"nature",icon:"mountain",country:"Slovenia",desc:"Train via Ljubljana. Pletna boat to island church. Bled cream cake. Julian Alps sunset.",nights:1,lat:46.37,lng:14.09},
+      {day:6,date:"Apr 30",location:"→ Split",type:"train",icon:"train",country:"Croatia",desc:"Bled Castle morning. Train to Ljubljana → Zagreb → Split. Diocletian's Palace by night.",nights:1,lat:43.51,lng:16.44},
+      {day:7,date:"May 1",location:"Split",type:"city",icon:"camera",country:"Croatia",desc:"Diocletian's Palace, Riva promenade, fresh market. Swim or explore Trogir. Seafood dinner.",nights:1,lat:43.51,lng:16.44},
+      {day:8,date:"May 2",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls.",nights:1,lat:42.65,lng:18.09},
+      {day:9,date:"May 3",location:"Dubrovnik",type:"highlight",icon:"heart",country:"Croatia",desc:"Walk full city walls. Kayaking optional. Cobblestone exploring, bakeries. Farewell dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:10,date:"May 4",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive SLC late evening.",nights:0,lat:42.65,lng:18.09},
+    ]}
+  },
+  budgetTiers: {
+    fall: {
+      value:{label:"Value",emoji:"🎒",flights:1650,accommodation:55,trains:126,food:55,activities:235,misc:25},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2050,accommodation:75,trains:126,food:70,activities:325,misc:35},
+      premium:{label:"Premium",emoji:"👑",flights:2400,accommodation:110,trains:126,food:95,activities:415,misc:50},
+    },
+    spring: {
+      value:{label:"Value",emoji:"🎒",flights:1450,accommodation:45,trains:126,food:50,activities:235,misc:20},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:1800,accommodation:62,trains:126,food:65,activities:325,misc:30},
+      premium:{label:"Premium",emoji:"👑",flights:2100,accommodation:95,trains:126,food:90,activities:415,misc:45},
+    }
+  },
+  trainLegs: [
+    {from:"Munich",to:"Salzburg",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet"},
+    {from:"Salzburg",to:"Ljubljana",hrs:"4.5h",cost:29,scenic:5,type:"ÖBB EuroCity"},
+    {from:"Ljubljana",to:"Bled Jezero",hrs:"1.5h",cost:7,scenic:4,type:"SZ Train"},
+    {from:"Bled Jezero",to:"Ljubljana",hrs:"1.5h",cost:7,scenic:4,type:"SZ Train"},
+    {from:"Ljubljana",to:"Zagreb",hrs:"2.5h",cost:18,scenic:3,type:"SZ/HŽ Direct"},
+    {from:"Zagreb",to:"Split",hrs:"6-8h",cost:18,scenic:4,type:"HZPP Train"},
+    {from:"Split",to:"Dubrovnik",hrs:"4-5h",cost:16,scenic:5,type:"FlixBus"},
+  ],
+  activities: [
+    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰"},
+    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵"},
+    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯"},
+    {name:"Mozart Fortress Concert",cost:51,loc:"Salzburg",icon:"🎻"},
+    {name:"Lake Bled Pletna Boat",cost:22,loc:"Slovenia",icon:"🚣"},
+    {name:"Bled Castle Entry",cost:17,loc:"Slovenia",icon:"🏰"},
+    {name:"Dubrovnik City Walls",cost:44,loc:"Dubrovnik",icon:"🧱"},
+    {name:"Sea Kayak Dubrovnik",cost:38,loc:"Dubrovnik",icon:"🛶"},
+    {name:"Diocletian's Palace Tour",cost:15,loc:"Split",icon:"🏛️"},
+  ],
+  foodByCountry: [
+    {country:"Germany",breakfast:14,lunch:20,dinner:30,snacks:8,flag:"🇩🇪"},
+    {country:"Austria",breakfast:15,lunch:22,dinner:32,snacks:9,flag:"🇦🇹"},
+    {country:"Slovenia",breakfast:10,lunch:14,dinner:22,snacks:6,flag:"🇸🇮"},
+    {country:"Croatia",breakfast:10,lunch:15,dinner:24,snacks:6,flag:"🇭🇷"},
+  ],
+  accomData: [
+    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt"},
+    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge $1,175/nt (castle!)"},
+    {loc:"Lake Bled",n:1,rate:[96,85],rec:"Eagle's Nest · 9BR · $96/pp/nt",unique:"🦅 Lakeview 5.0★"},
+    {loc:"Split / Dalmatia",n:2,rate:[42,35],rec:"Apartments Kaja · 7BR · $42/pp/nt",unique:"🎬 Villa Dalmacroa · cinema"},
+    {loc:"Dubrovnik",n:2,rate:[35,30],rec:"Villa Heights · 6BR · $35/pp/nt",unique:"🏊 Villa Sonja · pool · $1,084/nt"},
+  ],
+  hiddenGems: [
+    {region:"Bavaria",color:"#fbbf24",flag:"🇩🇪",gems:[
+      {name:"Mittenwald",desc:"Tiny violin-making village with painted facades. Feels like a storybook."},
+      {name:"Partnachklamm",desc:"700m gorge with roaring waterfalls and rock tunnels. 30-min otherworldly walk."},
+      {name:"Füssen Old Town",desc:"Medieval town below Neuschwanstein. Cobblestone lanes, zero crowds."},
+    ]},
+    {region:"Salzburg",color:T.rose,flag:"🇦🇹",gems:[
+      {name:"Steingasse",desc:"Narrow medieval lane across the river. Tiny bars, 600 years of history."},
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery in Salzburg (since 1160). Wood-fired bread in a monastery courtyard."},
+      {name:"Schranne Market (Thurs)",desc:"Weekly farmer's market at Mirabell. Local cheeses, pastries, flowers."},
+    ]},
+    {region:"Slovenia",color:T.green,flag:"🇸🇮",gems:[
+      {name:"Vintgar Gorge",desc:"1.6km boardwalk through a turquoise river gorge. More beautiful than the tourist version."},
+      {name:"Lake Bohinj",desc:"Bled's quieter, wilder cousin — crystal water, Julian Alps, fraction of visitors."},
+      {name:"Bled Cream Cake at Park Hotel",desc:"The kremšnita was invented here in 1953. $4 for a slice of heaven on the lakefront."},
+    ]},
+    {region:"Dubrovnik / Split",color:T.blue,flag:"🇭🇷",gems:[
+      {name:"Trogir Old Town",desc:"Entire island is UNESCO. 15 min from Split but feels a world away."},
+      {name:"Buža Bar",desc:"Cliff bar carved into the city walls. No sign, just a hole in the wall. Sunset drinks."},
+      {name:"Elafiti Islands",desc:"Three car-free islands 20 min by ferry. Pine forests, hidden coves, fresh grilled fish."},
+    ]},
+  ],
+  weather: [
+    {city:"Munich",fH:60,fL:43,sH:62,sL:42,fR:8,sR:11},
+    {city:"Salzburg",fH:58,fL:41,sH:59,sL:40,fR:9,sR:12},
+    {city:"Lake Bled",fH:59,fL:42,sH:61,sL:41,fR:10,sR:12},
+    {city:"Split",fH:72,fL:57,sH:68,sL:52,fR:7,sR:8},
+    {city:"Dubrovnik",fH:73,fL:58,sH:69,sL:54,fR:8,sR:9},
+  ],
+  compareScorecard: [
+    {factor:"Price",fall:"Higher (~15%)",spring:"Lower",winner:"spring",icon:"DollarSign"},
+    {factor:"Croatia Weather",fall:"Warm 70s°F",spring:"Mild high 60s",winner:"fall",icon:"Sun"},
+    {factor:"Alps Weather",fall:"Crisp & colorful",spring:"Green, more rain",winner:"fall",icon:"Mountain"},
+    {factor:"Crowd Level",fall:"Low shoulder",spring:"Low shoulder",winner:"tie",icon:"Users"},
+    {factor:"Schedule Fit",fall:"Most prefer",spring:"Fewer prefer",winner:"fall",icon:"Calendar"},
+    {factor:"Anniversary",fall:"Celebrate on trip!",spring:"Already passed",winner:"fall",icon:"Heart"},
+    {factor:"Childcare",fall:"Kids slightly younger",spring:"Kids older = easier",winner:"spring",icon:"Shield"},
+  ],
+},
+// --- ROUTE 2: Alpine Lakes & Swiss Alps ---
+{
+  id: "alpine-swiss",
+  name: "Alpine Lakes & Swiss Alps",
+  tagline: "Peaks, Lakes & Chocolate",
+  color: T.blue,
+  gradient: T.gradient2,
+  countries: ["Germany","Austria","Switzerland"],
+  countryFlags: ["🇩🇪","🇦🇹","🇨🇭"],
+  cities: ["Munich","Salzburg","Innsbruck","Lucerne","Interlaken"],
+  cityFlags: ["🇩🇪","🇦🇹","🇦🇹","🇨🇭","🇨🇭"],
+  highlights: ["Purest alpine experience","World-class scenic trains","Swiss chocolate & cheese","Castle-heavy route","Jungfrau & Pilatus peaks"],
+  itinerary: {
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+      {day:0,date:"Sep 26",location:"SLC → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight.",nights:0,lat:48.14,lng:11.58},
+      {day:1,date:"Sep 27",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. LDS church. Marienplatz & Viktualienmarkt. Beer hall dinner.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Sep 28",location:"Neuschwanstein & Bavaria",type:"nature",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Bavarian Alps. Füssen village. Bakery crawl.",nights:1,lat:47.56,lng:10.75},
+      {day:3,date:"Sep 29",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5h). Old Town, Getreidegasse, Mozart. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Sep 30",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church, Hohensalzburg Fortress.",nights:1,lat:47.8,lng:13.04},
+      {day:5,date:"Oct 1",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Train through Alps (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
+      {day:6,date:"Oct 2",location:"Lucerne",type:"train",icon:"train",country:"Switzerland",desc:"Scenic train via Zürich (4.5h). Chapel Bridge, Lion Monument, lake walk.",nights:1,lat:47.05,lng:8.31},
+      {day:7,date:"Oct 3",location:"Mt. Pilatus Day",type:"highlight",icon:"mountain",country:"Switzerland",desc:"Golden round trip: boat + cog railway + gondola. Panoramic summit views.",nights:1,lat:47.05,lng:8.31},
+      {day:8,date:"Oct 4",location:"Interlaken",type:"train",icon:"train",country:"Switzerland",desc:"GoldenPass Express (2h). Jungfrau views. Swiss chocolate workshop.",nights:1,lat:46.69,lng:7.85},
+      {day:9,date:"Oct 5",location:"Lauterbrunnen Valley",type:"highlight",icon:"mountain",country:"Switzerland",desc:"Valley of 72 waterfalls. Grindelwald. Cable cars. Farewell fondue dinner.",nights:1,lat:46.69,lng:7.85},
+      {day:10,date:"Oct 6",location:"Zürich → Home",type:"travel",icon:"plane",country:"Transit",desc:"Train to Zürich (2h). Fly home. Arrive SLC late evening.",nights:0,lat:47.38,lng:8.54},
+    ]},
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+      {day:0,date:"Apr 24",location:"SLC → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight.",nights:0,lat:48.14,lng:11.58},
+      {day:1,date:"Apr 25",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. LDS church. Marienplatz & Viktualienmarkt. Beer hall dinner.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Apr 26",location:"Neuschwanstein & Bavaria",type:"nature",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Bavarian Alps. Füssen village. Bakery crawl.",nights:1,lat:47.56,lng:10.75},
+      {day:3,date:"Apr 27",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5h). Old Town, Getreidegasse, Mozart. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Apr 28",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church, Hohensalzburg Fortress.",nights:1,lat:47.8,lng:13.04},
+      {day:5,date:"Apr 29",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Train through Alps (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
+      {day:6,date:"Apr 30",location:"Lucerne",type:"train",icon:"train",country:"Switzerland",desc:"Scenic train via Zürich (4.5h). Chapel Bridge, Lion Monument, lake walk.",nights:1,lat:47.05,lng:8.31},
+      {day:7,date:"May 1",location:"Mt. Pilatus Day",type:"highlight",icon:"mountain",country:"Switzerland",desc:"Golden round trip: boat + cog railway + gondola. Panoramic summit views.",nights:1,lat:47.05,lng:8.31},
+      {day:8,date:"May 2",location:"Interlaken",type:"train",icon:"train",country:"Switzerland",desc:"GoldenPass Express (2h). Jungfrau views. Swiss chocolate workshop.",nights:1,lat:46.69,lng:7.85},
+      {day:9,date:"May 3",location:"Lauterbrunnen Valley",type:"highlight",icon:"mountain",country:"Switzerland",desc:"Valley of 72 waterfalls. Grindelwald. Cable cars. Farewell fondue dinner.",nights:1,lat:46.69,lng:7.85},
+      {day:10,date:"May 4",location:"Zürich → Home",type:"travel",icon:"plane",country:"Transit",desc:"Train to Zürich (2h). Fly home. Arrive SLC late evening.",nights:0,lat:47.38,lng:8.54},
+    ]}
+  },
+  budgetTiers: {
+    fall: {
+      value:{label:"Value",emoji:"🎒",flights:1700,accommodation:65,trains:185,food:65,activities:280,misc:30},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2100,accommodation:90,trains:185,food:85,activities:380,misc:40},
+      premium:{label:"Premium",emoji:"👑",flights:2500,accommodation:130,trains:185,food:115,activities:480,misc:55},
+    },
+    spring: {
+      value:{label:"Value",emoji:"🎒",flights:1500,accommodation:55,trains:185,food:60,activities:280,misc:25},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:1850,accommodation:78,trains:185,food:78,activities:380,misc:35},
+      premium:{label:"Premium",emoji:"👑",flights:2200,accommodation:115,trains:185,food:105,activities:480,misc:50},
+    }
+  },
+  trainLegs: [
+    {from:"Munich",to:"Salzburg",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet"},
+    {from:"Salzburg",to:"Innsbruck",hrs:"2h",cost:25,scenic:5,type:"ÖBB Railjet"},
+    {from:"Innsbruck",to:"Zürich",hrs:"3.5h",cost:39,scenic:4,type:"ÖBB/SBB EuroCity"},
+    {from:"Zürich",to:"Lucerne",hrs:"0.75h",cost:15,scenic:3,type:"SBB IR"},
+    {from:"Lucerne",to:"Interlaken",hrs:"2h",cost:35,scenic:5,type:"GoldenPass Express"},
+    {from:"Interlaken",to:"Zürich",hrs:"2h",cost:35,scenic:4,type:"SBB IC"},
+  ],
+  activities: [
+    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰"},
+    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵"},
+    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯"},
+    {name:"Nordkette Cable Car",cost:45,loc:"Innsbruck",icon:"🚡"},
+    {name:"Swarovski Crystal Worlds",cost:22,loc:"Innsbruck",icon:"💎"},
+    {name:"Mt. Pilatus Golden Round Trip",cost:95,loc:"Lucerne",icon:"⛰️"},
+    {name:"Swiss Chocolate Workshop",cost:65,loc:"Interlaken",icon:"🍫"},
+    {name:"Harder Kulm Viewpoint",cost:35,loc:"Interlaken",icon:"🔭"},
+    {name:"Trümmelbach Falls",cost:14,loc:"Lauterbrunnen",icon:"💦"},
+  ],
+  foodByCountry: [
+    {country:"Germany",breakfast:14,lunch:20,dinner:30,snacks:8,flag:"🇩🇪"},
+    {country:"Austria",breakfast:15,lunch:22,dinner:32,snacks:9,flag:"🇦🇹"},
+    {country:"Switzerland",breakfast:18,lunch:28,dinner:42,snacks:12,flag:"🇨🇭"},
+  ],
+  accomData: [
+    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt"},
+    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge Castle $1,175/nt"},
+    {loc:"Innsbruck",n:1,rate:[70,60],rec:"Alpine Chalet · shared · $70/pp/nt",unique:"🏔️ Boutique in Old Town"},
+    {loc:"Lucerne",n:2,rate:[95,82],rec:"Lakeside apartment · $95/pp/nt",unique:"🏔️ Pilatus view penthouse"},
+    {loc:"Interlaken",n:2,rate:[85,72],rec:"Chalet with Jungfrau views · $85/pp/nt",unique:"🏔️ Swiss A-frame cabin"},
+  ],
+  hiddenGems: [
+    {region:"Bavaria",color:"#fbbf24",flag:"🇩🇪",gems:[
+      {name:"Mittenwald",desc:"Violin-making village in the Alps. Painted facades on every house."},
+      {name:"Partnachklamm",desc:"700m gorge near Garmisch. Roaring waterfalls and rock tunnels."},
+      {name:"Füssen Old Town",desc:"Medieval town below Neuschwanstein. Cobblestone lanes, zero crowds."},
+    ]},
+    {region:"Salzburg",color:T.rose,flag:"🇦🇹",gems:[
+      {name:"Steingasse",desc:"Narrow medieval lane. Tiny bars, zero tour groups, 600 years of history."},
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery in Salzburg (since 1160). Wood-fired monastery bread."},
+      {name:"Schranne Market",desc:"Thursday farmer's market at Mirabell. Cheeses, pastries, flowers."},
+    ]},
+    {region:"Innsbruck",color:T.purple,flag:"🇦🇹",gems:[
+      {name:"Bergisel Ski Jump",desc:"Zaha Hadid-designed viewpoint. Panoramic view of the Inn Valley."},
+      {name:"Alpenzoo",desc:"Highest-altitude zoo in Europe. Alpine animals with mountain backdrop."},
+      {name:"Maria-Theresien-Straße",desc:"Baroque boulevard with mountain views at every turn."},
+    ]},
+    {region:"Swiss Alps",color:T.cyan,flag:"🇨🇭",gems:[
+      {name:"Trümmelbach Falls",desc:"10 glacial waterfalls INSIDE a mountain. Only accessible in the world."},
+      {name:"Iseltwald",desc:"Tiny lakeside village that went viral. Turquoise water dock photo spot."},
+      {name:"Rigi Kulm",desc:"Sunrise above the clouds. First mountain railway in Europe (1871)."},
+      {name:"Lauterbrunnen",desc:"Valley of 72 waterfalls. Tolkien's inspiration for Rivendell."},
+    ]},
+  ],
+  weather: [
+    {city:"Munich",fH:60,fL:43,sH:62,sL:42,fR:8,sR:11},
+    {city:"Salzburg",fH:58,fL:41,sH:59,sL:40,fR:9,sR:12},
+    {city:"Innsbruck",fH:57,fL:38,sH:60,sL:39,fR:8,sR:11},
+    {city:"Lucerne",fH:56,fL:40,sH:58,sL:39,fR:10,sR:13},
+    {city:"Interlaken",fH:55,fL:38,sH:57,sL:37,fR:11,sR:13},
+  ],
+  compareScorecard: [
+    {factor:"Price",fall:"Highest (~20% more)",spring:"Still premium",winner:"spring",icon:"DollarSign"},
+    {factor:"Mountain Weather",fall:"Crisp, clear peaks",spring:"Green but more rain",winner:"fall",icon:"Mountain"},
+    {factor:"Scenic Trains",fall:"Peak fall colors",spring:"Lush green valleys",winner:"fall",icon:"Train"},
+    {factor:"Crowd Level",fall:"Low shoulder",spring:"Moderate",winner:"fall",icon:"Users"},
+    {factor:"Schedule Fit",fall:"Most prefer",spring:"Fewer prefer",winner:"fall",icon:"Calendar"},
+    {factor:"Anniversary",fall:"Celebrate on trip!",spring:"Already passed",winner:"fall",icon:"Heart"},
+    {factor:"Snow Risk",fall:"Minimal",spring:"Possible at altitude",winner:"fall",icon:"Shield"},
+  ],
+},
+// --- ROUTE 3: Italian Lakes & Alps ---
+{
+  id: "italian-alps",
+  name: "Italian Lakes & Alps",
+  tagline: "Canals, Peaks & Castles",
+  color: T.green,
+  gradient: T.gradient3,
+  countries: ["Italy","Austria","Germany"],
+  countryFlags: ["🇮🇹","🇦🇹","🇩🇪"],
+  cities: ["Lake Como","Bolzano","Innsbruck","Salzburg","Munich"],
+  cityFlags: ["🇮🇹","🇮🇹","🇦🇹","🇦🇹","🇩🇪"],
+  highlights: ["Best food of all 3 routes","Italian lakeside + Dolomites","Renaissance architecture","Sound of Music still included","Finishes in Bavaria"],
+  itinerary: {
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+      {day:0,date:"Sep 26",location:"SLC → Milan",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight to Milan Malpensa.",nights:0,lat:45.63,lng:8.72},
+      {day:1,date:"Sep 27",location:"Lake Como",type:"nature",icon:"mountain",country:"Italy",desc:"Train to Varenna (1h). Lakeside village stroll. Villa Monastero gardens. Aperitivo on the waterfront.",nights:1,lat:46.01,lng:9.28},
+      {day:2,date:"Sep 28",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Ferry to Bellagio (Pearl of the Lake). Cobblestone lanes, gelato, Villa Melzi. Boat ride. Italian dinner.",nights:1,lat:46.01,lng:9.28},
+      {day:3,date:"Sep 29",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Scenic train (3h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
+      {day:4,date:"Sep 30",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
+      {day:5,date:"Oct 1",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Brenner Pass train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
+      {day:6,date:"Oct 2",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:7,date:"Oct 3",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
+      {day:8,date:"Oct 4",location:"Munich",type:"train",icon:"train",country:"Germany",desc:"Train (1.5h). Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner.",nights:1,lat:48.14,lng:11.58},
+      {day:9,date:"Oct 5",location:"Neuschwanstein & Bavaria",type:"highlight",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Füssen village. Bavarian Alps. Farewell dinner.",nights:1,lat:48.14,lng:11.58},
+      {day:10,date:"Oct 6",location:"Munich → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home from Munich. Arrive SLC late evening.",nights:0,lat:48.14,lng:11.58},
+    ]},
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+      {day:0,date:"Apr 24",location:"SLC → Milan",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight to Milan Malpensa.",nights:0,lat:45.63,lng:8.72},
+      {day:1,date:"Apr 25",location:"Lake Como",type:"nature",icon:"mountain",country:"Italy",desc:"Train to Varenna (1h). Lakeside village stroll. Villa Monastero gardens. Aperitivo on the waterfront.",nights:1,lat:46.01,lng:9.28},
+      {day:2,date:"Apr 26",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Ferry to Bellagio (Pearl of the Lake). Cobblestone lanes, gelato, Villa Melzi. Boat ride. Italian dinner.",nights:1,lat:46.01,lng:9.28},
+      {day:3,date:"Apr 27",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Scenic train (3h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
+      {day:4,date:"Apr 28",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
+      {day:5,date:"Apr 29",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Brenner Pass train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
+      {day:6,date:"Apr 30",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:7,date:"May 1",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
+      {day:8,date:"May 2",location:"Munich",type:"train",icon:"train",country:"Germany",desc:"Train (1.5h). Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner.",nights:1,lat:48.14,lng:11.58},
+      {day:9,date:"May 3",location:"Neuschwanstein & Bavaria",type:"highlight",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Füssen village. Bavarian Alps. Farewell dinner.",nights:1,lat:48.14,lng:11.58},
+      {day:10,date:"May 4",location:"Munich → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home from Munich. Arrive SLC late evening.",nights:0,lat:48.14,lng:11.58},
+    ]}
+  },
+  budgetTiers: {
+    fall: {
+      value:{label:"Value",emoji:"🎒",flights:1600,accommodation:52,trains:115,food:60,activities:240,misc:25},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2000,accommodation:72,trains:115,food:78,activities:340,misc:35},
+      premium:{label:"Premium",emoji:"👑",flights:2350,accommodation:105,trains:115,food:100,activities:440,misc:48},
+    },
+    spring: {
+      value:{label:"Value",emoji:"🎒",flights:1400,accommodation:42,trains:115,food:55,activities:240,misc:20},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:1750,accommodation:60,trains:115,food:72,activities:340,misc:30},
+      premium:{label:"Premium",emoji:"👑",flights:2100,accommodation:90,trains:115,food:92,activities:440,misc:42},
+    }
+  },
+  trainLegs: [
+    {from:"Milan",to:"Varenna (Como)",hrs:"1h",cost:12,scenic:4,type:"Trenord Regional"},
+    {from:"Varenna",to:"Bolzano",hrs:"3h",cost:25,scenic:4,type:"Trenitalia"},
+    {from:"Bolzano",to:"Innsbruck",hrs:"2h",cost:18,scenic:5,type:"ÖBB Brenner"},
+    {from:"Innsbruck",to:"Salzburg",hrs:"2h",cost:25,scenic:5,type:"ÖBB Railjet"},
+    {from:"Salzburg",to:"Munich",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet"},
+  ],
+  activities: [
+    {name:"Villa Monastero Gardens",cost:12,loc:"Varenna",icon:"🌿"},
+    {name:"Bellagio Ferry & Stroll",cost:15,loc:"Lake Como",icon:"⛴️"},
+    {name:"Ötzi Museum",cost:15,loc:"Bolzano",icon:"🏛️"},
+    {name:"Seceda Cable Car",cost:45,loc:"Dolomites",icon:"🚡"},
+    {name:"Mountain Hut Lunch",cost:25,loc:"Dolomites",icon:"🏔️"},
+    {name:"Nordkette Cable Car",cost:45,loc:"Innsbruck",icon:"🚡"},
+    {name:"Sound of Music Tour",cost:76,loc:"Salzburg",icon:"🎵"},
+    {name:"Hohensalzburg Fortress",cost:21,loc:"Salzburg",icon:"🏯"},
+    {name:"Mozart Dinner Concert",cost:75,loc:"Salzburg",icon:"🎶"},
+    {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰"},
+  ],
+  foodByCountry: [
+    {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
+    {country:"Austria",breakfast:15,lunch:22,dinner:32,snacks:9,flag:"🇦🇹"},
+    {country:"Germany",breakfast:14,lunch:20,dinner:30,snacks:8,flag:"🇩🇪"},
+  ],
+  accomData: [
+    {loc:"Lake Como (Varenna)",n:2,rate:[65,55],rec:"Lakeside apartment · $65/pp/nt",unique:"🏡 Villa with terrace view"},
+    {loc:"Bolzano / Dolomites",n:2,rate:[55,45],rec:"Mountain chalet · $55/pp/nt",unique:"🏔️ Agriturismo with vineyard"},
+    {loc:"Innsbruck",n:1,rate:[70,60],rec:"Alpine townhouse · $70/pp/nt",unique:"🏔️ Boutique in Old Town"},
+    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · $50/pp/nt",unique:"🏰 Burglodge Castle $1,175/nt"},
+    {loc:"Munich / Bavaria",n:2,rate:[91,80],rec:"Bavarian house · 8BR · $91/pp/nt",unique:"🏰 Monastery Residence $2,239/nt"},
+  ],
+  hiddenGems: [
+    {region:"Lake Como",color:T.green,flag:"🇮🇹",gems:[
+      {name:"Varenna",desc:"Quieter than Bellagio. Pastel houses, olive groves, lakeside promenade at sunset."},
+      {name:"Greenway del Lago",desc:"10km lakeside walking path through olive groves and hidden villages."},
+      {name:"Nesso Waterfall Bridge",desc:"Ancient stone bridge over a gorge where a waterfall drops into the lake."},
+    ]},
+    {region:"Dolomites",color:T.cyan,flag:"🇮🇹",gems:[
+      {name:"Val di Funes",desc:"Iconic church meadow with Dolomite peaks. One of the most photographed spots in the Alps."},
+      {name:"Pragser Wildsee",desc:"Hidden emerald lake surrounded by cliffs. Arrive early for mirror reflections."},
+      {name:"Bolzano Farmers Market",desc:"Daily market in Piazza delle Erbe. South Tyrolean cheese, speck, strudel, wine."},
+    ]},
+    {region:"Innsbruck",color:T.purple,flag:"🇦🇹",gems:[
+      {name:"Bergisel Ski Jump",desc:"Zaha Hadid viewpoint. Panoramic views of the entire Inn Valley."},
+      {name:"Café Sacher Innsbruck",desc:"The original Sachertorte. Quieter than the Vienna location."},
+      {name:"Alpenzoo",desc:"Highest-altitude zoo in Europe. Alpine animals in natural settings."},
+    ]},
+    {region:"Salzburg & Bavaria",color:"#fbbf24",flag:"🇦🇹🇩🇪",gems:[
+      {name:"Steingasse",desc:"Narrow medieval lane. Tiny bars, 600 years of history, zero tourist groups."},
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery (since 1160). Wood-fired bread in monastery courtyard."},
+      {name:"Viktualienmarkt Beer Garden",desc:"Munich's secret: communal beer garden hidden inside the daily market."},
+    ]},
+  ],
+  weather: [
+    {city:"Lake Como",fH:66,fL:52,sH:64,sL:48,fR:7,sR:9},
+    {city:"Bolzano",fH:63,fL:44,sH:65,sL:43,fR:7,sR:9},
+    {city:"Innsbruck",fH:57,fL:38,sH:60,sL:39,fR:8,sR:11},
+    {city:"Salzburg",fH:58,fL:41,sH:59,sL:40,fR:9,sR:12},
+    {city:"Munich",fH:60,fL:43,sH:62,sL:42,fR:8,sR:11},
+  ],
+  compareScorecard: [
+    {factor:"Price",fall:"Moderate",spring:"Best value",winner:"spring",icon:"DollarSign"},
+    {factor:"Italian Weather",fall:"Perfect: warm, dry",spring:"Pleasant, some rain",winner:"fall",icon:"Sun"},
+    {factor:"Food Quality",fall:"Peak season produce",spring:"Spring menus",winner:"fall",icon:"Coffee"},
+    {factor:"Crowd Level",fall:"Low in Dolomites",spring:"Low everywhere",winner:"tie",icon:"Users"},
+    {factor:"Schedule Fit",fall:"Most prefer",spring:"Fewer prefer",winner:"fall",icon:"Calendar"},
+    {factor:"Anniversary",fall:"Celebrate on trip!",spring:"Already passed",winner:"fall",icon:"Heart"},
+    {factor:"Alpine Access",fall:"All lifts open",spring:"Some lifts closed",winner:"fall",icon:"Mountain"},
+  ],
+},
+];
+
+// ============ SHARED DATA ============
 const destinationVotes = [
-  { name: "Austria / Salzburg", votes: 9 }, { name: "Croatia / Dubrovnik", votes: 8 },
-  { name: "Germany / Bavaria", votes: 8 }, { name: "Switzerland", votes: 5 },
-  { name: "Prague / Czech Rep.", votes: 5 }, { name: "Italy / Rome", votes: 5 },
-  { name: "Slovenia / Bled", votes: 3 }, { name: "Greece", votes: 3 },
+  {name:"Austria / Salzburg",votes:9},{name:"Croatia / Dubrovnik",votes:8},{name:"Germany / Bavaria",votes:8},{name:"Switzerland",votes:5},{name:"Prague / Czech Rep.",votes:5},{name:"Italy / Rome",votes:5},{name:"Slovenia / Bled",votes:3},{name:"Greece",votes:3},
 ];
-
 const experienceData = [
-  { exp: "Togetherness", score: 10 }, { exp: "Bakeries & Food", score: 9 },
-  { exp: "Castles", score: 9 }, { exp: "Small Towns", score: 9 },
-  { exp: "Scenic Train", score: 9 }, { exp: "Nature / Hike", score: 8 },
-  { exp: "History", score: 7 }, { exp: "Cathedrals", score: 7 },
-  { exp: "Opera / Show", score: 6 }, { exp: "Architecture", score: 6 },
+  {exp:"Togetherness",score:10},{exp:"Bakeries & Food",score:9},{exp:"Castles",score:9},{exp:"Small Towns",score:9},{exp:"Scenic Train",score:9},{exp:"Nature / Hike",score:8},{exp:"History",score:7},{exp:"Cathedrals",score:7},{exp:"Opera / Show",score:6},{exp:"Architecture",score:6},
 ];
-
-// Food costs per person per day — researched via budgetyourtrip.com, numbeo.com, and travel forums (March 2026)
-const foodByCountry = [
-  { country: "Germany", breakfast: 14, lunch: 20, dinner: 30, snacks: 8, flag: "🇩🇪" },
-  { country: "Austria", breakfast: 15, lunch: 22, dinner: 32, snacks: 9, flag: "🇦🇹" },
-  { country: "Slovenia", breakfast: 10, lunch: 14, dinner: 22, snacks: 6, flag: "🇸🇮" },
-  { country: "Croatia", breakfast: 10, lunch: 15, dinner: 24, snacks: 6, flag: "🇭🇷" },
-];
-
-// Activities — AUDITED against official sites March 2026. All € converted at ~$1.09/€.
-const activities = [
-  { name: "Neuschwanstein Castle", cost: 26, loc: "Bavaria", icon: "🏰", source: "neuschwanstein.de — €21 + €2.50 booking = €23.50", url: "https://www.neuschwanstein.de/englisch/tourist/" },
-  { name: "Sound of Music Tour", cost: 76, loc: "Salzburg", icon: "🎵", source: "Panorama Tours — €70 pp (verified)", url: "https://www.panoramatours.com/en/salzburg/tour/original-sound-of-music-tour-tour-1a-28/" },
-  { name: "Hohensalzburg Fortress (All-Incl.)", cost: 21, loc: "Salzburg", icon: "🏯", source: "festung-hohensalzburg.at — €19.20 all-inclusive", url: "https://www.festung-hohensalzburg.at/en/your-visit/tickets" },
-  { name: "Mozart Fortress Concert", cost: 51, loc: "Salzburg", icon: "🎻", source: "salzburghighlights.at — €47 Cat 1 (rows 1-6)", url: "https://www.salzburghighlights.at/en/best-of-mozart-concerts/best-of-mozart-fortress-concert-21/" },
-  { name: "Mozart Dinner Concert", cost: 75, loc: "Salzburg", icon: "🎶", source: "Stiftskeller St. Peter — ~€69 pp", url: "https://www.mozart-dinner-concert-salzburg.com/" },
-  { name: "Lake Bled Pletna Boat", cost: 22, loc: "Slovenia", icon: "🚣", source: "pletna.si — €20 round trip (2025 rate)", url: "https://pletna.si/en/home/" },
-  { name: "Bled Castle Entry", cost: 17, loc: "Slovenia", icon: "🏰", source: "blejski-grad.si — €16 group rate (10+)", url: "https://www.blejski-grad.si/en/plan-your-visit/price-list/" },
-  { name: "Dubrovnik City Walls", cost: 44, loc: "Dubrovnik", icon: "🧱", source: "citywallsdubrovnik.hr — €40 Mar-Oct season", url: "https://shop.citywallsdubrovnik.hr/en/buy-tickets-for-the-following-locations" },
-  { name: "Sea Kayak Dubrovnik", cost: 38, loc: "Dubrovnik", icon: "🛶", source: "Adventure Dubrovnik — ~€35", url: "https://www.adventuredubrovnik.com/sea-kayaking-dubrovnik" },
-  { name: "Diocletian's Palace Tour", cost: 15, loc: "Split", icon: "🏛️", source: "Guided walking tour from €14", url: "https://diocletianpalace.com/diocletians-palace-walking-tour/" },
-  { name: "Food Walking Tour (Split)", cost: 120, loc: "Split", icon: "🍞", source: "My Hidden Croatia — €110 pp incl. food", url: "https://myhiddencroatia.com/when-in-split/" },
-  { name: "Zipline Omiš (optional)", cost: 87, loc: "Near Split", icon: "🪂", source: "zipline-croatia.com — €80 pp", url: "https://zipline-croatia.com/en/" },
-];
-
-// Train/bus legs — AUDITED via seat61.com, ÖBB, SZ, HZPP, FlixBus official sites (March 2026)
-// Prices below use realistic advance-booking rates (2-3 months out). Flex fares can be 30-50% higher.
-// Point-to-point BEATS Eurail Pass: ~€120/pp advance vs €369 Eurail Global 7-day pass
-const trainLegs = [
-  { from: "Munich", to: "Salzburg", hrs: "1.5h", cost: 22, scenic: 4, type: "ÖBB Railjet", url: "https://www.oebb.at/en/" },
-  { from: "Salzburg", to: "Ljubljana", hrs: "4.5h", cost: 29, scenic: 5, type: "ÖBB EuroCity", url: "https://www.oebb.at/en/" },
-  { from: "Ljubljana", to: "Bled Jezero", hrs: "1.5h", cost: 7, scenic: 4, type: "SZ Train (via Jesenice)", url: "https://potniski.sz.si/en/" },
-  { from: "Bled Jezero", to: "Ljubljana", hrs: "1.5h", cost: 7, scenic: 4, type: "SZ Train (via Jesenice)", url: "https://potniski.sz.si/en/" },
-  { from: "Ljubljana", to: "Zagreb", hrs: "2.5h", cost: 18, scenic: 3, type: "SZ/HŽ Direct", url: "https://potniski.sz.si/en/" },
-  { from: "Zagreb", to: "Split", hrs: "6-8h", cost: 18, scenic: 4, type: "HZPP Train", url: "https://www.hzpp.hr/en" },
-  { from: "Split", to: "Dubrovnik", hrs: "4-5h", cost: 16, scenic: 5, type: "FlixBus (no rail option)", url: "https://www.flixbus.com/" },
-];
-
-// Group preferences aggregated anonymously from all input
 const groupPreferences = [
-  { category: "Top Destinations", items: ["Austria/Salzburg", "Croatia/Dubrovnik", "Germany/Bavaria", "Switzerland", "Prague", "Italy/Rome", "Slovenia", "Greece"] },
-  { category: "Travel Style", items: ["Rural small towns + some landmarks", "Castles & countryside", "Mountains & chill relaxation", "Nature mixed with history", "Scenic views & cathedrals", "Coast & history", "Amazing architecture & WWII history", "Everything — all of it"] },
-  { category: "Must-Haves", items: ["Good breakfast every day", "Bakeries & local food", "Mom-and-pop restaurants", "Opera or classical concert", "Sound of Music experience", "Scenic train rides", "Cobblestone town exploring", "Castle or cathedral stay", "Cathedrals & old buildings", "Private/uncrowded experiences"] },
-  { category: "Must-Avoids", items: ["No hostels", "No early mornings", "No crowded tourist traps", "Not August", "No checked luggage", "Not too hot or too rainy"] },
-];
-
-const weather = [
-  { city: "Munich", fH: 60, fL: 43, sH: 62, sL: 42, fR: 8, sR: 11 },
-  { city: "Salzburg", fH: 58, fL: 41, sH: 59, sL: 40, fR: 9, sR: 12 },
-  { city: "Lake Bled", fH: 59, fL: 42, sH: 61, sL: 41, fR: 10, sR: 12 },
-  { city: "Split", fH: 72, fL: 57, sH: 68, sL: 52, fR: 7, sR: 8 },
-  { city: "Dubrovnik", fH: 73, fL: 58, sH: 69, sL: 54, fR: 8, sR: 9 },
-];
-
-// Accommodation data — REAL Airbnb search results for 16 guests (March 2026)
-// Villa prices = per night for ENTIRE property (all 16 guests) | Per-couple calculated automatically
-const accomData = [
-  { loc: "Munich / Bavaria", n: 2, villa: [1452, 1200], hotel: [165, 130],
-    unique: "🏰 Monastery Residence $2,239/nt",
-    rec: "Bavarian house · 8BR · $91/pp/nt",
-    airbnb: "https://www.airbnb.com/rooms/1109206529214830368",
-    airbnbName: "Modern Bavarian House, Lengenfeld",
-    castleOption: { name: "Thierhaupten Monastery Residence", url: "https://www.airbnb.com/rooms/1264474549701160014", price: 2239, beds: "17BR / 16 beds", note: "Actual monastery — incredible for the group" },
-  },
-  { loc: "Salzburg Region", n: 3, villa: [798, 650], hotel: [150, 120],
-    unique: "🏰 Burglodge $1,175/nt (castle!)",
-    rec: "Forsthaus Neuberg · 9BR · $50/pp/nt",
-    airbnb: "https://www.airbnb.com/rooms/9474529",
-    airbnbName: "Forsthaus Neuberg (Guest Fav, 4.94★)",
-    castleOption: { name: "Burglodge Fischerkeusche", url: "https://www.airbnb.com/rooms/1036282935324077664", price: 1175, beds: "13BR / 24 beds", note: "Castle lodge for up to 35 — the group dream stay" },
-  },
-  { loc: "Lake Bled", n: 2, villa: [1530, 1250], hotel: [125, 95],
-    unique: "🦅 Eagle's Nest Lakeview $1,530/nt",
-    rec: "Eagle's Nest · 9BR · $96/pp/nt",
-    airbnb: "https://www.airbnb.com/rooms/952759732791662526",
-    airbnbName: "9BR Lakeview Eagle's Nest Plus (5.0★)",
-    castleOption: null,
-  },
-  { loc: "Split / Dalmatia", n: 2, villa: [665, 540], hotel: [120, 90],
-    unique: "🎬 Villa Dalmacroa · cinema · $1,875/nt",
-    rec: "Apartments Kaja · 7BR · $42/pp/nt",
-    airbnb: "https://www.airbnb.com/rooms/1094351562839288240",
-    airbnbName: "New Apartments Kaja (5.0★, 20 ppl)",
-    castleOption: { name: "Villa Dalmacroa (9BR + Cinema Room)", url: "https://www.airbnb.com/rooms/41542144", price: 1875, beds: "9BR / 16 beds", note: "Private villa w/ cinema, pool — a group showstopper" },
-  },
-  { loc: "Dubrovnik", n: 2, villa: [566, 450], hotel: [140, 105],
-    unique: "🏊 Villa Sonja · 22 guests · pool · $1,084/nt",
-    rec: "Villa Heights · 6BR · $35/pp/nt",
-    airbnb: "https://www.airbnb.com/rooms/31159275",
-    airbnbName: "Villa Heights (Superhost, Pool+Jacuzzi)",
-    castleOption: { name: "Villa Sonja (7BR, Pool, 22 guests)", url: "https://www.airbnb.com/rooms/1641839753763172441", price: 1084, beds: "7BR / 22 beds", note: "Fits everyone with room to spare — pool + views" },
-  },
-];
-
-// Hidden gems — lesser-known spots locals love, researched from travel forums, Atlas Obscura, and local blogs
-const hiddenGems = [
-  { region: "Bavaria", gems: [
-    { name: "Mittenwald", desc: "Tiny violin-making village in the Alps with painted facades on every house. Feels like stepping into a storybook.", type: "village", url: "https://www.google.com/maps/place/Mittenwald,+Germany" },
-    { name: "Geisterklamm (Spirit Gorge)", desc: "Dramatic gorge hike with suspended walkways between Germany and Austria. Easy walk, stunning payoff.", type: "nature", url: "https://www.google.com/maps/place/Geisterklamm" },
-    { name: "Füssen Old Town", desc: "Most people only see Neuschwanstein — but the medieval town below has cobblestone lanes, painted buildings, and zero crowds.", type: "village", url: "https://www.google.com/maps/place/F%C3%BCssen,+Germany" },
-    { name: "Partnachklamm", desc: "700m gorge near Garmisch with roaring waterfalls and rock tunnels. A 30-min walk that feels otherworldly.", type: "nature", url: "https://www.google.com/maps/place/Partnachklamm" },
-  ]},
-  { region: "Salzburg", gems: [
-    { name: "Steingasse", desc: "The narrow medieval lane across the river from the tourist Old Town. Tiny bars, zero tour groups, 600 years of history.", type: "street", url: "https://www.google.com/maps/place/Steingasse,+Salzburg" },
-    { name: "Schranne Market (Thurs)", desc: "Salzburg's weekly farmer's market at Mirabell. Local cheeses, meats, pastries, flowers — exactly the authentic food experience the family wants.", type: "market", url: "https://www.google.com/maps/place/Schranne+Market+Salzburg" },
-    { name: "Stiftsbäckerei St. Peter", desc: "Oldest bakery in Salzburg (since 1160). Wood-fired bread in a monastery courtyard. The real deal for bakery lovers.", type: "food", url: "https://www.google.com/maps/place/Stiftsb%C3%A4ckerei+St.+Peter" },
-    { name: "Mondsee (Sound of Music church)", desc: "The actual wedding church from the film. A 20-min drive from Salzburg — lakeside town, no crowds, gorgeous.", type: "landmark", url: "https://www.google.com/maps/place/Mondsee,+Austria" },
-  ]},
-  { region: "Slovenia", gems: [
-    { name: "Vintgar Gorge", desc: "1.6km boardwalk through a turquoise river gorge. Locals consider it more beautiful than the tourist version in Bled.", type: "nature", url: "https://www.google.com/maps/place/Vintgar+Gorge" },
-    { name: "Lake Bohinj", desc: "Bled's quieter, wilder cousin — crystal water, Julian Alps backdrop, a fraction of the visitors. Perfect for a morning walk.", type: "nature", url: "https://www.google.com/maps/place/Lake+Bohinj" },
-    { name: "Pokljuka Gorge", desc: "Hidden forest gorge 20 min from Bled. Moss-covered cliffs, wooden bridges, virtually empty even in peak season.", type: "nature", url: "https://www.google.com/maps/place/Pokljuka+Gorge" },
-    { name: "Bled Cream Cake at Park Hotel", desc: "The kremšnita (cream cake) was invented here in 1953. Eat it on the lakefront terrace — $4 for a slice of heaven.", type: "food", url: "https://www.google.com/maps/place/Park+Hotel+Bled" },
-  ]},
-  { region: "Split / Dalmatia", gems: [
-    { name: "Trogir Old Town", desc: "Entire island is a UNESCO World Heritage site. 15 min from Split but feels a world away — Romanesque cathedral, no cruise ships.", type: "village", url: "https://www.google.com/maps/place/Trogir,+Croatia" },
-    { name: "Omiš", desc: "Pirate town at the mouth of a dramatic canyon. Home to the zipline, river rafting, and fortress ruins with views for days.", type: "village", url: "https://www.google.com/maps/place/Omi%C5%A1,+Croatia" },
-    { name: "Marjan Hill", desc: "Split's 'lung' — a forested peninsula with trails, hidden beaches, and a 360° panorama of the city and islands.", type: "nature", url: "https://www.google.com/maps/place/Marjan+Hill" },
-    { name: "Green Market (Pazar)", desc: "Daily open-air market right behind Diocletian's Palace. Local fruits, lavender honey, cheese, olive oil. The best souvenirs.", type: "market", url: "https://www.google.com/maps/place/Pazar+Split" },
-  ]},
-  { region: "Dubrovnik", gems: [
-    { name: "Elafiti Islands day trip", desc: "Three car-free islands 20 min by ferry. Pine forests, hidden coves, fresh grilled fish. Like Croatia 30 years ago.", type: "nature", url: "https://www.google.com/maps/place/Elafiti+Islands" },
-    { name: "Lokrum Island", desc: "10-min ferry from Old Town. Botanical garden, monastery ruins, peacocks roaming everywhere. A peaceful half-day escape.", type: "nature", url: "https://www.google.com/maps/place/Lokrum+Island" },
-    { name: "Buža Bar", desc: "Cliff bar literally carved into the city walls. No sign, just a hole in the wall. Drinks with a sunset over the Adriatic.", type: "food", url: "https://www.google.com/maps/place/Bu%C5%BEa+Bar+Dubrovnik" },
-    { name: "War Photo Limited", desc: "Powerful photojournalism gallery in the Old Town. Gives context to Croatia's recent history. Free entry some days.", type: "landmark", url: "https://www.google.com/maps/place/War+Photo+Limited" },
-  ]},
+  {category:"Top Destinations",items:["Austria/Salzburg","Croatia/Dubrovnik","Germany/Bavaria","Switzerland","Prague","Italy/Rome","Slovenia","Greece"]},
+  {category:"Travel Style",items:["Rural small towns + landmarks","Castles & countryside","Mountains & chill","Nature + history","Scenic views & cathedrals","Coast & history","Architecture & WWII history","Everything"]},
+  {category:"Must-Haves",items:["Good breakfast every day","Bakeries & local food","Mom-and-pop restaurants","Opera or classical concert","Sound of Music","Scenic train rides","Cobblestone exploring","Castle or cathedral stay"]},
+  {category:"Must-Avoids",items:["No hostels","No early mornings","No crowded tourist traps","Not August","No checked luggage","Not too hot or rainy"]},
 ];
 
 // ============ UTILITY COMPONENTS ============
-function AnimIn({ children, delay = 0 }) {
-  const [show, setShow] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setShow(true), delay); return () => clearTimeout(t); }, [delay]);
-  return React.createElement("div", { style: { opacity: show ? 1 : 0, transform: show ? "translateY(0)" : "translateY(16px)", transition: "all 0.5s cubic-bezier(0.16,1,0.3,1)" } }, children);
+function AnimIn({children,delay=0}) {
+  const [s,setS] = useState(false);
+  useEffect(() => { const t = setTimeout(() => setS(true), delay); return () => clearTimeout(t); }, [delay]);
+  return React.createElement("div", {style:{opacity:s?1:0,transform:s?"translateY(0)":"translateY(16px)",transition:"all 0.5s cubic-bezier(0.16,1,0.3,1)"}}, children);
 }
-
-function GlowCard({ children, glow, style, onClick }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    React.createElement("div", { onMouseEnter: () => setHovered(true), onMouseLeave: () => setHovered(false), onClick: onClick,
-      style: { ...glassStyle, padding: 24, position: "relative", overflow: "hidden", transition: "all 0.3s", cursor: onClick ? "pointer" : "default",
-        boxShadow: hovered ? `0 0 30px ${glow || T.accent}22, 0 8px 32px rgba(0,0,0,0.3)` : "0 4px 20px rgba(0,0,0,0.2)",
-        transform: hovered && onClick ? "translateY(-2px)" : "none", ...style } },
-      glow && React.createElement("div", { style: { position: "absolute", top: 0, left: 0, right: 0, height: 2, background: glow } }),
-      children
+function GlowCard({children,glow,style,onClick}) {
+  const [h,setH] = useState(false);
+  return React.createElement("div", {onMouseEnter:()=>setH(true),onMouseLeave:()=>setH(false),onClick,
+    style:{...glass,padding:24,position:"relative",overflow:"hidden",transition:"all 0.3s",cursor:onClick?"pointer":"default",
+      boxShadow:h?`0 0 30px ${glow||T.accent}22, 0 8px 32px rgba(0,0,0,0.3)`:"0 4px 20px rgba(0,0,0,0.2)",
+      transform:h&&onClick?"translateY(-2px)":"none",...style}},
+    glow && React.createElement("div", {style:{position:"absolute",top:0,left:0,right:0,height:2,background:glow}}),
+    children
+  );
+}
+function MiniStat({icon:Icon,label,value,color,sub}) {
+  return React.createElement("div", {style:{display:"flex",alignItems:"center",gap:12,padding:"12px 16px",background:`${color}10`,borderRadius:12,border:`1px solid ${color}20`}},
+    React.createElement("div", {style:{width:40,height:40,borderRadius:10,background:`${color}18`,display:"flex",alignItems:"center",justifyContent:"center"}}, React.createElement(Icon, {size:20,color})),
+    React.createElement("div", null,
+      React.createElement("div", {style:{fontSize:11,color:T.textMuted,letterSpacing:0.5,textTransform:"uppercase"}}, label),
+      React.createElement("div", {style:{fontSize:20,fontWeight:800,color:T.text}}, value),
+      sub && React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, sub)
     )
   );
 }
-
-function Pill({ children, color, active, onClick }) {
-  return (
-    React.createElement("button", { onClick: onClick, style: {
-      padding: "8px 18px", borderRadius: 99, border: `1.5px solid ${active ? color : T.border}`, cursor: "pointer",
-      background: active ? `${color}18` : "transparent", color: active ? color : T.textMuted,
-      fontSize: 13, fontWeight: 600, transition: "all 0.25s", letterSpacing: 0.2,
-      minHeight: 44, WebkitTapHighlightColor: "transparent",
-    } }, children)
-  );
+function ScenicDots({count}) {
+  return React.createElement("span", null, Array.from({length:5},(_,i) => React.createElement("span", {key:i,style:{color:i<count?T.accent:T.textDim,fontSize:14}}, "●")));
 }
 
-function MiniStat({ icon: Icon, label, value, color, sub }) {
-  return (
-    React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 12, padding: "12px 16px", background: `${color}10`, borderRadius: 12, border: `1px solid ${color}20` } },
-      React.createElement("div", { style: { width: 40, height: 40, borderRadius: 10, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center" } },
-        React.createElement(Icon, { size: 20, color: color })
-      ),
-      React.createElement("div", null,
-        React.createElement("div", { style: { fontSize: 11, color: T.textMuted, letterSpacing: 0.5, textTransform: "uppercase" } }, label),
-        React.createElement("div", { style: { fontSize: 20, fontWeight: 800, color: T.text } }, value),
-        sub && React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, sub)
-      )
-    )
-  );
-}
-
-function ScenicDots({ count }) {
-  return React.createElement("span", null, Array.from({ length: 5 }, (_, i) => React.createElement("span", { key: i, style: { color: i < count ? T.accent : T.textDim, fontSize: 14 } }, "●")));
-}
-
-const iconMap = { plane: Plane, train: Train, church: Church, mountain: Mountain, music: Music, camera: Camera, compass: Compass, heart: Heart };
-
-// ============ SECTIONS ============
-function RouteMap() {
-  const mapRef = useRef(null);
-  const mapInstance = useRef(null);
-  const stops = [
-    { name: "Munich", lat: 48.14, lng: 11.58, flag: "\u{1F1E9}\u{1F1EA}" },
-    { name: "Salzburg", lat: 47.80, lng: 13.04, flag: "\u{1F1E6}\u{1F1F9}" },
-    { name: "Lake Bled", lat: 46.37, lng: 14.09, flag: "\u{1F1F8}\u{1F1EE}" },
-    { name: "Split", lat: 43.51, lng: 16.44, flag: "\u{1F1ED}\u{1F1F7}" },
-    { name: "Dubrovnik", lat: 42.65, lng: 18.09, flag: "\u{1F1ED}\u{1F1F7}" },
-  ];
+// ============ MAP COMPONENTS ============
+function RouteMapFull({route}) {
+  const ref = useRef(null), inst = useRef(null);
+  const stops = route.cities.map((c,i) => {
+    const leg = route.itinerary.fall.legs.find(l => l.location.includes(c) || c.includes(l.location.split(" ")[0]));
+    return {name:c, lat:leg?leg.lat:0, lng:leg?leg.lng:0, flag:route.cityFlags[i]};
+  });
   useEffect(() => {
-    if (!mapRef.current || mapInstance.current) return;
-    const L = window.L;
-    if (!L) return;
-    const map = L.map(mapRef.current, { scrollWheelZoom: false, zoomControl: false, attributionControl: false, dragging: true });
-    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
-    const coords = stops.map(s => [s.lat, s.lng]);
-    L.polyline(coords, { color: "#f0a050", weight: 3, opacity: 0.7, dashArray: "10, 8" }).addTo(map);
-    stops.forEach((stop, i) => {
-      const m = L.circleMarker([stop.lat, stop.lng], { radius: 7, fillColor: "#f0a050", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9 }).addTo(map);
-      m.bindTooltip(stop.flag + " " + stop.name, { permanent: true, direction: i <= 2 ? "top" : "bottom", className: "route-tooltip", offset: [0, i <= 2 ? -10 : 10] });
+    if (!ref.current || inst.current) return;
+    const L = window.L; if (!L) return;
+    const map = L.map(ref.current, {scrollWheelZoom:false,zoomControl:false,attributionControl:false,dragging:true});
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19}).addTo(map);
+    const coords = stops.map(s=>[s.lat,s.lng]);
+    L.polyline(coords,{color:route.color,weight:3,opacity:0.7,dashArray:"10,8"}).addTo(map);
+    stops.forEach((stop,i) => {
+      const m = L.circleMarker([stop.lat,stop.lng],{radius:7,fillColor:route.color,color:"#fff",weight:2,opacity:1,fillOpacity:0.9}).addTo(map);
+      m.bindTooltip(stop.flag+" "+stop.name,{permanent:true,direction:i%2===0?"top":"bottom",className:"route-tooltip",offset:[0,i%2===0?-10:10]});
     });
     map.fitBounds(L.latLngBounds(coords).pad(0.15));
-    mapInstance.current = map;
-    return () => { map.remove(); mapInstance.current = null; };
-  }, []);
-  return React.createElement("div", { style: { marginBottom: 20 } },
-    React.createElement("div", { ref: mapRef, style: { height: 300, borderRadius: 16, border: "1px solid " + T.border, overflow: "hidden" } })
+    inst.current = map;
+    return () => { map.remove(); inst.current = null; };
+  }, [route.id]);
+  return React.createElement("div", {style:{marginBottom:20}},
+    React.createElement("div", {ref,style:{height:300,borderRadius:16,border:"1px solid "+T.border,overflow:"hidden"}})
   );
 }
 
-function HeroSection({ season, setSeason, setTab }) {
-  const cities = ["Munich", "Salzburg", "Lake Bled", "Split", "Dubrovnik"];
-  const flags = ["🇩🇪", "🇦🇹", "🇸🇮", "🇭🇷", "🇭🇷"];
-  return (
-    React.createElement("div", { style: { textAlign: "center", padding: "48px 24px 32px", position: "relative", overflow: "hidden" } },
-      React.createElement("div", { style: { position: "absolute", inset: 0, background: "radial-gradient(ellipse at 50% 0%, rgba(240,160,80,0.08) 0%, transparent 60%)", pointerEvents: "none" } }),
-      React.createElement(AnimIn, null,
-        React.createElement("div", { style: { fontSize: 12, letterSpacing: 3, color: T.accent, fontWeight: 700, textTransform: "uppercase", marginBottom: 8 } }, "The Alpine-Adriatic Route"),
-        React.createElement("h1", { style: { fontSize: 36, fontWeight: 900, color: T.white, margin: "0 0 6px", letterSpacing: -1 } }, "Perkins Family Europe Trip"),
-        React.createElement("p", { style: { color: T.textMuted, fontSize: 15, margin: "0 0 24px" } }, "Celebrating 50 Years of Marriage")
-      ),
-      React.createElement(AnimIn, { delay: 100 },
-        React.createElement("div", { style: { display: "flex", justifyContent: "center", alignItems: "center", gap: 4, flexWrap: "wrap", marginBottom: 28 } },
-          cities.map((c, i) =>
-            React.createElement("div", { key: c, style: { display: "flex", alignItems: "center", gap: 4 } },
-              React.createElement("span", { style: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 99, padding: "6px 14px", fontSize: 13, fontWeight: 600, color: T.text, display: "inline-flex", alignItems: "center", gap: 6 } },
-                React.createElement("span", null, flags[i]), c
-              ),
-              i < cities.length - 1 && React.createElement(ChevronRight, { size: 14, color: T.textDim })
-            )
-          )
-        )
-      ),
-      React.createElement(AnimIn, { delay: 200 },
-        React.createElement("div", { style: { display: "inline-flex", background: T.card, border: `1px solid ${T.border}`, borderRadius: 99, padding: 4, gap: 4 } },
-          ["fall", "spring"].map(s =>
-            React.createElement("button", { key: s, onClick: () => setSeason(s), style: {
-              padding: "10px 28px", borderRadius: 99, border: "none", cursor: "pointer", fontWeight: 700, fontSize: 14, transition: "all 0.3s", minHeight: 44, WebkitTapHighlightColor: "transparent",
-              background: season === s ? (s === "fall" ? T.gradient1 : T.gradient3) : "transparent",
-              color: season === s ? T.white : T.textMuted,
-              boxShadow: season === s ? `0 4px 15px ${s === "fall" ? "rgba(240,160,80,0.3)" : "rgba(74,222,128,0.3)"}` : "none",
-            } },
-              s === "fall" ? "🍂 Fall 2026" : "🌷 Spring 2027"
-            )
-          )
-        )
+function MiniMap({route}) {
+  const ref = useRef(null), inst = useRef(null);
+  const stops = route.cities.map((c,i) => {
+    const leg = route.itinerary.fall.legs.find(l => l.location.includes(c) || c.includes(l.location.split(" ")[0]));
+    return {lat:leg?leg.lat:0, lng:leg?leg.lng:0};
+  });
+  useEffect(() => {
+    if (!ref.current || inst.current) return;
+    const L = window.L; if (!L) return;
+    const map = L.map(ref.current, {scrollWheelZoom:false,zoomControl:false,attributionControl:false,dragging:false,touchZoom:false,doubleClickZoom:false});
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png",{maxZoom:19}).addTo(map);
+    const coords = stops.map(s=>[s.lat,s.lng]);
+    L.polyline(coords,{color:route.color,weight:3,opacity:0.8,dashArray:"8,6"}).addTo(map);
+    stops.forEach(s => L.circleMarker([s.lat,s.lng],{radius:5,fillColor:route.color,color:"#fff",weight:1.5,fillOpacity:0.9}).addTo(map));
+    map.fitBounds(L.latLngBounds(coords).pad(0.2));
+    inst.current = map;
+    return () => { map.remove(); inst.current = null; };
+  }, [route.id]);
+  return React.createElement("div", {ref,style:{height:180,borderRadius:12,overflow:"hidden",border:"1px solid "+T.border}});
+}
+
+// ============ OVERVIEW SCREEN ============
+function OverviewScreen({onSelect}) {
+  return React.createElement("div", {style:{maxWidth:1100,margin:"0 auto",padding:"0 16px 60px"}},
+    React.createElement(AnimIn, null,
+      React.createElement("div", {style:{textAlign:"center",padding:"48px 24px 32px",position:"relative"}},
+        React.createElement("div", {style:{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 0%,rgba(240,160,80,0.08) 0%,transparent 60%)",pointerEvents:"none"}}),
+        React.createElement("div", {style:{fontSize:12,letterSpacing:3,color:T.accent,fontWeight:700,textTransform:"uppercase",marginBottom:8}}, "Choose Your Adventure"),
+        React.createElement("h1", {style:{fontSize:36,fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, "Perkins Family Europe Trip"),
+        React.createElement("p", {style:{color:T.textMuted,fontSize:15,margin:"0 0 8px"}}, "Celebrating 50 Years of Marriage"),
+        React.createElement("p", {style:{color:T.textDim,fontSize:13,margin:0}}, "3 curated routes based on everyone's feedback · 16 travelers · 8 couples · Fall 2026 or Spring 2027"),
       )
-    )
-  );
-}
-
-function OverviewTab({ season }) {
-  const tiers = budgetTiers[season];
-  const tierKeys = ["value", "mid", "premium"];
-  const tierColors = [T.green, T.accent, T.purple];
-  const s = itinerary[season];
-
-  return (
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } },
-      React.createElement(AnimIn, null,
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 12 } },
-          React.createElement(MiniStat, { icon: Calendar, label: "Duration", value: `${s.groundDays} nights`, color: T.accent, sub: "+ 2 travel days" }),
-          React.createElement(MiniStat, { icon: Globe, label: "Countries", value: "4", color: T.blue, sub: "DE · AT · SI · HR" }),
-          React.createElement(MiniStat, { icon: Users, label: "Travelers", value: "16", color: T.green, sub: "8 couples" }),
-          React.createElement(MiniStat, { icon: MapPin, label: "Cities", value: "6", color: T.purple, sub: "Munich → Dubrovnik" }),
-          React.createElement(MiniStat, { icon: Train, label: "Train Legs", value: "7", color: T.cyan, sub: "Point-to-point" }),
-          React.createElement(MiniStat, { icon: DollarSign, label: "Base Gift", value: "$3K", color: T.accent, sub: "per couple" })
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 100 },
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 16 } },
-          tierKeys.map((k, i) => {
-            const t = tiers[k];
-            const pp = calcPP(t);
-            const couple = calcCouple(t);
-            const oop = couple - 3000;
-            const isMid = k === "mid";
-            return (
-              React.createElement(GlowCard, { key: k, glow: tierColors[i], style: isMid ? { border: `2px solid ${T.accent}40`, boxShadow: `0 0 40px ${T.accent}15` } : {} },
-                isMid && React.createElement("div", { style: { position: "absolute", top: 12, right: 16, background: T.gradient1, borderRadius: 99, padding: "3px 12px", fontSize: 10, fontWeight: 800, color: T.white, letterSpacing: 0.5 } }, "RECOMMENDED"),
-                React.createElement("div", { style: { fontSize: 28, marginBottom: 4 } }, t.emoji),
-                React.createElement("div", { style: { fontSize: 13, fontWeight: 700, color: tierColors[i], textTransform: "uppercase", letterSpacing: 1 } }, t.label),
-                React.createElement("div", { style: { fontSize: 40, fontWeight: 900, color: T.white, margin: "8px 0 2px", letterSpacing: -1 } }, `$${pp.toLocaleString()}`),
-                React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "per person"),
-                React.createElement("div", { style: { margin: "16px 0", padding: "12px 0", borderTop: `1px solid ${T.border}`, borderBottom: `1px solid ${T.border}` } },
-                  React.createElement("div", { style: { fontSize: 22, fontWeight: 800, color: tierColors[i] } }, `$${couple.toLocaleString()} `, React.createElement("span", { style: { fontSize: 12, fontWeight: 500, color: T.textMuted } }, "/ couple")),
-                  React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: T.green, marginTop: 4 } }, `Out of pocket: $${oop.toLocaleString()}`)
-                ),
-                React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6, fontSize: 12, color: T.textMuted } },
-                  [["Flights", `$${t.flights}`], [`Lodging (${NIGHTS}n)`, `$${t.accommodation * NIGHTS}`], [`Food (${NIGHTS}d)`, `$${t.food * NIGHTS}`], ["Transport", `$${t.trains}`], ["Activities", `$${t.activities}`]].map(([l, v]) =>
-                    React.createElement("div", { key: l, style: { display: "flex", justifyContent: "space-between" } },
-                      React.createElement("span", null, l), React.createElement("span", { style: { color: T.text, fontWeight: 600 } }, v)
-                    )
-                  )
-                )
-              )
-            );
-          })
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 200 },
-        React.createElement(GlowCard, { glow: T.blue },
-          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16 } }, "Where the Money Goes — Mid-Tier"),
-          React.createElement(ResponsiveContainer, { width: "99%", height: 260 },
-            React.createElement(PieChart, null,
-              React.createElement(Pie, { data: [
-                { name: "Flights", value: tiers.mid.flights },
-                { name: `Lodging`, value: tiers.mid.accommodation * NIGHTS },
-                { name: `Food`, value: tiers.mid.food * NIGHTS },
-                { name: "Transport", value: tiers.mid.trains },
-                { name: "Activities", value: tiers.mid.activities },
-                { name: `Misc`, value: tiers.mid.misc * NIGHTS },
-              ], cx: "50%", cy: "50%", innerRadius: 60, outerRadius: 100, paddingAngle: 3, dataKey: "value",
-                label: ({ name, value }) => `${name} $${value}`, labelLine: { stroke: T.textDim } },
-                CHART_COLORS.map((c, i) => React.createElement(Cell, { key: i, fill: c }))
-              ),
-              React.createElement(Tooltip, { contentStyle: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text }, formatter: v => `$${v}` })
-            )
-          )
-        )
-      )
-    )
-  );
-}
-
-function ItineraryTab({ season }) {
-  const [expanded, setExpanded] = useState(null);
-  const s = itinerary[season];
-  const typeColors = { travel: T.textDim, city: T.blue, nature: T.green, train: T.cyan, highlight: T.accent };
-  const countryColors = { Transit: T.textDim, Germany: "#fbbf24", Austria: T.rose, Slovenia: T.green, Croatia: T.blue };
-
-  return (
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 0, position: "relative" } },
-      React.createElement("div", { style: { position: "absolute", left: 28, top: 24, bottom: 24, width: 2, background: `linear-gradient(to bottom, ${T.accent}, ${T.blue}, ${T.green})`, borderRadius: 2, zIndex: 0 } }),
-      s.legs.map((leg, i) => {
-        const Icon = iconMap[leg.icon] || MapPin;
-        const color = typeColors[leg.type];
-        const isExpanded = expanded === i;
-        return (
-          React.createElement(AnimIn, { key: i, delay: i * 50 },
-            React.createElement("div", { onClick: () => setExpanded(isExpanded ? null : i), style: { display: "flex", gap: 16, padding: "12px 0", cursor: "pointer", position: "relative", zIndex: 1 } },
-              React.createElement("div", { style: {
-                width: 56, height: 56, borderRadius: 16, background: `${color}18`, border: `2px solid ${color}40`,
-                display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 0.3s",
-                boxShadow: isExpanded ? `0 0 20px ${color}30` : "none",
-              } },
-                React.createElement(Icon, { size: 22, color: color })
-              ),
-              React.createElement("div", { style: { flex: 1, minWidth: 0 } },
-                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" } },
-                  React.createElement("span", { style: { fontSize: 11, fontWeight: 800, color: T.textMuted, letterSpacing: 1 } }, `DAY ${leg.day}`),
-                  React.createElement("span", { style: { fontSize: 11, color: T.textDim } }, leg.date),
-                  React.createElement("span", { style: { fontSize: 10, fontWeight: 700, color: countryColors[leg.country], background: `${countryColors[leg.country]}15`, padding: "2px 8px", borderRadius: 99 } }, leg.country)
-                ),
-                React.createElement("div", { style: { fontSize: 17, fontWeight: 700, color: T.white, marginTop: 2 } }, leg.location),
-                React.createElement("div", { style: {
-                  fontSize: 13, color: T.textMuted, lineHeight: 1.6, marginTop: 4,
-                  maxHeight: isExpanded ? 200 : 22, overflow: "hidden", transition: "max-height 0.4s ease",
-                } }, leg.desc)
-              ),
-              leg.nights > 0 && React.createElement("div", { style: { fontSize: 11, color: T.textDim, display: "flex", alignItems: "center", gap: 4, flexShrink: 0 } }, React.createElement(Moon, { size: 12 }), `${leg.nights}n`)
-            )
-          )
-        );
-      }),
-
-      React.createElement(AnimIn, { delay: 600 },
-        React.createElement(GlowCard, { glow: T.cyan, style: { marginTop: 20 } },
-          React.createElement("h3", { style: { margin: "0 0 4px", color: T.white, fontSize: 16, display: "flex", alignItems: "center", gap: 8 } }, React.createElement(Train, { size: 18, color: T.cyan }), " Train Route"),
-          React.createElement("p", { style: { margin: "0 0 16px", fontSize: 12, color: T.textMuted } }, "Point-to-point saves ~$5,000 vs. Eurail Pass for 16 people"),
-          React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 8 } },
-            trainLegs.map((leg, i) =>
-              React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: `${T.cyan}08`, borderRadius: 10, border: `1px solid ${T.cyan}15` } },
-                React.createElement("div", { style: { flex: 1, display: "flex", alignItems: "center", gap: 6, fontSize: 13 } },
-                  React.createElement("span", { style: { fontWeight: 700, color: T.text } }, leg.from),
-                  React.createElement(ArrowRight, { size: 14, color: T.textDim }),
-                  React.createElement("span", { style: { fontWeight: 700, color: T.text } }, leg.to),
-                  leg.url && React.createElement("a", { href: leg.url, target: "_blank", rel: "noopener noreferrer", style: { fontSize: 10, color: T.cyan, textDecoration: "none", background: `${T.cyan}15`, padding: "6px 12px", borderRadius: 99, display: "inline-flex", alignItems: "center", WebkitTapHighlightColor: "transparent" } }, leg.type)
-                ),
-                React.createElement("span", { style: { fontSize: 12, color: T.textMuted, minWidth: 45 } }, leg.hrs),
-                React.createElement("span", { style: { fontSize: 12, fontWeight: 700, color: T.cyan, minWidth: 35, textAlign: "right" } }, `€${leg.cost}`),
-                React.createElement(ScenicDots, { count: leg.scenic })
-              )
+    ),
+    React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(300px,1fr))",gap:20}},
+      ROUTES.map((route,i) => React.createElement(AnimIn, {key:route.id,delay:i*120},
+        React.createElement(GlowCard, {glow:route.color,onClick:()=>onSelect(i),style:{padding:0,overflow:"hidden"}},
+          React.createElement(MiniMap, {route}),
+          React.createElement("div", {style:{padding:"20px 24px 24px"}},
+            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},
+              React.createElement("span", {style:{fontSize:11,fontWeight:800,color:route.color,letterSpacing:1,textTransform:"uppercase"}}, "Route "+(i+1)),
+              React.createElement("span", {style:{fontSize:10,color:T.textDim}}, "·"),
+              React.createElement("span", {style:{fontSize:10,color:T.textMuted}}, route.countries.length+" countries"),
             ),
-            React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", gap: 16, padding: "8px 14px", fontSize: 13, fontWeight: 700 } },
-              React.createElement("span", { style: { color: T.textMuted } }, "Total per person:"),
-              React.createElement("span", { style: { color: T.cyan } }, `€${trainLegs.reduce((s, l) => s + l.cost, 0)} (~$${Math.round(trainLegs.reduce((s, l) => s + l.cost, 0) * 1.08)})`)
-            )
-          )
-        )
-      )
-    )
-  );
-}
-
-function StaysTab({ season }) {
-  const si = season === "fall" ? 0 : 1;
-  return (
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 16 } },
-      accomData.map((a, i) =>
-        React.createElement(AnimIn, { key: i, delay: i * 80 },
-          React.createElement(GlowCard, { glow: CHART_COLORS[i] },
-            React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: 8 } },
+            React.createElement("h2", {style:{fontSize:22,fontWeight:900,color:T.white,margin:"0 0 2px"}}, route.name),
+            React.createElement("p", {style:{fontSize:13,color:T.textMuted,margin:"0 0 12px"}}, route.tagline),
+            React.createElement("div", {style:{display:"flex",gap:4,flexWrap:"wrap",marginBottom:14}},
+              route.cities.map((c,ci) => React.createElement("span", {key:ci,style:{fontSize:11,background:`${route.color}12`,color:route.color,padding:"3px 10px",borderRadius:99,fontWeight:600,border:`1px solid ${route.color}25`}}, route.cityFlags[ci]+" "+c))
+            ),
+            React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid "+T.border}},
               React.createElement("div", null,
-                React.createElement("h3", { style: { margin: 0, color: T.white, fontSize: 18 } }, a.loc),
-                React.createElement("span", { style: { fontSize: 12, color: T.textMuted } }, `${a.n} night${a.n > 1 ? "s" : ""}`)
+                React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, "Mid-tier per couple"),
+                React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+calcCouple(route.budgetTiers.fall.mid).toLocaleString()),
               ),
-              React.createElement("span", { style: { fontSize: 11, background: `${CHART_COLORS[i]}18`, color: CHART_COLORS[i], padding: "4px 12px", borderRadius: 99, fontWeight: 700 } }, a.rec)
-            ),
-            React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12, marginTop: 16 } },
-              [
-                { label: "Airbnb (all 16)", val: `$${a.villa[si].toLocaleString()}/nt`, sub: `$${Math.round(a.villa[si] / 8)}/couple/nt` },
-                { label: "Hotel (per room)", val: `$${a.hotel[si]}/nt`, sub: `$${a.hotel[si] * a.n} total for ${a.n}n` },
-                { label: "Standout Option", val: a.unique, sub: "" },
-              ].map((opt, j) =>
-                React.createElement("div", { key: j, style: { background: `${T.bg}90`, borderRadius: 10, padding: 12, border: `1px solid ${T.border}` } },
-                  React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginBottom: 4 } }, opt.label),
-                  React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: T.white } }, opt.val),
-                  opt.sub && React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginTop: 2 } }, opt.sub)
-                )
-              )
-            ),
-            a.airbnb && (
-              React.createElement("div", { style: { marginTop: 12, padding: "10px 14px", background: `${CHART_COLORS[i]}08`, borderRadius: 10, border: `1px solid ${CHART_COLORS[i]}15`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 } },
-                React.createElement("div", { style: { fontSize: 12, color: T.text } },
-                  React.createElement("span", { style: { fontWeight: 700 } }, "Top Pick: "),
-                  React.createElement("a", { href: a.airbnb, target: "_blank", rel: "noopener noreferrer", style: { color: CHART_COLORS[i], textDecoration: "none" } }, a.airbnbName)
-                )
-              )
-            ),
-            a.castleOption && (
-              React.createElement("div", { style: { marginTop: 8, padding: "10px 14px", background: `${T.accent}10`, borderRadius: 10, border: `1px solid ${T.accent}25`, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 } },
-                React.createElement("div", { style: { fontSize: 12, color: T.text } },
-                  React.createElement("span", { style: { fontSize: 16, marginRight: 6 } }, "🏰"),
-                  React.createElement("span", { style: { fontWeight: 700, color: T.accent } }, "Castle Option: "),
-                  React.createElement("a", { href: a.castleOption.url, target: "_blank", rel: "noopener noreferrer", style: { color: T.accent, textDecoration: "none" } }, a.castleOption.name),
-                  React.createElement("span", { style: { color: T.textMuted } }, ` — ${a.castleOption.beds} · $${a.castleOption.price}/nt · ${a.castleOption.note}`)
-                )
+              React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,color:route.color,fontSize:13,fontWeight:700}},
+                "Explore Route", React.createElement(ChevronRight, {size:16})
               )
             )
           )
         )
-      ),
+      ))
+    )
+  );
+}
 
-      React.createElement(AnimIn, { delay: 500 },
-        React.createElement(GlowCard, { glow: T.accent },
-          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16 } }, "Fall vs Spring — Nightly Rates"),
-          React.createElement(ResponsiveContainer, { width: "99%", height: 250 },
-            React.createElement(BarChart, { data: accomData.map(a => ({ loc: a.loc, Fall: a.hotel[0], Spring: a.hotel[1] })) },
-              React.createElement(CartesianGrid, { strokeDasharray: "3 3", stroke: T.border }),
-              React.createElement(XAxis, { dataKey: "loc", tick: { fill: T.textMuted, fontSize: 11 } }),
-              React.createElement(YAxis, { tickFormatter: v => `$${v}`, tick: { fill: T.textMuted, fontSize: 11 } }),
-              React.createElement(Tooltip, { contentStyle: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text }, formatter: v => `$${v}/room` }),
-              React.createElement(Legend, null),
-              React.createElement(Bar, { dataKey: "Fall", fill: T.accent, radius: [6, 6, 0, 0] }),
-              React.createElement(Bar, { dataKey: "Spring", fill: T.green, radius: [6, 6, 0, 0] })
+// ============ DETAIL TABS ============
+function OverviewTab({route,season}) {
+  const tiers = route.budgetTiers[season];
+  const tierKeys = ["value","mid","premium"];
+  const tierColors = [T.green, route.color, T.purple];
+  return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
+    React.createElement(AnimIn, null,
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(150px,1fr))",gap:12}},
+        React.createElement(MiniStat, {icon:Calendar,label:"Duration",value:"9 nights",color:route.color,sub:"+2 travel days"}),
+        React.createElement(MiniStat, {icon:Globe,label:"Countries",value:String(route.countries.length),color:T.blue,sub:route.countryFlags.join(" ")}),
+        React.createElement(MiniStat, {icon:Users,label:"Travelers",value:"16",color:T.green,sub:"8 couples"}),
+        React.createElement(MiniStat, {icon:MapPin,label:"Cities",value:String(route.cities.length),color:T.purple,sub:route.cities[0]+" → "+route.cities[route.cities.length-1]}),
+        React.createElement(MiniStat, {icon:Train,label:"Train Legs",value:String(route.trainLegs.length),color:T.cyan,sub:"Point-to-point"}),
+        React.createElement(MiniStat, {icon:DollarSign,label:"Base Gift",value:"$3K",color:T.accent,sub:"per couple"}),
+      )
+    ),
+    React.createElement(AnimIn, {delay:100},
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(260px,1fr))",gap:16}},
+        tierKeys.map((k,i) => {
+          const t = tiers[k]; const pp = calcPP(t); const couple = calcCouple(t); const oop = couple - 3000; const isMid = k==="mid";
+          return React.createElement(GlowCard, {key:k,glow:tierColors[i],style:isMid?{border:`2px solid ${route.color}40`,boxShadow:`0 0 40px ${route.color}15`}:{}},
+            isMid && React.createElement("div", {style:{position:"absolute",top:12,right:16,background:route.gradient,borderRadius:99,padding:"3px 12px",fontSize:10,fontWeight:800,color:T.white}}, "RECOMMENDED"),
+            React.createElement("div", {style:{fontSize:28,marginBottom:4}}, t.emoji),
+            React.createElement("div", {style:{fontSize:13,fontWeight:700,color:tierColors[i],textTransform:"uppercase",letterSpacing:1}}, t.label),
+            React.createElement("div", {style:{fontSize:40,fontWeight:900,color:T.white,margin:"8px 0 2px",letterSpacing:-1}}, "$"+pp.toLocaleString()),
+            React.createElement("div", {style:{fontSize:12,color:T.textMuted}}, "per person"),
+            React.createElement("div", {style:{margin:"16px 0",padding:"12px 0",borderTop:"1px solid "+T.border,borderBottom:"1px solid "+T.border}},
+              React.createElement("div", {style:{fontSize:22,fontWeight:800,color:tierColors[i]}}, "$"+couple.toLocaleString()+" ",React.createElement("span",{style:{fontSize:12,fontWeight:500,color:T.textMuted}},"/ couple")),
+              React.createElement("div", {style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}}, "Out of pocket: $"+oop.toLocaleString()),
+            ),
+            React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:6,fontSize:12,color:T.textMuted}},
+              [["Flights","$"+t.flights],["Lodging ("+NIGHTS+"n)","$"+(t.accommodation*NIGHTS)],["Food ("+NIGHTS+"d)","$"+(t.food*NIGHTS)],["Transport","$"+t.trains],["Activities","$"+t.activities]].map(([l,v])=>
+                React.createElement("div",{key:l,style:{display:"flex",justifyContent:"space-between"}},React.createElement("span",null,l),React.createElement("span",{style:{color:T.text,fontWeight:600}},v))
+              )
             )
+          );
+        })
+      )
+    ),
+    React.createElement(AnimIn, {delay:200},
+      React.createElement(GlowCard, {glow:T.blue},
+        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16}}, "Where the Money Goes — Mid-Tier"),
+        React.createElement(ResponsiveContainer, {width:"99%",height:260},
+          React.createElement(PieChart, null,
+            React.createElement(Pie, {data:[
+              {name:"Flights",value:tiers.mid.flights},{name:"Lodging",value:tiers.mid.accommodation*NIGHTS},{name:"Food",value:tiers.mid.food*NIGHTS},{name:"Transport",value:tiers.mid.trains},{name:"Activities",value:tiers.mid.activities},{name:"Misc",value:tiers.mid.misc*NIGHTS},
+            ],cx:"50%",cy:"50%",innerRadius:60,outerRadius:100,paddingAngle:3,dataKey:"value",label:({name,value})=>name+" $"+value,labelLine:{stroke:T.textDim}},
+              CC.map((c,i) => React.createElement(Cell,{key:i,fill:c}))
+            ),
+            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},formatter:v=>"$"+v})
           )
         )
       )
@@ -614,111 +601,54 @@ function StaysTab({ season }) {
   );
 }
 
-function FoodTab() {
-  return (
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } },
-      React.createElement(AnimIn, null,
-        React.createElement(GlowCard, { glow: T.accent },
-          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16, display: "flex", alignItems: "center", gap: 8 } }, React.createElement(Coffee, { size: 18, color: T.accent }), " Daily Food Budget by Country"),
-          React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: 14 } },
-            foodByCountry.map((c, i) => {
-              const total = c.breakfast + c.lunch + c.dinner + c.snacks;
-              return (
-                React.createElement("div", { key: i, style: { background: `${CHART_COLORS[i]}10`, borderRadius: 14, padding: 16, border: `1px solid ${CHART_COLORS[i]}25`, textAlign: "center" } },
-                  React.createElement("div", { style: { fontSize: 32 } }, c.flag),
-                  React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: T.white, marginTop: 4 } }, c.country),
-                  React.createElement("div", { style: { fontSize: 28, fontWeight: 900, color: CHART_COLORS[i], margin: "8px 0" } }, `$${total}`),
-                  React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, "per person / day"),
-                  React.createElement("div", { style: { marginTop: 10, fontSize: 11, color: T.textMuted, display: "flex", flexDirection: "column", gap: 3 } },
-                    React.createElement("div", null, "☀️ Breakfast $", c.breakfast),
-                    React.createElement("div", null, "🥖 Lunch $", c.lunch),
-                    React.createElement("div", null, "🍷 Dinner $", c.dinner),
-                    React.createElement("div", null, "☕ Snacks $", c.snacks)
-                  )
-                )
-              );
-            })
-          )
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 100 },
-        React.createElement(GlowCard, { glow: T.blue },
-          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16, display: "flex", alignItems: "center", gap: 8 } }, React.createElement(Camera, { size: 18, color: T.blue }), " Activities & Experiences"),
-          React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 6 } },
-            activities.map((a, i) =>
-              React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", background: i % 2 === 0 ? `${T.blue}06` : "transparent", borderRadius: 8 } },
-                React.createElement("span", { style: { fontSize: 20, width: 32, textAlign: "center" } }, a.icon),
-                React.createElement("div", { style: { flex: 1 } },
-                  React.createElement("div", { style: { fontSize: 14, fontWeight: 600 } },
-                    a.url ? React.createElement("a", { href: a.url, target: "_blank", rel: "noopener noreferrer", style: { color: T.text, textDecoration: "none", borderBottom: `1px dashed ${T.textDim}` } }, a.name) : React.createElement("span", { style: { color: T.text } }, a.name)
-                  ),
-                  React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, a.loc, a.source ? ` · ${a.source}` : "")
-                ),
-                React.createElement("div", { style: { textAlign: "right" } },
-                  React.createElement("div", { style: { fontSize: 15, fontWeight: 700, color: a.cost === 0 ? T.green : T.white } }, a.cost === 0 ? "Free" : `$${a.cost}`),
-                  a.cost > 0 && React.createElement("div", { style: { fontSize: 10, color: T.textMuted } }, `× 16 = $${a.cost * 16}`)
-                )
-              )
+function ItineraryTab({route,season}) {
+  const [expanded,setExpanded] = useState(null);
+  const s = route.itinerary[season];
+  const typeColors = {travel:T.textDim,city:T.blue,nature:T.green,train:T.cyan,highlight:route.color};
+  const countryColors = {Transit:T.textDim,Germany:"#fbbf24",Austria:T.rose,Slovenia:T.green,Croatia:T.blue,Switzerland:T.cyan,Italy:T.green};
+  return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:0,position:"relative"}},
+    React.createElement("div", {style:{position:"absolute",left:28,top:24,bottom:24,width:2,background:`linear-gradient(to bottom,${route.color},${T.blue},${T.green})`,borderRadius:2,zIndex:0}}),
+    s.legs.map((leg,i) => {
+      const Icon = iconMap[leg.icon]||MapPin; const color = typeColors[leg.type]; const isExp = expanded===i;
+      return React.createElement(AnimIn, {key:i,delay:i*50},
+        React.createElement("div", {onClick:()=>setExpanded(isExp?null:i),style:{display:"flex",gap:16,padding:"12px 0",cursor:"pointer",position:"relative",zIndex:1}},
+          React.createElement("div", {style:{width:56,height:56,borderRadius:16,background:`${color}18`,border:`2px solid ${color}40`,display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,transition:"all 0.3s",boxShadow:isExp?`0 0 20px ${color}30`:"none"}},
+            React.createElement(Icon, {size:22,color})
+          ),
+          React.createElement("div", {style:{flex:1,minWidth:0}},
+            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,flexWrap:"wrap"}},
+              React.createElement("span", {style:{fontSize:11,fontWeight:800,color:T.textMuted,letterSpacing:1}}, "DAY "+leg.day),
+              React.createElement("span", {style:{fontSize:11,color:T.textDim}}, leg.date),
+              React.createElement("span", {style:{fontSize:10,fontWeight:700,color:countryColors[leg.country],background:`${countryColors[leg.country]}15`,padding:"2px 8px",borderRadius:99}}, leg.country),
             ),
-            React.createElement("div", { style: { display: "flex", justifyContent: "flex-end", padding: "12px 14px", borderTop: `1px solid ${T.border}`, marginTop: 4, fontSize: 14 } },
-              React.createElement("span", { style: { color: T.textMuted, marginRight: 12 } }, "All activities per person:"),
-              React.createElement("span", { style: { fontWeight: 800, color: T.accent } }, `$${activities.reduce((s, a) => s + a.cost, 0)}`)
-            )
-          )
+            React.createElement("div", {style:{fontSize:17,fontWeight:700,color:T.white,marginTop:2}}, leg.location),
+            React.createElement("div", {style:{fontSize:13,color:T.textMuted,lineHeight:1.6,marginTop:4,maxHeight:isExp?200:22,overflow:"hidden",transition:"max-height 0.4s ease"}}, leg.desc),
+          ),
+          leg.nights>0 && React.createElement("div", {style:{fontSize:11,color:T.textDim,display:"flex",alignItems:"center",gap:4,flexShrink:0}},React.createElement(Moon,{size:12}),leg.nights+"n")
         )
-      )
-    )
-  );
-}
-
-function GemsTab() {
-  const typeIcons = { village: "🏘️", nature: "🌿", street: "🚶", market: "🧺", food: "🥐", landmark: "🏛️" };
-  const regionColors = { Bavaria: "#fbbf24", Salzburg: T.rose, Slovenia: T.green, "Split / Dalmatia": T.blue, Dubrovnik: T.cyan };
-  const regionFlags = { Bavaria: "🇩🇪", Salzburg: "🇦🇹", Slovenia: "🇸🇮", "Split / Dalmatia": "🇭🇷", Dubrovnik: "🇭🇷" };
-  return (
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 16 } },
-      React.createElement(AnimIn, null,
-        React.createElement("div", { style: { textAlign: "center", marginBottom: 8 } },
-          React.createElement("div", { style: { fontSize: 13, color: T.accent, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase" } }, "Off the Beaten Path"),
-          React.createElement("div", { style: { fontSize: 13, color: T.textMuted, marginTop: 4 } }, "The spots locals love that most tourists walk right past")
-        )
-      ),
-      hiddenGems.map((region, ri) => {
-        const color = regionColors[region.region] || T.accent;
-        return (
-          React.createElement(AnimIn, { key: ri, delay: ri * 80 },
-            React.createElement(GlowCard, { glow: color },
-              React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } },
-                React.createElement("span", { style: { fontSize: 24 } }, regionFlags[region.region]),
-                React.createElement("h3", { style: { margin: 0, color: T.white, fontSize: 17, fontWeight: 800 } }, region.region)
+      );
+    }),
+    React.createElement(AnimIn, {delay:600},
+      React.createElement(GlowCard, {glow:T.cyan,style:{marginTop:20}},
+        React.createElement("h3", {style:{margin:"0 0 4px",color:T.white,fontSize:16,display:"flex",alignItems:"center",gap:8}},React.createElement(Train,{size:18,color:T.cyan})," Train Route"),
+        React.createElement("p", {style:{margin:"0 0 16px",fontSize:12,color:T.textMuted}}, "Point-to-point advance tickets"),
+        React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:8}},
+          route.trainLegs.map((leg,i) =>
+            React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:`${T.cyan}08`,borderRadius:10,border:`1px solid ${T.cyan}15`}},
+              React.createElement("div", {style:{flex:1,display:"flex",alignItems:"center",gap:6,fontSize:13}},
+                React.createElement("span", {style:{fontWeight:700,color:T.text}}, leg.from),
+                React.createElement(ArrowRight, {size:14,color:T.textDim}),
+                React.createElement("span", {style:{fontWeight:700,color:T.text}}, leg.to),
+                React.createElement("span", {style:{fontSize:10,color:T.cyan,background:`${T.cyan}15`,padding:"4px 10px",borderRadius:99}}, leg.type),
               ),
-              React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 10 } },
-                region.gems.map((gem, gi) =>
-                  React.createElement("a", { key: gi, href: gem.url, target: "_blank", rel: "noopener noreferrer", style: { textDecoration: "none", WebkitTapHighlightColor: "transparent" } },
-                    React.createElement("div", { style: { background: `${color}08`, borderRadius: 12, padding: 14, border: `1px solid ${color}18`, transition: "all 0.25s", cursor: "pointer" },
-                      onMouseEnter: (e) => { e.currentTarget.style.background = `${color}15`; e.currentTarget.style.transform = "translateY(-2px)"; },
-                      onMouseLeave: (e) => { e.currentTarget.style.background = `${color}08`; e.currentTarget.style.transform = "none"; },
-                      onTouchStart: (e) => { e.currentTarget.style.background = `${color}15`; },
-                      onTouchEnd: (e) => { e.currentTarget.style.background = `${color}08`; } },
-                      React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 6, marginBottom: 6 } },
-                        React.createElement("span", { style: { fontSize: 16 } }, typeIcons[gem.type] || "📍"),
-                        React.createElement("span", { style: { fontSize: 14, fontWeight: 700, color: T.white } }, gem.name)
-                      ),
-                      React.createElement("div", { style: { fontSize: 12, color: T.textMuted, lineHeight: 1.6 } }, gem.desc)
-                    )
-                  )
-                )
-              )
+              React.createElement("span", {style:{fontSize:12,color:T.textMuted,minWidth:45}}, leg.hrs),
+              React.createElement("span", {style:{fontSize:12,fontWeight:700,color:T.cyan,minWidth:35,textAlign:"right"}}, "€"+leg.cost),
+              React.createElement(ScenicDots, {count:leg.scenic}),
             )
-          )
-        );
-      }),
-      React.createElement(AnimIn, { delay: 500 },
-        React.createElement(GlowCard, { glow: T.accent, style: { textAlign: "center", padding: 20 } },
-          React.createElement("div", { style: { fontSize: 14, color: T.accent, fontWeight: 700, marginBottom: 4 } }, "Pro Tip for the Group"),
-          React.createElement("div", { style: { fontSize: 13, color: T.textMuted, lineHeight: 1.7, maxWidth: 600, margin: "0 auto" } },
-            "These hidden gems are perfect for \"free afternoon\" time — couples can pick a spot that interests them and explore on their own, then regroup for dinner. No one needs to agree on everything."
+          ),
+          React.createElement("div", {style:{display:"flex",justifyContent:"flex-end",gap:16,padding:"8px 14px",fontSize:13,fontWeight:700}},
+            React.createElement("span", {style:{color:T.textMuted}}, "Total per person:"),
+            React.createElement("span", {style:{color:T.cyan}}, "€"+route.trainLegs.reduce((s,l)=>s+l.cost,0)+" (~$"+Math.round(route.trainLegs.reduce((s,l)=>s+l.cost,0)*1.08)+")")
           )
         )
       )
@@ -726,281 +656,359 @@ function GemsTab() {
   );
 }
 
-function FamilyTab() {
-  const prefColors = [T.accent, T.blue, T.green, T.purple];
-  const prefIcons = [Globe, Compass, Heart, Shield];
-  return (
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } },
-      React.createElement(AnimIn, null,
-        React.createElement(GlowCard, { glow: T.accent },
-          React.createElement("h3", { style: { margin: "0 0 4px", color: T.white, fontSize: 16 } }, "Destination Popularity"),
-          React.createElement("p", { style: { margin: "0 0 16px", fontSize: 12, color: T.textMuted } }, "How many times each destination was mentioned across all input (anonymous aggregate)"),
-          React.createElement(ResponsiveContainer, { width: "99%", height: 280 },
-            React.createElement(BarChart, { data: destinationVotes, layout: "vertical" },
-              React.createElement(CartesianGrid, { strokeDasharray: "3 3", stroke: T.border }),
-              React.createElement(XAxis, { type: "number", domain: [0, 10], tick: { fill: T.textMuted, fontSize: 11 } }),
-              React.createElement(YAxis, { dataKey: "name", type: "category", width: 140, tick: { fill: T.textMuted, fontSize: 12 } }),
-              React.createElement(Tooltip, { contentStyle: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text } }),
-              React.createElement(Bar, { dataKey: "votes", name: "Mentions", radius: [0, 8, 8, 0] },
-                destinationVotes.map((_, i) => React.createElement(Cell, { key: i, fill: CHART_COLORS[i % CHART_COLORS.length] }))
-              )
-            )
-          )
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 100 },
-        React.createElement(GlowCard, { glow: T.purple },
-          React.createElement("h3", { style: { margin: "0 0 4px", color: T.white, fontSize: 16 } }, "Experience Priorities"),
-          React.createElement("p", { style: { margin: "0 0 16px", fontSize: 12, color: T.textMuted } }, "Weighted importance across all family input — what matters most to the group collectively"),
-          React.createElement(ResponsiveContainer, { width: "99%", height: 320 },
-            React.createElement(RadarChart, { data: experienceData },
-              React.createElement(PolarGrid, { stroke: T.border }),
-              React.createElement(PolarAngleAxis, { dataKey: "exp", tick: { fill: T.textMuted, fontSize: 11 } }),
-              React.createElement(PolarRadiusAxis, { domain: [0, 10], tick: { fill: T.textDim, fontSize: 10 } }),
-              React.createElement(Radar, { name: "Priority", dataKey: "score", stroke: T.accent, fill: T.accent, fillOpacity: 0.2, strokeWidth: 2 })
-            )
-          )
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 200 },
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 14 } },
-          groupPreferences.map((gp, i) => {
-            const Icon = prefIcons[i];
-            const color = prefColors[i];
-            return (
-              React.createElement(GlowCard, { key: i, glow: color, style: { padding: 20 } },
-                React.createElement("div", { style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 14 } },
-                  React.createElement("div", { style: { width: 36, height: 36, borderRadius: 10, background: `${color}18`, display: "flex", alignItems: "center", justifyContent: "center" } },
-                    React.createElement(Icon, { size: 18, color: color })
-                  ),
-                  React.createElement("div", { style: { fontSize: 15, fontWeight: 800, color: T.white } }, gp.category)
-                ),
-                React.createElement("div", { style: { display: "flex", flexWrap: "wrap", gap: 6 } },
-                  gp.items.map((item, j) =>
-                    React.createElement("span", { key: j, style: { fontSize: 12, padding: "5px 12px", borderRadius: 99, background: `${color}12`, border: `1px solid ${color}25`, color: T.text, fontWeight: 500 } }, item)
-                  )
-                )
-              )
-            );
-          })
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 300 },
-        React.createElement(GlowCard, { glow: T.cyan },
-          React.createElement("h3", { style: { margin: "0 0 4px", color: T.white, fontSize: 16 } }, "Budget Range (Anonymous)"),
-          React.createElement("p", { style: { margin: "0 0 16px", fontSize: 12, color: T.textMuted } }, "What the group collectively indicated they're comfortable spending per couple"),
-          React.createElement("div", { style: { display: "flex", gap: 16, justifyContent: "center", flexWrap: "wrap" } },
-            React.createElement("div", { style: { textAlign: "center", background: T.accentSoft, borderRadius: 12, padding: 16, minWidth: 140, border: `1px solid ${T.accent}25` } },
-              React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginBottom: 4 } }, "Base (Gifted)"),
-              React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: T.accent } }, "$3,000"),
-              React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, "per couple")
-            ),
-            React.createElement("div", { style: { textAlign: "center", background: T.blueSoft, borderRadius: 12, padding: 16, minWidth: 140, border: `1px solid ${T.blue}25` } },
-              React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginBottom: 4 } }, "Additional Out-of-Pocket"),
-              React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: T.blue } }, "$3K–$5K"),
-              React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, "most common range")
-            ),
-            React.createElement("div", { style: { textAlign: "center", background: T.greenSoft, borderRadius: 12, padding: 16, minWidth: 140, border: `1px solid ${T.green}25` } },
-              React.createElement("div", { style: { fontSize: 11, color: T.textMuted, marginBottom: 4 } }, "Total Target"),
-              React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: T.green } }, "$6K–$8K"),
-              React.createElement("div", { style: { fontSize: 11, color: T.textMuted } }, "per couple all-in")
-            )
-          )
-        )
-      )
-    )
-  );
-}
-
-function CompareTab() {
-  const fMid = calcCouple(budgetTiers.fall.mid);
-  const sMid = calcCouple(budgetTiers.spring.mid);
-  const save = fMid - sMid;
-
-  const scorecard = [
-    { factor: "Price", fall: "Higher (~15%)", spring: "Lower", winner: "spring", icon: DollarSign },
-    { factor: "Croatia Weather", fall: "Warm 70s°F", spring: "Mild high 60s", winner: "fall", icon: Sun },
-    { factor: "Alps Weather", fall: "Crisp & colorful", spring: "Green, more rain", winner: "fall", icon: Mountain },
-    { factor: "Crowd Level", fall: "Low shoulder", spring: "Low shoulder", winner: "tie", icon: Users },
-    { factor: "Schedule Fit", fall: "Most prefer", spring: "Fewer prefer", winner: "fall", icon: Calendar },
-    { factor: "Anniversary", fall: "Celebrate on trip!", spring: "Already passed", winner: "fall", icon: Heart },
-    { factor: "Childcare", fall: "Kids slightly younger", spring: "Kids older = easier", winner: "spring", icon: Shield },
-  ];
-
-  const fallW = scorecard.filter(s => s.winner === "fall").length;
-  const springW = scorecard.filter(s => s.winner === "spring").length;
-  const ties = scorecard.filter(s => s.winner === "tie").length;
-
-  return (
-    React.createElement("div", { style: { display: "flex", flexDirection: "column", gap: 20 } },
-      React.createElement(AnimIn, null,
-        React.createElement("div", { style: { display: "grid", gridTemplateColumns: "1fr auto 1fr", gap: 16, alignItems: "center" } },
-          React.createElement(GlowCard, { glow: T.accent, style: { textAlign: "center" } },
-            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "🍂 Fall 2026"),
-            React.createElement("div", { style: { fontSize: 36, fontWeight: 900, color: T.accent } }, `$${fMid.toLocaleString()}`),
-            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "per couple (mid-tier)"),
-            React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: T.green, marginTop: 4 } }, `OOP: $${(fMid - 3000).toLocaleString()}`)
+function StaysTab({route,season}) {
+  const si = season==="fall"?0:1;
+  return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:16}},
+    route.accomData.map((a,i) => React.createElement(AnimIn, {key:i,delay:i*80},
+      React.createElement(GlowCard, {glow:CC[i]},
+        React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"flex-start",flexWrap:"wrap",gap:8}},
+          React.createElement("div", null,
+            React.createElement("h3", {style:{margin:0,color:T.white,fontSize:18}}, a.loc),
+            React.createElement("span", {style:{fontSize:12,color:T.textMuted}}, a.n+" night"+(a.n>1?"s":""))
           ),
-          React.createElement("div", { style: { textAlign: "center", padding: "0 8px" } },
-            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "Spring saves"),
-            React.createElement("div", { style: { fontSize: 24, fontWeight: 900, color: T.green } }, `$${save.toLocaleString()}`),
-            React.createElement(TrendingDown, { size: 20, color: T.green, style: { margin: "4px auto 0" } })
-          ),
-          React.createElement(GlowCard, { glow: T.green, style: { textAlign: "center" } },
-            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "🌷 Spring 2027"),
-            React.createElement("div", { style: { fontSize: 36, fontWeight: 900, color: T.green } }, `$${sMid.toLocaleString()}`),
-            React.createElement("div", { style: { fontSize: 12, color: T.textMuted } }, "per couple (mid-tier)"),
-            React.createElement("div", { style: { fontSize: 14, fontWeight: 700, color: T.green, marginTop: 4 } }, `OOP: $${(sMid - 3000).toLocaleString()}`)
-          )
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 100 },
-        React.createElement(GlowCard, { glow: T.purple },
-          React.createElement("div", { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 } },
-            React.createElement("h3", { style: { margin: 0, color: T.white, fontSize: 16 } }, "Season Scorecard"),
-            React.createElement("div", { style: { display: "flex", gap: 12, fontSize: 13, fontWeight: 700 } },
-              React.createElement("span", { style: { color: T.accent } }, `🍂 ${fallW}`),
-              React.createElement("span", { style: { color: T.textDim } }, `Tie ${ties}`),
-              React.createElement("span", { style: { color: T.green } }, `🌷 ${springW}`)
-            )
-          ),
-          scorecard.map((row, i) => {
-            const Icon = row.icon;
-            return (
-              React.createElement("div", { key: i, style: { display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: i < scorecard.length - 1 ? `1px solid ${T.border}` : "none" } },
-                React.createElement(Icon, { size: 16, color: T.textDim }),
-                React.createElement("div", { style: { width: 120, fontSize: 13, fontWeight: 600, color: T.text } }, row.factor),
-                React.createElement("div", { style: { flex: 1, fontSize: 12, color: row.winner === "fall" ? T.accent : T.textMuted, textAlign: "center", fontWeight: row.winner === "fall" ? 700 : 400 } }, row.fall),
-                React.createElement("div", { style: { width: 32, textAlign: "center" } },
-                  row.winner === "fall" && React.createElement("span", { style: { color: T.accent } }, "🍂"),
-                  row.winner === "spring" && React.createElement("span", { style: { color: T.green } }, "🌷"),
-                  row.winner === "tie" && React.createElement("span", { style: { color: T.textDim } }, "—")
-                ),
-                React.createElement("div", { style: { flex: 1, fontSize: 12, color: row.winner === "spring" ? T.green : T.textMuted, textAlign: "center", fontWeight: row.winner === "spring" ? 700 : 400 } }, row.spring)
-              )
-            );
-          }),
-          React.createElement("div", { style: { textAlign: "center", marginTop: 16, padding: 14, background: T.accentSoft, borderRadius: 12 } },
-            React.createElement("p", { style: { margin: 0, fontSize: 14, color: T.accent, fontWeight: 700 } }, `Fall 2026 wins ${fallW}–${springW}–${ties}. Costs ~15% more but celebrates the anniversary on the trip and fits more schedules.`)
-          )
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 200 },
-        React.createElement(GlowCard, { glow: T.cyan },
-          React.createElement("h3", { style: { margin: "0 0 16px", color: T.white, fontSize: 16 } }, "Weather Comparison"),
-          React.createElement(ResponsiveContainer, { width: "99%", height: 250 },
-            React.createElement(BarChart, { data: weather.map(w => ({ city: w.city, "Fall High": w.fH, "Spring High": w.sH, "Fall Low": w.fL, "Spring Low": w.sL })) },
-              React.createElement(CartesianGrid, { strokeDasharray: "3 3", stroke: T.border }),
-              React.createElement(XAxis, { dataKey: "city", tick: { fill: T.textMuted, fontSize: 11 } }),
-              React.createElement(YAxis, { domain: [30, 80], tick: { fill: T.textMuted, fontSize: 11 } }),
-              React.createElement(Tooltip, { contentStyle: { background: T.card, border: `1px solid ${T.border}`, borderRadius: 8, color: T.text } }),
-              React.createElement(Legend, null),
-              React.createElement(Bar, { dataKey: "Fall High", fill: T.accent, radius: [4, 4, 0, 0] }),
-              React.createElement(Bar, { dataKey: "Spring High", fill: T.green, radius: [4, 4, 0, 0] })
-            )
-          )
-        )
-      ),
-
-      React.createElement(AnimIn, { delay: 300 },
-        React.createElement(GlowCard, { glow: T.green, style: { textAlign: "center", padding: 20 } },
-          React.createElement("div", { style: { display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginBottom: 6 } },
-            React.createElement(Check, { size: 18, color: T.green }),
-            React.createElement("span", { style: { fontSize: 14, fontWeight: 700, color: T.green } }, "Rome Temple Side Trip — Skipped")
-          ),
-          React.createElement("div", { style: { fontSize: 12, color: T.textMuted, lineHeight: 1.6 } }, "Saves ~$250/pp and a full travel day. Keeps 16-person logistics simple and gives extra time in Dubrovnik or Bled instead.")
-        )
-      )
-    )
-  );
-}
-
-// ============ MAIN ============
-function App() {
-  const [season, setSeason] = useState("fall");
-  const [tab, setTab] = useState("overview");
-
-  const tabs = [
-    { id: "overview", label: "Budget", icon: DollarSign },
-    { id: "itinerary", label: "Itinerary", icon: MapPin },
-    { id: "stays", label: "Stays", icon: Bed },
-    { id: "food", label: "Food & Fun", icon: Utensils },
-    { id: "gems", label: "Hidden Gems", icon: Star },
-    { id: "family", label: "Family", icon: Users },
-    { id: "compare", label: "Compare", icon: Compass },
-  ];
-
-  return (
-    React.createElement("div", { style: {
-      minHeight: "100dvh",
-      background: T.bg, color: T.text,
-      fontFamily: "'Inter', -apple-system, system-ui, sans-serif",
-      WebkitFontSmoothing: "antialiased", MozOsxFontSmoothing: "grayscale",
-      WebkitTextSizeAdjust: "100%",
-      WebkitTapHighlightColor: "transparent",
-      overflowX: "hidden",
-    } },
-      React.createElement("div", { style: { maxWidth: 900, margin: "0 auto", padding: "0 16px calc(40px + env(safe-area-inset-bottom, 0px))", paddingTop: "env(safe-area-inset-top, 0px)" } },
-        React.createElement(HeroSection, { season: season, setSeason: setSeason, setTab: setTab }),
-        React.createElement(RouteMap, null),
-
-        React.createElement("div", { style: {
-          display: "flex", gap: 4, justifyContent: "center", flexWrap: "wrap",
-          padding: "8px 8px 16px",
-          position: "sticky", top: 0, zIndex: 20,
-          background: `${T.bg}ee`,
-          WebkitBackdropFilter: "blur(8px)", backdropFilter: "blur(8px)",
-          overflowX: "auto", WebkitOverflowScrolling: "touch",
-          msOverflowStyle: "none", scrollbarWidth: "none",
-        } },
-          tabs.map(t => {
-            const Icon = t.icon;
-            return (
-              React.createElement("button", { key: t.id, onClick: () => setTab(t.id), style: {
-                display: "flex", alignItems: "center", gap: 5,
-                padding: "10px 14px", borderRadius: 99, border: "none", cursor: "pointer",
-                transition: "all 0.25s",
-                background: tab === t.id ? `${T.accent}18` : "transparent",
-                color: tab === t.id ? T.accent : T.textMuted,
-                fontWeight: tab === t.id ? 700 : 500, fontSize: 12,
-                whiteSpace: "nowrap", flexShrink: 0,
-                minHeight: 44,
-                WebkitTapHighlightColor: "transparent",
-              } },
-                React.createElement(Icon, { size: 14 }),
-                t.label
-              )
-            );
-          })
+          React.createElement("span", {style:{fontSize:11,background:`${CC[i]}18`,color:CC[i],padding:"4px 12px",borderRadius:99,fontWeight:700}}, a.rec)
         ),
-
-        tab === "overview" && React.createElement(OverviewTab, { season: season }),
-        tab === "itinerary" && React.createElement(ItineraryTab, { season: season }),
-        tab === "stays" && React.createElement(StaysTab, { season: season }),
-        tab === "food" && React.createElement(FoodTab, null),
-        tab === "gems" && React.createElement(GemsTab, null),
-        tab === "family" && React.createElement(FamilyTab, null),
-        tab === "compare" && React.createElement(CompareTab, null),
-
-        React.createElement("div", { style: { textAlign: "center", padding: "32px 0 0", fontSize: 11, color: T.textDim } },
-          React.createElement("p", null, "Compiled from 2 family calls + 17 voice memos from 12 contributors · All preferences anonymized"),
-          React.createElement("p", { style: { marginTop: 4 } }, "Pricing verified via Kiwi, Airbnb, and official booking sites · March 2026"),
-          React.createElement("p", { style: { marginTop: 4 } }, "Still needed: Hard blackout dates from all couples")
+        React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(140px,1fr))",gap:12,marginTop:16}},
+          [{label:"Per Person/Night",val:"$"+a.rate[si]+"/nt",sub:"$"+(a.rate[si]*a.n)+" total"},
+           {label:"Per Couple/Night",val:"$"+(a.rate[si]*2)+"/nt",sub:"$"+(a.rate[si]*2*a.n)+" total"},
+           {label:"Standout Option",val:a.unique,sub:""}
+          ].map((opt,j) => React.createElement("div", {key:j,style:{background:`${T.bg}90`,borderRadius:10,padding:12,border:"1px solid "+T.border}},
+            React.createElement("div", {style:{fontSize:11,color:T.textMuted,marginBottom:4}}, opt.label),
+            React.createElement("div", {style:{fontSize:15,fontWeight:700,color:T.white}}, opt.val),
+            opt.sub && React.createElement("div", {style:{fontSize:11,color:T.textMuted,marginTop:2}}, opt.sub)
+          ))
+        )
+      )
+    )),
+    React.createElement(AnimIn, {delay:500},
+      React.createElement(GlowCard, {glow:route.color},
+        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16}}, "Fall vs Spring — Nightly Rate per Person"),
+        React.createElement(ResponsiveContainer, {width:"99%",height:250},
+          React.createElement(BarChart, {data:route.accomData.map(a=>({loc:a.loc,Fall:a.rate[0],Spring:a.rate[1]}))},
+            React.createElement(CartesianGrid, {strokeDasharray:"3 3",stroke:T.border}),
+            React.createElement(XAxis, {dataKey:"loc",tick:{fill:T.textMuted,fontSize:10}}),
+            React.createElement(YAxis, {tickFormatter:v=>"$"+v,tick:{fill:T.textMuted,fontSize:11}}),
+            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},formatter:v=>"$"+v+"/pp/nt"}),
+            React.createElement(Legend),
+            React.createElement(Bar, {dataKey:"Fall",fill:T.accent,radius:[6,6,0,0]}),
+            React.createElement(Bar, {dataKey:"Spring",fill:T.green,radius:[6,6,0,0]}),
+          )
         )
       )
     )
   );
 }
 
-// Render
+function FoodTab({route}) {
+  return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
+    React.createElement(AnimIn, null,
+      React.createElement(GlowCard, {glow:route.color},
+        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16,display:"flex",alignItems:"center",gap:8}},React.createElement(Coffee,{size:18,color:route.color})," Daily Food Budget by Country"),
+        React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(180px,1fr))",gap:14}},
+          route.foodByCountry.map((c,i) => {
+            const total = c.breakfast+c.lunch+c.dinner+c.snacks;
+            return React.createElement("div", {key:i,style:{background:`${CC[i]}10`,borderRadius:14,padding:16,border:`1px solid ${CC[i]}25`,textAlign:"center"}},
+              React.createElement("div", {style:{fontSize:32}}, c.flag),
+              React.createElement("div", {style:{fontSize:14,fontWeight:700,color:T.white,marginTop:4}}, c.country),
+              React.createElement("div", {style:{fontSize:28,fontWeight:900,color:CC[i],margin:"8px 0"}}, "$"+total),
+              React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, "per person / day"),
+              React.createElement("div", {style:{marginTop:10,fontSize:11,color:T.textMuted,display:"flex",flexDirection:"column",gap:3}},
+                React.createElement("div",null,"☀️ Breakfast $"+c.breakfast),
+                React.createElement("div",null,"🥖 Lunch $"+c.lunch),
+                React.createElement("div",null,"🍷 Dinner $"+c.dinner),
+                React.createElement("div",null,"☕ Snacks $"+c.snacks),
+              )
+            );
+          })
+        )
+      )
+    ),
+    React.createElement(AnimIn, {delay:100},
+      React.createElement(GlowCard, {glow:T.blue},
+        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16,display:"flex",alignItems:"center",gap:8}},React.createElement(Camera,{size:18,color:T.blue})," Activities & Experiences"),
+        React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:6}},
+          route.activities.map((a,i) =>
+            React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:12,padding:"10px 14px",background:i%2===0?`${T.blue}06`:"transparent",borderRadius:8}},
+              React.createElement("span", {style:{fontSize:20,width:32,textAlign:"center"}}, a.icon),
+              React.createElement("div", {style:{flex:1}},
+                React.createElement("div", {style:{fontSize:14,fontWeight:600,color:T.text}}, a.name),
+                React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, a.loc)
+              ),
+              React.createElement("div", {style:{textAlign:"right"}},
+                React.createElement("div", {style:{fontSize:15,fontWeight:700,color:a.cost===0?T.green:T.white}}, a.cost===0?"Free":"$"+a.cost),
+                a.cost>0 && React.createElement("div", {style:{fontSize:10,color:T.textMuted}}, "×16 = $"+(a.cost*16))
+              )
+            )
+          ),
+          React.createElement("div", {style:{display:"flex",justifyContent:"flex-end",padding:"12px 14px",borderTop:"1px solid "+T.border,marginTop:4,fontSize:14}},
+            React.createElement("span", {style:{color:T.textMuted,marginRight:12}}, "All activities per person:"),
+            React.createElement("span", {style:{fontWeight:800,color:route.color}}, "$"+route.activities.reduce((s,a)=>s+a.cost,0))
+          )
+        )
+      )
+    )
+  );
+}
+
+function GemsTab({route}) {
+  return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:16}},
+    React.createElement(AnimIn, null,
+      React.createElement("div", {style:{textAlign:"center",marginBottom:8}},
+        React.createElement("div", {style:{fontSize:13,color:route.color,fontWeight:700,letterSpacing:1,textTransform:"uppercase"}}, "Off the Beaten Path"),
+        React.createElement("div", {style:{fontSize:13,color:T.textMuted,marginTop:4}}, "The spots locals love that most tourists walk right past")
+      )
+    ),
+    route.hiddenGems.map((region,ri) =>
+      React.createElement(AnimIn, {key:ri,delay:ri*80},
+        React.createElement(GlowCard, {glow:region.color},
+          React.createElement("div", {style:{display:"flex",alignItems:"center",gap:10,marginBottom:14}},
+            React.createElement("span", {style:{fontSize:24}}, region.flag),
+            React.createElement("h3", {style:{margin:0,color:T.white,fontSize:17,fontWeight:800}}, region.region)
+          ),
+          React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(220px,1fr))",gap:10}},
+            region.gems.map((gem,gi) =>
+              React.createElement("div", {key:gi,style:{background:`${region.color}08`,borderRadius:12,padding:14,border:`1px solid ${region.color}18`}},
+                React.createElement("div", {style:{fontSize:14,fontWeight:700,color:T.white,marginBottom:6}}, gem.name),
+                React.createElement("div", {style:{fontSize:12,color:T.textMuted,lineHeight:1.6}}, gem.desc)
+              )
+            )
+          )
+        )
+      )
+    )
+  );
+}
+
+function FamilyTab({route}) {
+  const prefColors = [T.accent,T.blue,T.green,T.purple];
+  const prefIcons = [Globe,Compass,Heart,Shield];
+  return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
+    React.createElement(AnimIn, null,
+      React.createElement(GlowCard, {glow:route.color},
+        React.createElement("h3", {style:{margin:"0 0 4px",color:T.white,fontSize:16}}, "Destination Popularity"),
+        React.createElement("p", {style:{margin:"0 0 16px",fontSize:12,color:T.textMuted}}, "How many times each destination was mentioned across all input"),
+        React.createElement(ResponsiveContainer, {width:"99%",height:280},
+          React.createElement(BarChart, {data:destinationVotes,layout:"vertical"},
+            React.createElement(CartesianGrid, {strokeDasharray:"3 3",stroke:T.border}),
+            React.createElement(XAxis, {type:"number",domain:[0,10],tick:{fill:T.textMuted,fontSize:11}}),
+            React.createElement(YAxis, {dataKey:"name",type:"category",width:140,tick:{fill:T.textMuted,fontSize:12}}),
+            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text}}),
+            React.createElement(Bar, {dataKey:"votes",name:"Mentions",radius:[0,8,8,0]},
+              destinationVotes.map((_,i)=>React.createElement(Cell,{key:i,fill:CC[i%CC.length]}))
+            )
+          )
+        )
+      )
+    ),
+    React.createElement(AnimIn, {delay:100},
+      React.createElement(GlowCard, {glow:T.purple},
+        React.createElement("h3", {style:{margin:"0 0 4px",color:T.white,fontSize:16}}, "Experience Priorities"),
+        React.createElement("p", {style:{margin:"0 0 16px",fontSize:12,color:T.textMuted}}, "Weighted importance across all family input"),
+        React.createElement(ResponsiveContainer, {width:"99%",height:320},
+          React.createElement(RadarChart, {data:experienceData},
+            React.createElement(PolarGrid, {stroke:T.border}),
+            React.createElement(PolarAngleAxis, {dataKey:"exp",tick:{fill:T.textMuted,fontSize:11}}),
+            React.createElement(PolarRadiusAxis, {domain:[0,10],tick:{fill:T.textDim,fontSize:10}}),
+            React.createElement(Radar, {name:"Priority",dataKey:"score",stroke:route.color,fill:route.color,fillOpacity:0.2,strokeWidth:2})
+          )
+        )
+      )
+    ),
+    React.createElement(AnimIn, {delay:200},
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(280px,1fr))",gap:14}},
+        groupPreferences.map((gp,i) => {
+          const Icon = prefIcons[i]; const color = prefColors[i];
+          return React.createElement(GlowCard, {key:i,glow:color,style:{padding:20}},
+            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:10,marginBottom:14}},
+              React.createElement("div", {style:{width:36,height:36,borderRadius:10,background:`${color}18`,display:"flex",alignItems:"center",justifyContent:"center"}}, React.createElement(Icon,{size:18,color})),
+              React.createElement("div", {style:{fontSize:15,fontWeight:800,color:T.white}}, gp.category)
+            ),
+            React.createElement("div", {style:{display:"flex",flexWrap:"wrap",gap:6}},
+              gp.items.map((item,j) => React.createElement("span", {key:j,style:{fontSize:12,padding:"5px 12px",borderRadius:99,background:`${color}12`,border:`1px solid ${color}25`,color:T.text,fontWeight:500}}, item))
+            )
+          );
+        })
+      )
+    ),
+    React.createElement(AnimIn, {delay:300},
+      React.createElement(GlowCard, {glow:T.cyan},
+        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16}}, "Budget Range (Anonymous)"),
+        React.createElement("div", {style:{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}},
+          [{label:"Base (Gifted)",val:"$3,000",sub:"per couple",color:T.accent,bg:T.accentSoft},
+           {label:"Additional Out-of-Pocket",val:"$3K–$5K",sub:"most common range",color:T.blue,bg:T.blueSoft},
+           {label:"Total Target",val:"$6K–$8K",sub:"per couple all-in",color:T.green,bg:T.greenSoft}
+          ].map((b,i) => React.createElement("div", {key:i,style:{textAlign:"center",background:b.bg,borderRadius:12,padding:16,minWidth:140,border:`1px solid ${b.color}25`}},
+            React.createElement("div", {style:{fontSize:11,color:T.textMuted,marginBottom:4}}, b.label),
+            React.createElement("div", {style:{fontSize:24,fontWeight:900,color:b.color}}, b.val),
+            React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, b.sub)
+          ))
+        )
+      )
+    )
+  );
+}
+
+function CompareTab({route,season}) {
+  const fMid = calcCouple(route.budgetTiers.fall.mid);
+  const sMid = calcCouple(route.budgetTiers.spring.mid);
+  const save = fMid - sMid;
+  const scorecard = route.compareScorecard;
+  const iconLookup = {DollarSign,Sun,Mountain,Users,Calendar,Heart,Shield,Train,Coffee};
+  const fallW = scorecard.filter(s=>s.winner==="fall").length;
+  const springW = scorecard.filter(s=>s.winner==="spring").length;
+  const ties = scorecard.filter(s=>s.winner==="tie").length;
+  return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
+    React.createElement(AnimIn, null,
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"1fr auto 1fr",gap:16,alignItems:"center"}},
+        React.createElement(GlowCard, {glow:T.accent,style:{textAlign:"center"}},
+          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"🍂 Fall 2026"),
+          React.createElement("div",{style:{fontSize:36,fontWeight:900,color:T.accent}},"$"+fMid.toLocaleString()),
+          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"per couple (mid-tier)"),
+          React.createElement("div",{style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}},"OOP: $"+(fMid-3000).toLocaleString()),
+        ),
+        React.createElement("div", {style:{textAlign:"center",padding:"0 8px"}},
+          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"Spring saves"),
+          React.createElement("div",{style:{fontSize:24,fontWeight:900,color:T.green}},"$"+save.toLocaleString()),
+          React.createElement(TrendingDown, {size:20,color:T.green,style:{margin:"4px auto 0"}}),
+        ),
+        React.createElement(GlowCard, {glow:T.green,style:{textAlign:"center"}},
+          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"🌷 Spring 2027"),
+          React.createElement("div",{style:{fontSize:36,fontWeight:900,color:T.green}},"$"+sMid.toLocaleString()),
+          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"per couple (mid-tier)"),
+          React.createElement("div",{style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}},"OOP: $"+(sMid-3000).toLocaleString()),
+        ),
+      )
+    ),
+    React.createElement(AnimIn, {delay:100},
+      React.createElement(GlowCard, {glow:T.purple},
+        React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}},
+          React.createElement("h3", {style:{margin:0,color:T.white,fontSize:16}}, "Season Scorecard"),
+          React.createElement("div", {style:{display:"flex",gap:12,fontSize:13,fontWeight:700}},
+            React.createElement("span",{style:{color:T.accent}},"🍂 "+fallW),
+            React.createElement("span",{style:{color:T.textDim}},"Tie "+ties),
+            React.createElement("span",{style:{color:T.green}},"🌷 "+springW),
+          )
+        ),
+        scorecard.map((row,i) => {
+          const Icon = iconLookup[row.icon]||Info;
+          return React.createElement("div", {key:i,style:{display:"flex",alignItems:"center",gap:12,padding:"10px 0",borderBottom:i<scorecard.length-1?"1px solid "+T.border:"none"}},
+            React.createElement(Icon, {size:16,color:T.textDim}),
+            React.createElement("div", {style:{width:120,fontSize:13,fontWeight:600,color:T.text}}, row.factor),
+            React.createElement("div", {style:{flex:1,fontSize:12,color:row.winner==="fall"?T.accent:T.textMuted,textAlign:"center",fontWeight:row.winner==="fall"?700:400}}, row.fall),
+            React.createElement("div", {style:{width:32,textAlign:"center"}},
+              row.winner==="fall"&&React.createElement("span",{style:{color:T.accent}},"🍂"),
+              row.winner==="spring"&&React.createElement("span",{style:{color:T.green}},"🌷"),
+              row.winner==="tie"&&React.createElement("span",{style:{color:T.textDim}},"—"),
+            ),
+            React.createElement("div", {style:{flex:1,fontSize:12,color:row.winner==="spring"?T.green:T.textMuted,textAlign:"center",fontWeight:row.winner==="spring"?700:400}}, row.spring),
+          );
+        }),
+        React.createElement("div", {style:{textAlign:"center",marginTop:16,padding:14,background:`${route.color}12`,borderRadius:12}},
+          React.createElement("p", {style:{margin:0,fontSize:14,color:route.color,fontWeight:700}}, "Fall 2026 wins "+fallW+"–"+springW+"–"+ties+". Costs more but celebrates the anniversary on the trip and fits more schedules.")
+        )
+      )
+    ),
+    React.createElement(AnimIn, {delay:200},
+      React.createElement(GlowCard, {glow:T.cyan},
+        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16}}, "Weather Comparison"),
+        React.createElement(ResponsiveContainer, {width:"99%",height:250},
+          React.createElement(BarChart, {data:route.weather.map(w=>({city:w.city,"Fall High":w.fH,"Spring High":w.sH}))},
+            React.createElement(CartesianGrid, {strokeDasharray:"3 3",stroke:T.border}),
+            React.createElement(XAxis, {dataKey:"city",tick:{fill:T.textMuted,fontSize:11}}),
+            React.createElement(YAxis, {domain:[30,80],tick:{fill:T.textMuted,fontSize:11}}),
+            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text}}),
+            React.createElement(Legend),
+            React.createElement(Bar, {dataKey:"Fall High",fill:T.accent,radius:[4,4,0,0]}),
+            React.createElement(Bar, {dataKey:"Spring High",fill:T.green,radius:[4,4,0,0]}),
+          )
+        )
+      )
+    )
+  );
+}
+
+// ============ DETAIL VIEW ============
+function DetailView({route,routeIndex,onBack}) {
+  const [season,setSeason] = useState("fall");
+  const [tab,setTab] = useState("overview");
+  const tabs = [
+    {id:"overview",label:"Budget",icon:DollarSign},
+    {id:"itinerary",label:"Itinerary",icon:MapPin},
+    {id:"stays",label:"Stays",icon:Bed},
+    {id:"food",label:"Food & Fun",icon:Utensils},
+    {id:"gems",label:"Hidden Gems",icon:Star},
+    {id:"family",label:"Family",icon:Users},
+    {id:"compare",label:"Compare",icon:Compass},
+  ];
+  return React.createElement("div", {style:{maxWidth:900,margin:"0 auto",padding:"0 16px calc(40px + env(safe-area-inset-bottom,0px))"}},
+    React.createElement("button", {onClick:onBack,style:{display:"flex",alignItems:"center",gap:6,background:"transparent",border:"none",color:route.color,fontSize:13,fontWeight:700,cursor:"pointer",padding:"16px 0",marginTop:8}},
+      React.createElement(ChevronLeft, {size:16}), "Back to All Routes"
+    ),
+    React.createElement("div", {style:{textAlign:"center",padding:"16px 24px 32px",position:"relative"}},
+      React.createElement("div", {style:{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 0%,${route.color}14 0%,transparent 60%)`,pointerEvents:"none"}}),
+      React.createElement("div", {style:{fontSize:12,letterSpacing:3,color:route.color,fontWeight:700,textTransform:"uppercase",marginBottom:8}}, route.tagline),
+      React.createElement("h1", {style:{fontSize:32,fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, route.name),
+      React.createElement("p", {style:{color:T.textMuted,fontSize:14,margin:"0 0 20px"}}, "Perkins Family Europe Trip · Route "+(routeIndex+1)+" of 3"),
+      React.createElement("div", {style:{display:"flex",justifyContent:"center",alignItems:"center",gap:4,flexWrap:"wrap",marginBottom:24}},
+        route.cities.map((c,i) => React.createElement("div", {key:c,style:{display:"flex",alignItems:"center",gap:4}},
+          React.createElement("span", {style:{background:T.card,border:"1px solid "+T.border,borderRadius:99,padding:"6px 14px",fontSize:13,fontWeight:600,color:T.text,display:"inline-flex",alignItems:"center",gap:6}},
+            React.createElement("span",null,route.cityFlags[i]), c
+          ),
+          i<route.cities.length-1 && React.createElement(ChevronRight, {size:14,color:T.textDim})
+        ))
+      ),
+      React.createElement("div", {style:{display:"inline-flex",background:T.card,border:"1px solid "+T.border,borderRadius:99,padding:4,gap:4}},
+        ["fall","spring"].map(s =>
+          React.createElement("button", {key:s,onClick:()=>setSeason(s),style:{
+            padding:"10px 28px",borderRadius:99,border:"none",cursor:"pointer",fontWeight:700,fontSize:14,transition:"all 0.3s",minHeight:44,
+            background:season===s?route.gradient:"transparent",
+            color:season===s?T.white:T.textMuted,
+            boxShadow:season===s?`0 4px 15px ${route.color}40`:"none",
+          }}, s==="fall"?"🍂 Fall 2026":"🌷 Spring 2027")
+        )
+      )
+    ),
+    React.createElement(RouteMapFull, {route}),
+    React.createElement("div", {style:{display:"flex",gap:4,justifyContent:"center",flexWrap:"wrap",padding:"8px 8px 16px",position:"sticky",top:0,zIndex:20,background:`${T.bg}ee`,WebkitBackdropFilter:"blur(8px)",backdropFilter:"blur(8px)"}},
+      tabs.map(t => {
+        const Icon = t.icon;
+        return React.createElement("button", {key:t.id,onClick:()=>setTab(t.id),style:{
+          display:"flex",alignItems:"center",gap:5,padding:"10px 14px",borderRadius:99,border:"none",cursor:"pointer",transition:"all 0.25s",
+          background:tab===t.id?`${route.color}18`:"transparent",
+          color:tab===t.id?route.color:T.textMuted,
+          fontWeight:tab===t.id?700:500,fontSize:12,whiteSpace:"nowrap",flexShrink:0,minHeight:44,
+        }}, React.createElement(Icon,{size:14}), t.label);
+      })
+    ),
+    tab==="overview" && React.createElement(OverviewTab, {route,season}),
+    tab==="itinerary" && React.createElement(ItineraryTab, {route,season}),
+    tab==="stays" && React.createElement(StaysTab, {route,season}),
+    tab==="food" && React.createElement(FoodTab, {route}),
+    tab==="gems" && React.createElement(GemsTab, {route}),
+    tab==="family" && React.createElement(FamilyTab, {route}),
+    tab==="compare" && React.createElement(CompareTab, {route,season}),
+    React.createElement("div", {style:{textAlign:"center",padding:"32px 0 0",fontSize:11,color:T.textDim}},
+      React.createElement("p",null,"Compiled from 2 family calls + 17 voice memos from 12 contributors · All preferences anonymized"),
+      React.createElement("p",{style:{marginTop:4}},"Pricing researched via Kiwi, Airbnb, ÖBB, SBB, and official sites · March 2026"),
+    )
+  );
+}
+
+// ============ APP ============
+function App() {
+  const [selectedRoute, setSelectedRoute] = useState(null);
+  if (selectedRoute !== null) {
+    return React.createElement(DetailView, {
+      route: ROUTES[selectedRoute],
+      routeIndex: selectedRoute,
+      onBack: () => setSelectedRoute(null)
+    });
+  }
+  return React.createElement(OverviewScreen, { onSelect: setSelectedRoute });
+}
+
 import ReactDOM from "https://esm.sh/react-dom@18.3.1/client";
 ReactDOM.createRoot(document.getElementById("root")).render(React.createElement(App));
     </script>
   </body>
 </html>
-
