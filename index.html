@@ -52,45 +52,45 @@ const ROUTES = [
   countryFlags: ["🇬🇧","🇫🇷","🇮🇹"],
   cities: ["Cotswolds","London","Paris","Rome"],
   cityFlags: ["🇬🇧","🇬🇧","🇫🇷","🇮🇹"],
-  highlights: ["Three of Europe's most iconic cities","English countryside in the Cotswolds","Eurostar through the Channel Tunnel","Roman history + Italian food","Most recognizable landmarks"],
+  highlights: ["3 days in the English countryside","Churchill War Rooms + quiet London gems","Eurostar through the Channel Tunnel","Rome Italy Temple + Vatican + Colosseum","Non-tourist villages, markets & hidden streets"],
   itinerary: {
     fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
-      {day:0,date:"Sep 26",location:"SLC → London",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight to London Heathrow.",nights:0,lat:51.51,lng:-0.13},
-      {day:1,date:"Sep 27",location:"Cotswolds",type:"nature",icon:"heart",country:"United Kingdom",desc:"Arrive London, transfer to Cotswolds. Bibury, Bourton-on-the-Water. Settle into stone manor house.",nights:1,lat:51.87,lng:-1.70},
-      {day:2,date:"Sep 28",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Blenheim Palace morning. Stow-on-the-Wold, Broadway Tower. Cream tea in a village pub. Quiet evening.",nights:1,lat:51.87,lng:-1.70},
-      {day:3,date:"Sep 29",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Westminster Abbey, Big Ben, Thames walk. Evening pub dinner in Covent Garden.",nights:1,lat:51.51,lng:-0.13},
-      {day:4,date:"Sep 30",location:"London",type:"highlight",icon:"building",country:"United Kingdom",desc:"Tower of London, Borough Market, St. Paul's Cathedral. Neal's Yard. West End show evening.",nights:1,lat:51.51,lng:-0.13},
-      {day:5,date:"Oct 1",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Eurostar to Paris (2.25h). Settle in. Afternoon walk Île de la Cité. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
-      {day:6,date:"Oct 2",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre Museum, Tuileries Gardens. Lunch in Le Marais. Sainte-Chapelle. Seine dinner cruise.",nights:1,lat:48.86,lng:2.35},
-      {day:7,date:"Oct 3",location:"Paris",type:"highlight",icon:"compass",country:"France",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Saint-Germain-des-Prés. Luxembourg Gardens.",nights:1,lat:48.86,lng:2.35},
-      {day:8,date:"Oct 4",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Morning flight to Rome (2h). Afternoon Colosseum & Roman Forum. First gelato. Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
-      {day:9,date:"Oct 5",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Vatican Museums, Sistine Chapel, St. Peter's Basilica. Piazza Navona. Cobblestone exploring.",nights:1,lat:41.90,lng:12.50},
-      {day:10,date:"Oct 6",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning Pantheon, Trevi Fountain, Spanish Steps. Farewell espresso. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+      {day:0,date:"Sep 26",location:"U.S. → London",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to London Heathrow.",nights:0,lat:51.51,lng:-0.13},
+      {day:1,date:"Sep 27",location:"Cotswolds",type:"nature",icon:"heart",country:"United Kingdom",desc:"Arrive London, transfer to Cotswolds (1.5h). Settle into stone manor house. Bibury and Arlington Row afternoon stroll.",nights:1,lat:51.87,lng:-1.70},
+      {day:2,date:"Sep 28",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Bourton-on-the-Water, Stow-on-the-Wold. Cream tea at a village pub. Broadway Tower sunset.",nights:1,lat:51.87,lng:-1.70},
+      {day:3,date:"Sep 29",location:"Cotswolds",type:"highlight",icon:"compass",country:"United Kingdom",desc:"Blenheim Palace morning. Chipping Campden walk. Farm shop lunch. Quiet evening in the village.",nights:1,lat:51.87,lng:-1.70},
+      {day:4,date:"Sep 30",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Churchill War Rooms. Borough Market lunch. Thames walk to Tower Bridge. Pub dinner.",nights:1,lat:51.51,lng:-0.13},
+      {day:5,date:"Oct 1",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
+      {day:6,date:"Oct 2",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
+      {day:7,date:"Oct 3",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon flight to Rome (2h). Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
+      {day:8,date:"Oct 4",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Colosseum & Roman Forum morning. Afternoon Rome Italy Temple visit. Piazza Navona. Gelato crawl.",nights:1,lat:41.90,lng:12.50},
+      {day:9,date:"Oct 5",location:"Rome",type:"highlight",icon:"heart",country:"Italy",desc:"Vatican Museums & Sistine Chapel morning. Pantheon, Trevi Fountain, Spanish Steps. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
+      {day:10,date:"Oct 6",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
     ]},
     spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
-      {day:0,date:"Apr 24",location:"SLC → London",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight to London Heathrow.",nights:0,lat:51.51,lng:-0.13},
-      {day:1,date:"Apr 25",location:"Cotswolds",type:"nature",icon:"heart",country:"United Kingdom",desc:"Arrive London, transfer to Cotswolds. Bibury, Bourton-on-the-Water. Settle into stone manor house.",nights:1,lat:51.87,lng:-1.70},
-      {day:2,date:"Apr 26",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Blenheim Palace morning. Stow-on-the-Wold, Broadway Tower. Cream tea in a village pub. Quiet evening.",nights:1,lat:51.87,lng:-1.70},
-      {day:3,date:"Apr 27",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Westminster Abbey, Big Ben, Thames walk. Evening pub dinner in Covent Garden.",nights:1,lat:51.51,lng:-0.13},
-      {day:4,date:"Apr 28",location:"London",type:"highlight",icon:"building",country:"United Kingdom",desc:"Tower of London, Borough Market, St. Paul's Cathedral. Neal's Yard. West End show evening.",nights:1,lat:51.51,lng:-0.13},
-      {day:5,date:"Apr 29",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Eurostar to Paris (2.25h). Settle in. Afternoon walk Île de la Cité. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
-      {day:6,date:"Apr 30",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre Museum, Tuileries Gardens. Lunch in Le Marais. Sainte-Chapelle. Seine dinner cruise.",nights:1,lat:48.86,lng:2.35},
-      {day:7,date:"May 1",location:"Paris",type:"highlight",icon:"compass",country:"France",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Saint-Germain-des-Prés. Luxembourg Gardens.",nights:1,lat:48.86,lng:2.35},
-      {day:8,date:"May 2",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Morning flight to Rome (2h). Afternoon Colosseum & Roman Forum. First gelato. Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
-      {day:9,date:"May 3",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Vatican Museums, Sistine Chapel, St. Peter's Basilica. Piazza Navona. Cobblestone exploring.",nights:1,lat:41.90,lng:12.50},
-      {day:10,date:"May 4",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning Pantheon, Trevi Fountain, Spanish Steps. Farewell espresso. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+      {day:0,date:"Apr 24",location:"U.S. → London",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to London Heathrow.",nights:0,lat:51.51,lng:-0.13},
+      {day:1,date:"Apr 25",location:"Cotswolds",type:"nature",icon:"heart",country:"United Kingdom",desc:"Arrive London, transfer to Cotswolds (1.5h). Settle into stone manor house. Bibury and Arlington Row afternoon stroll.",nights:1,lat:51.87,lng:-1.70},
+      {day:2,date:"Apr 26",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Bourton-on-the-Water, Stow-on-the-Wold. Cream tea at a village pub. Broadway Tower sunset.",nights:1,lat:51.87,lng:-1.70},
+      {day:3,date:"Apr 27",location:"Cotswolds",type:"highlight",icon:"compass",country:"United Kingdom",desc:"Blenheim Palace morning. Chipping Campden walk. Farm shop lunch. Quiet evening in the village.",nights:1,lat:51.87,lng:-1.70},
+      {day:4,date:"Apr 28",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Churchill War Rooms. Borough Market lunch. Thames walk to Tower Bridge. Pub dinner.",nights:1,lat:51.51,lng:-0.13},
+      {day:5,date:"Apr 29",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
+      {day:6,date:"Apr 30",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
+      {day:7,date:"May 1",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon flight to Rome (2h). Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
+      {day:8,date:"May 2",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Colosseum & Roman Forum morning. Afternoon Rome Italy Temple visit. Piazza Navona. Gelato crawl.",nights:1,lat:41.90,lng:12.50},
+      {day:9,date:"May 3",location:"Rome",type:"highlight",icon:"heart",country:"Italy",desc:"Vatican Museums & Sistine Chapel morning. Pantheon, Trevi Fountain, Spanish Steps. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
+      {day:10,date:"May 4",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
     ]}
   },
   budgetTiers: {
     fall: {
-      value:{label:"Value",emoji:"🎒",flights:1900,accommodation:70,trains:80,food:72,activities:240,misc:30},
-      mid:{label:"Mid-Tier",emoji:"✨",flights:2300,accommodation:95,trains:80,food:92,activities:340,misc:40},
-      premium:{label:"Premium",emoji:"👑",flights:2700,accommodation:135,trains:80,food:120,activities:440,misc:55},
+      value:{label:"Value",emoji:"🎒",flights:1900,accommodation:65,trains:80,food:68,activities:200,misc:28},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2300,accommodation:88,trains:80,food:88,activities:290,misc:38},
+      premium:{label:"Premium",emoji:"👑",flights:2700,accommodation:125,trains:80,food:115,activities:380,misc:52},
     },
     spring: {
-      value:{label:"Value",emoji:"🎒",flights:1700,accommodation:60,trains:80,food:66,activities:240,misc:25},
-      mid:{label:"Mid-Tier",emoji:"✨",flights:2050,accommodation:82,trains:80,food:85,activities:340,misc:35},
-      premium:{label:"Premium",emoji:"👑",flights:2400,accommodation:118,trains:80,food:112,activities:440,misc:48},
+      value:{label:"Value",emoji:"🎒",flights:1700,accommodation:55,trains:80,food:62,activities:200,misc:24},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2050,accommodation:75,trains:80,food:80,activities:290,misc:32},
+      premium:{label:"Premium",emoji:"👑",flights:2400,accommodation:108,trains:80,food:105,activities:380,misc:45},
     }
   },
   trainLegs: [
@@ -98,16 +98,15 @@ const ROUTES = [
     {from:"London St Pancras",to:"Paris Gare du Nord",hrs:"2.25h",cost:80,scenic:4,type:"Eurostar",url:"https://www.eurostar.com/"},
   ],
   activities: [
-    {name:"Tower of London",cost:40,loc:"London",icon:"🏰",url:"https://www.hrp.org.uk/tower-of-london/"},
-    {name:"Westminster Abbey",cost:29,loc:"London",icon:"⛪",url:"https://www.westminster-abbey.org/"},
     {name:"Blenheim Palace",cost:35,loc:"Cotswolds",icon:"🏛️",url:"https://www.blenheimpalace.com/"},
-    {name:"Eiffel Tower Summit",cost:30,loc:"Paris",icon:"🗼",url:"https://www.toureiffel.paris/en"},
+    {name:"Churchill War Rooms",cost:30,loc:"London",icon:"🏛️",url:"https://www.iwm.org.uk/visits/churchill-war-rooms"},
+    {name:"Borough Market",cost:0,loc:"London",icon:"🧀",url:"https://boroughmarket.org.uk/"},
     {name:"Louvre Museum",cost:20,loc:"Paris",icon:"🖼️",url:"https://www.louvre.fr/en"},
-    {name:"Versailles",cost:25,loc:"Paris",icon:"👑",url:"https://en.chateauversailles.fr/"},
-    {name:"Seine River Cruise",cost:18,loc:"Paris",icon:"🚢",url:"https://www.bateaux-mouches.fr/en"},
+    {name:"Sainte-Chapelle",cost:13,loc:"Paris",icon:"⛪",url:"https://www.sainte-chapelle.fr/en"},
     {name:"Colosseum & Forum",cost:22,loc:"Rome",icon:"🏟️",url:"https://colosseo.it/en/"},
     {name:"Vatican Museums",cost:20,loc:"Rome",icon:"🎨",url:"https://www.museivaticani.va/content/museivaticani/en.html"},
-    {name:"Trastevere Food Tour",cost:45,loc:"Rome",icon:"🍝",url:"https://www.google.com/maps/place/Trastevere,+Rome/"},
+    {name:"Rome Italy Temple",cost:0,loc:"Rome",icon:"⛪",url:"https://www.churchofjesuschrist.org/temples/details/rome-italy-temple"},
+    {name:"Trastevere Food Walk",cost:0,loc:"Rome",icon:"🍝",url:"https://www.google.com/maps/place/Trastevere,+Rome/"},
   ],
   foodByCountry: [
     {country:"United Kingdom",breakfast:16,lunch:22,dinner:35,snacks:10,flag:"🇬🇧"},
@@ -115,26 +114,26 @@ const ROUTES = [
     {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
   ],
   accomData: [
-    {loc:"Cotswolds",n:2,rate:[59,50],rec:"Middle Stanley Manor · 10BR · 4.84★ · 111 reviews",unique:"🏡 Stone manor in classic Cotswolds village",url:"https://www.airbnb.com/rooms/29120101"},
-    {loc:"London",n:2,rate:[75,65],rec:"Hotel · 8 rooms · central location · breakfast included",unique:"🏨 Group rate at 3-star near Westminster",url:"https://www.booking.com/searchresults.html?ss=London+Westminster&group_adults=16&checkin=2026-09-29&checkout=2026-10-01&nflt=class%3D3"},
-    {loc:"Paris",n:3,rate:[80,68],rec:"Hotel · 8 rooms · Marais or Saint-Germain · breakfast",unique:"🏨 Group rate at boutique hotel in central Paris",url:"https://www.booking.com/searchresults.html?ss=Paris+Marais&group_adults=16&checkin=2026-10-01&checkout=2026-10-04&nflt=class%3D3"},
+    {loc:"Cotswolds",n:3,rate:[59,50],rec:"Middle Stanley Manor · 10BR · 4.84★ · 111 reviews",unique:"🏡 Stone manor in classic Cotswolds village",url:"https://www.airbnb.com/rooms/29120101"},
+    {loc:"London",n:1,rate:[75,65],rec:"Hotel · 8 rooms · central location · breakfast included",unique:"🏨 Group rate at 3-star near Westminster",url:"https://www.booking.com/searchresults.html?ss=London+Westminster&group_adults=16&checkin=2026-09-30&checkout=2026-10-01&nflt=class%3D3"},
+    {loc:"Paris",n:2,rate:[80,68],rec:"Hotel · 8 rooms · Marais or Saint-Germain · breakfast",unique:"🏨 Group rate at boutique hotel in central Paris",url:"https://www.booking.com/searchresults.html?ss=Paris+Marais&group_adults=16&checkin=2026-10-01&checkout=2026-10-03&nflt=class%3D3"},
     {loc:"Rome",n:3,rate:[81,68],rec:"Villa LINA · 9BR · 14 beds · 4.98★ · 59 reviews",unique:"🏡 Guest Favorite · 5 min to metro",url:"https://www.airbnb.com/rooms/1136343333895843954"},
   ],
   hiddenGems: [
-    {region:"London",color:T.blue,flag:"🇬🇧",gems:[
-      {name:"Leadenhall Market",desc:"Victorian covered market. Diagon Alley filming location. Beautiful architecture.",url:"https://www.google.com/maps/place/Leadenhall+Market/"},
-      {name:"Neal's Yard",desc:"Hidden courtyard in Covent Garden painted every color. Tiny cheese shop and cafés.",url:"https://www.google.com/maps/place/Neal's+Yard,+London/"},
-      {name:"Borough Market",desc:"London's oldest food market (since 1014). Artisan bread, fresh oysters, British cheeses.",url:"https://boroughmarket.org.uk/"},
-    ]},
     {region:"Cotswolds",color:"#fbbf24",flag:"🇬🇧",gems:[
       {name:"Bibury",desc:"William Morris called it 'the most beautiful village in England.' Arlington Row stone cottages.",url:"https://www.google.com/maps/place/Bibury,+UK/"},
-      {name:"Bourton-on-the-Water",desc:"'Venice of the Cotswolds.' Stone bridges over a shallow river. Model village inside.",url:"https://www.google.com/maps/place/Bourton-on-the-Water,+UK/"},
-      {name:"Stow-on-the-Wold",desc:"Hilltop market town. Famous church door grown into a tree. Antique shops.",url:"https://www.google.com/maps/place/Stow-on-the-Wold,+UK/"},
+      {name:"Chipping Campden",desc:"Perfectly preserved wool-trade village. Honey-stone High Street, quiet gardens, zero crowds.",url:"https://www.google.com/maps/place/Chipping+Campden,+UK/"},
+      {name:"Daylesford Farm Shop",desc:"Organic farm shop and café. Local cheeses, fresh bread, farm-to-table lunch in the countryside.",url:"https://www.daylesford.com/"},
+    ]},
+    {region:"London",color:T.blue,flag:"🇬🇧",gems:[
+      {name:"Neal's Yard",desc:"Hidden courtyard in Covent Garden painted every color. Tiny cheese shop and cafés.",url:"https://www.google.com/maps/place/Neal's+Yard,+London/"},
+      {name:"Leadenhall Market",desc:"Victorian covered market. Diagon Alley filming location. Beautiful architecture.",url:"https://www.google.com/maps/place/Leadenhall+Market/"},
+      {name:"Dennis Severs' House",desc:"Candlelit 18th-century time capsule in Spitalfields. Silent, immersive, unforgettable.",url:"https://www.dennissevershouse.co.uk/"},
     ]},
     {region:"Paris",color:T.rose,flag:"🇫🇷",gems:[
-      {name:"Rue Crémieux",desc:"Most colorful street in Paris. Pastel houses, Instagram-famous, tucked behind Gare de Lyon.",url:"https://www.google.com/maps/place/Rue+Cr%C3%A9mieux,+Paris/"},
-      {name:"Sainte-Chapelle",desc:"Smaller than Notre-Dame but the stained glass is otherworldly. 1,113 panels of glass.",url:"https://www.sainte-chapelle.fr/en"},
-      {name:"Le Marais",desc:"Medieval Jewish quarter turned hip neighborhood. Falafel, concept shops, Place des Vosges.",url:"https://www.google.com/maps/place/Le+Marais,+Paris/"},
+      {name:"Rue Crémieux",desc:"Most colorful street in Paris. Pastel houses tucked behind Gare de Lyon. Quiet and surreal.",url:"https://www.google.com/maps/place/Rue+Cr%C3%A9mieux,+Paris/"},
+      {name:"Place des Vosges",desc:"Oldest planned square in Paris. Hidden in Le Marais. Red-brick arcades, quiet benches.",url:"https://www.google.com/maps/place/Place+des+Vosges,+Paris/"},
+      {name:"Marché des Enfants Rouges",desc:"Oldest covered market in Paris (since 1615). Crêpes, couscous, Japanese bento — all locals.",url:"https://www.google.com/maps/place/March%C3%A9+des+Enfants+Rouges/"},
     ]},
     {region:"Rome",color:T.green,flag:"🇮🇹",gems:[
       {name:"Trastevere",desc:"Rome's bohemian neighborhood. Cobblestoned, ivy-covered, the best trattorias in the city.",url:"https://www.google.com/maps/place/Trastevere,+Rome/"},
@@ -165,37 +164,37 @@ const ROUTES = [
   tagline: "Villages, Peaks & the Best Food",
   color: T.green,
   gradient: T.gradient3,
-  countries: ["Italy","Austria","Germany"],
-  countryFlags: ["🇮🇹","🇦🇹","🇩🇪"],
-  cities: ["Lake Como","Bolzano","Innsbruck","Salzburg","Munich"],
-  cityFlags: ["🇮🇹","🇮🇹","🇦🇹","🇦🇹","🇩🇪"],
-  highlights: ["Best food of all routes — Italian + Austrian","Quaint lakeside villages + Dolomite peaks","Every stop is a charming small town","Sound of Music + Neuschwanstein included","Best balance of culture, nature & value"],
+  countries: ["Germany","Austria","Italy"],
+  countryFlags: ["🇩🇪","🇦🇹","🇮🇹"],
+  cities: ["Munich","Salzburg","Innsbruck","Bolzano","Lake Como"],
+  cityFlags: ["🇩🇪","🇦🇹","🇦🇹","🇮🇹","🇮🇹"],
+  highlights: ["Best food of all routes — Italian + Austrian","Quaint lakeside villages + Dolomite peaks","Every stop is a charming small town","Sound of Music + Neuschwanstein included","Ends in Milan — optional Rome Temple extension"],
   itinerary: {
     fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
-      {day:0,date:"Sep 26",location:"SLC → Milan",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight to Milan Malpensa.",nights:0,lat:45.63,lng:8.72},
-      {day:1,date:"Sep 27",location:"Lake Como",type:"nature",icon:"mountain",country:"Italy",desc:"Train to Varenna (1h). Lakeside village stroll. Villa Monastero gardens. Aperitivo on the waterfront.",nights:1,lat:46.01,lng:9.28},
-      {day:2,date:"Sep 28",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Ferry to Bellagio (Pearl of the Lake). Cobblestone lanes, gelato, Villa Melzi. Boat ride. Italian dinner.",nights:1,lat:46.01,lng:9.28},
-      {day:3,date:"Sep 29",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Scenic train (3h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
-      {day:4,date:"Sep 30",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
-      {day:5,date:"Oct 1",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Brenner Pass train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
-      {day:6,date:"Oct 2",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
-      {day:7,date:"Oct 3",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
-      {day:8,date:"Oct 4",location:"Munich",type:"train",icon:"train",country:"Germany",desc:"Train (1.5h). Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner.",nights:1,lat:48.14,lng:11.58},
-      {day:9,date:"Oct 5",location:"Neuschwanstein & Bavaria",type:"highlight",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Füssen village. Bavarian Alps. Farewell dinner.",nights:1,lat:48.14,lng:11.58},
-      {day:10,date:"Oct 6",location:"Munich → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home from Munich. Arrive SLC late evening.",nights:0,lat:48.14,lng:11.58},
+      {day:0,date:"Sep 26",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
+      {day:1,date:"Sep 27",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Sep 28",location:"Neuschwanstein & Bavaria",type:"highlight",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Füssen village. Bavarian Alps. Bakery crawl.",nights:1,lat:48.14,lng:11.58},
+      {day:3,date:"Sep 29",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Sep 30",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
+      {day:5,date:"Oct 1",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
+      {day:6,date:"Oct 2",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Brenner Pass train (2h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
+      {day:7,date:"Oct 3",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
+      {day:8,date:"Oct 4",location:"Lake Como",type:"train",icon:"train",country:"Italy",desc:"Train to Varenna (3h). Lakeside village stroll. Villa Monastero gardens. Aperitivo on the waterfront.",nights:1,lat:46.01,lng:9.28},
+      {day:9,date:"Oct 5",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Ferry to Bellagio (Pearl of the Lake). Cobblestone lanes, gelato, Villa Melzi. Farewell Italian dinner.",nights:1,lat:46.01,lng:9.28},
+      {day:10,date:"Oct 6",location:"Milan → Home",type:"travel",icon:"plane",country:"Transit",desc:"Train to Milan (1h). Fly home. Arrive U.S. late evening.",nights:0,lat:45.63,lng:8.72},
     ]},
     spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
-      {day:0,date:"Apr 24",location:"SLC → Milan",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight to Milan Malpensa.",nights:0,lat:45.63,lng:8.72},
-      {day:1,date:"Apr 25",location:"Lake Como",type:"nature",icon:"mountain",country:"Italy",desc:"Train to Varenna (1h). Lakeside village stroll. Villa Monastero gardens. Aperitivo on the waterfront.",nights:1,lat:46.01,lng:9.28},
-      {day:2,date:"Apr 26",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Ferry to Bellagio (Pearl of the Lake). Cobblestone lanes, gelato, Villa Melzi. Boat ride. Italian dinner.",nights:1,lat:46.01,lng:9.28},
-      {day:3,date:"Apr 27",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Scenic train (3h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
-      {day:4,date:"Apr 28",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
-      {day:5,date:"Apr 29",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Brenner Pass train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
-      {day:6,date:"Apr 30",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
-      {day:7,date:"May 1",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
-      {day:8,date:"May 2",location:"Munich",type:"train",icon:"train",country:"Germany",desc:"Train (1.5h). Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner.",nights:1,lat:48.14,lng:11.58},
-      {day:9,date:"May 3",location:"Neuschwanstein & Bavaria",type:"highlight",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Füssen village. Bavarian Alps. Farewell dinner.",nights:1,lat:48.14,lng:11.58},
-      {day:10,date:"May 4",location:"Munich → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home from Munich. Arrive SLC late evening.",nights:0,lat:48.14,lng:11.58},
+      {day:0,date:"Apr 24",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
+      {day:1,date:"Apr 25",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Apr 26",location:"Neuschwanstein & Bavaria",type:"highlight",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Füssen village. Bavarian Alps. Bakery crawl.",nights:1,lat:48.14,lng:11.58},
+      {day:3,date:"Apr 27",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Apr 28",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
+      {day:5,date:"Apr 29",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
+      {day:6,date:"Apr 30",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Brenner Pass train (2h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
+      {day:7,date:"May 1",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
+      {day:8,date:"May 2",location:"Lake Como",type:"train",icon:"train",country:"Italy",desc:"Train to Varenna (3h). Lakeside village stroll. Villa Monastero gardens. Aperitivo on the waterfront.",nights:1,lat:46.01,lng:9.28},
+      {day:9,date:"May 3",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Ferry to Bellagio (Pearl of the Lake). Cobblestone lanes, gelato, Villa Melzi. Farewell Italian dinner.",nights:1,lat:46.01,lng:9.28},
+      {day:10,date:"May 4",location:"Milan → Home",type:"travel",icon:"plane",country:"Transit",desc:"Train to Milan (1h). Fly home. Arrive U.S. late evening.",nights:0,lat:45.63,lng:8.72},
     ]}
   },
   budgetTiers: {
@@ -211,11 +210,11 @@ const ROUTES = [
     }
   },
   trainLegs: [
-    {from:"Milan",to:"Varenna (Como)",hrs:"1h",cost:12,scenic:4,type:"Trenord Regional",url:"https://www.trenord.it/en/"},
-    {from:"Varenna",to:"Bolzano",hrs:"3h",cost:25,scenic:4,type:"Trenitalia",url:"https://www.trenitalia.com/en.html"},
-    {from:"Bolzano",to:"Innsbruck",hrs:"2h",cost:18,scenic:5,type:"ÖBB Brenner",url:"https://www.oebb.at/en/"},
-    {from:"Innsbruck",to:"Salzburg",hrs:"2h",cost:25,scenic:5,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
-    {from:"Salzburg",to:"Munich",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
+    {from:"Munich",to:"Salzburg",hrs:"1.5h",cost:22,scenic:4,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
+    {from:"Salzburg",to:"Innsbruck",hrs:"2h",cost:25,scenic:5,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
+    {from:"Innsbruck",to:"Bolzano",hrs:"2h",cost:18,scenic:5,type:"ÖBB Brenner",url:"https://www.oebb.at/en/"},
+    {from:"Bolzano",to:"Varenna (Como)",hrs:"3h",cost:25,scenic:4,type:"Trenitalia",url:"https://www.trenitalia.com/en.html"},
+    {from:"Varenna",to:"Milan",hrs:"1h",cost:12,scenic:4,type:"Trenord Regional",url:"https://www.trenord.it/en/"},
   ],
   activities: [
     {name:"Villa Monastero Gardens",cost:12,loc:"Varenna",icon:"🌿",url:"https://www.villamonastero.eu/"},
@@ -230,45 +229,45 @@ const ROUTES = [
     {name:"Neuschwanstein Castle",cost:26,loc:"Bavaria",icon:"🏰",url:"https://www.neuschwanstein.de/englisch/tourist/"},
   ],
   foodByCountry: [
-    {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
-    {country:"Austria",breakfast:15,lunch:22,dinner:32,snacks:9,flag:"🇦🇹"},
     {country:"Germany",breakfast:14,lunch:20,dinner:30,snacks:8,flag:"🇩🇪"},
+    {country:"Austria",breakfast:15,lunch:22,dinner:32,snacks:9,flag:"🇦🇹"},
+    {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
   ],
   accomData: [
-    {loc:"Lake Como (Varenna)",n:2,rate:[91,78],rec:"Villa del Lago · 7BR · 14 beds · 4.83★ · lake views",unique:"🏡 Private pool, lakefront terrace",url:"https://www.airbnb.com/rooms/801954418870522697"},
-    {loc:"Bolzano / Dolomites",n:2,rate:[55,45],rec:"Hotel 8 rooms · Dolomite village · breakfast included",unique:"🏔️ Agriturismo with vineyard & mountain views",url:"https://www.booking.com/searchresults.html?dest_id=-111126&dest_type=city&group_adults=16&nflt=roomfacility%3D81&checkin=2026-09-29&checkout=2026-10-01"},
-    {loc:"Innsbruck",n:1,rate:[45,40],rec:"Hotel 8 rooms · Old Town · most cost-effective option",unique:"🏔️ Walking distance to Golden Roof & cable car",url:"https://www.booking.com/searchresults.html?ss=Innsbruck&group_adults=16&checkin=2026-10-01&checkout=2026-10-02"},
-    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · 4.94★ · 161 reviews",unique:"🏡 Guest Favorite · countryside estate",url:"https://www.airbnb.com/rooms/9474529"},
     {loc:"Munich / Bavaria",n:2,rate:[80,70],rec:"Historic Rectory near Neuschwanstein · 5BR · 4.99★ · 93 reviews",unique:"🏰 Near the castle, charming village setting",url:"https://www.airbnb.com/rooms/17010988"},
+    {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · 4.94★ · 161 reviews",unique:"🏡 Guest Favorite · countryside estate",url:"https://www.airbnb.com/rooms/9474529"},
+    {loc:"Innsbruck",n:1,rate:[45,40],rec:"Hotel 8 rooms · Old Town · most cost-effective option",unique:"🏔️ Walking distance to Golden Roof & cable car",url:"https://www.booking.com/searchresults.html?ss=Innsbruck&group_adults=16&checkin=2026-10-01&checkout=2026-10-02"},
+    {loc:"Bolzano / Dolomites",n:2,rate:[55,45],rec:"Hotel 8 rooms · Dolomite village · breakfast included",unique:"🏔️ Agriturismo with vineyard & mountain views",url:"https://www.booking.com/searchresults.html?dest_id=-111126&dest_type=city&group_adults=16&nflt=roomfacility%3D81&checkin=2026-09-29&checkout=2026-10-01"},
+    {loc:"Lake Como (Varenna)",n:2,rate:[91,78],rec:"Villa del Lago · 7BR · 14 beds · 4.83★ · lake views",unique:"🏡 Private pool, lakefront terrace",url:"https://www.airbnb.com/rooms/801954418870522697"},
   ],
   hiddenGems: [
-    {region:"Lake Como",color:T.green,flag:"🇮🇹",gems:[
-      {name:"Varenna",desc:"Quieter than Bellagio. Pastel houses, olive groves, lakeside promenade at sunset.",url:"https://www.google.com/maps/place/Varenna,+Italy/"},
-      {name:"Greenway del Lago",desc:"10km lakeside walking path through olive groves and hidden villages.",url:"https://www.google.com/maps/place/Greenway+del+Lago+di+Como/"},
-      {name:"Nesso Waterfall Bridge",desc:"Ancient stone bridge over a gorge where a waterfall drops into the lake.",url:"https://www.google.com/maps/place/Orrido+di+Nesso/"},
-    ]},
-    {region:"Dolomites",color:T.cyan,flag:"🇮🇹",gems:[
-      {name:"Val di Funes",desc:"Iconic church meadow with Dolomite peaks. One of the most photographed spots in the Alps.",url:"https://www.google.com/maps/place/Val+di+Funes/"},
-      {name:"Pragser Wildsee",desc:"Hidden emerald lake surrounded by cliffs. Arrive early for mirror reflections.",url:"https://www.google.com/maps/place/Pragser+Wildsee/"},
-      {name:"Bolzano Farmers Market",desc:"Daily market in Piazza delle Erbe. South Tyrolean cheese, speck, strudel, wine.",url:"https://www.google.com/maps/place/Piazza+delle+Erbe,+Bolzano/"},
+    {region:"Salzburg & Bavaria",color:"#fbbf24",flag:"🇦🇹🇩🇪",gems:[
+      {name:"Steingasse",desc:"Narrow medieval lane. Tiny bars, 600 years of history, zero tourist groups.",url:"https://www.google.com/maps/place/Steingasse,+Salzburg,+Austria/"},
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery (since 1160). Wood-fired bread in monastery courtyard.",url:"https://www.google.com/maps/place/Stiftsb%C3%A4ckerei+St.+Peter/"},
+      {name:"Viktualienmarkt Beer Garden",desc:"Munich's secret: communal beer garden hidden inside the daily market.",url:"https://www.google.com/maps/place/Viktualienmarkt/"},
     ]},
     {region:"Innsbruck",color:T.purple,flag:"🇦🇹",gems:[
       {name:"Bergisel Ski Jump",desc:"Zaha Hadid viewpoint. Panoramic views of the entire Inn Valley.",url:"https://www.bergisel.info/en"},
       {name:"Café Sacher Innsbruck",desc:"The original Sachertorte. Quieter than the Vienna location.",url:"https://www.google.com/maps/place/Caf%C3%A9+Sacher+Innsbruck/"},
       {name:"Alpenzoo",desc:"Highest-altitude zoo in Europe. Alpine animals in natural settings.",url:"https://www.alpenzoo.at/en/"},
     ]},
-    {region:"Salzburg & Bavaria",color:"#fbbf24",flag:"🇦🇹🇩🇪",gems:[
-      {name:"Steingasse",desc:"Narrow medieval lane. Tiny bars, 600 years of history, zero tourist groups.",url:"https://www.google.com/maps/place/Steingasse,+Salzburg,+Austria/"},
-      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery (since 1160). Wood-fired bread in monastery courtyard.",url:"https://www.google.com/maps/place/Stiftsb%C3%A4ckerei+St.+Peter/"},
-      {name:"Viktualienmarkt Beer Garden",desc:"Munich's secret: communal beer garden hidden inside the daily market.",url:"https://www.google.com/maps/place/Viktualienmarkt/"},
+    {region:"Dolomites",color:T.cyan,flag:"🇮🇹",gems:[
+      {name:"Val di Funes",desc:"Iconic church meadow with Dolomite peaks. One of the most photographed spots in the Alps.",url:"https://www.google.com/maps/place/Val+di+Funes/"},
+      {name:"Pragser Wildsee",desc:"Hidden emerald lake surrounded by cliffs. Arrive early for mirror reflections.",url:"https://www.google.com/maps/place/Pragser+Wildsee/"},
+      {name:"Bolzano Farmers Market",desc:"Daily market in Piazza delle Erbe. South Tyrolean cheese, speck, strudel, wine.",url:"https://www.google.com/maps/place/Piazza+delle+Erbe,+Bolzano/"},
+    ]},
+    {region:"Lake Como",color:T.green,flag:"🇮🇹",gems:[
+      {name:"Varenna",desc:"Quieter than Bellagio. Pastel houses, olive groves, lakeside promenade at sunset.",url:"https://www.google.com/maps/place/Varenna,+Italy/"},
+      {name:"Greenway del Lago",desc:"10km lakeside walking path through olive groves and hidden villages.",url:"https://www.google.com/maps/place/Greenway+del+Lago+di+Como/"},
+      {name:"Nesso Waterfall Bridge",desc:"Ancient stone bridge over a gorge where a waterfall drops into the lake.",url:"https://www.google.com/maps/place/Orrido+di+Nesso/"},
     ]},
   ],
   weather: [
-    {city:"Lake Como",fH:66,fL:52,sH:64,sL:48,fR:7,sR:9},
-    {city:"Bolzano",fH:63,fL:44,sH:65,sL:43,fR:7,sR:9},
-    {city:"Innsbruck",fH:57,fL:38,sH:60,sL:39,fR:8,sR:11},
-    {city:"Salzburg",fH:58,fL:41,sH:59,sL:40,fR:9,sR:12},
     {city:"Munich",fH:60,fL:43,sH:62,sL:42,fR:8,sR:11},
+    {city:"Salzburg",fH:58,fL:41,sH:59,sL:40,fR:9,sR:12},
+    {city:"Innsbruck",fH:57,fL:38,sH:60,sL:39,fR:8,sR:11},
+    {city:"Bolzano",fH:63,fL:44,sH:65,sL:43,fR:7,sR:9},
+    {city:"Lake Como",fH:66,fL:52,sH:64,sL:48,fR:7,sR:9},
   ],
   compareScorecard: [
     {factor:"Price",fall:"Moderate",spring:"Best value",winner:"spring",icon:"DollarSign"},
@@ -279,6 +278,7 @@ const ROUTES = [
     {factor:"Anniversary",fall:"Celebrate on trip!",spring:"Already passed",winner:"fall",icon:"Heart"},
     {factor:"Alpine Access",fall:"All lifts open",spring:"Some lifts closed",winner:"fall",icon:"Mountain"},
   ],
+  bonusExtension: {title:"Optional: Rome Temple Extension",desc:"Since this route ends in Milan, anyone who wants extra time can catch a 1.5h flight to Rome for 2–3 bonus days. Visit the Rome Italy Temple, explore Trastevere, and see the Colosseum before flying home.",cost:"~$400–600pp extra (flight + 2 nights)",url:"https://www.churchofjesuschrist.org/temples/details/rome-italy-temple"},
 },
 // --- ROUTE 3: Alpine-Adriatic ---
 {
@@ -294,7 +294,7 @@ const ROUTES = [
   highlights: ["Charming villages from Alps to Adriatic","Sound of Music in Salzburg","Cobblestone old towns in every country","Best weather variety","4 countries, most culturally diverse"],
   itinerary: {
     fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
-      {day:0,date:"Sep 26",location:"SLC → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight.",nights:0,lat:48.14,lng:11.58},
+      {day:0,date:"Sep 26",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
       {day:1,date:"Sep 27",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. LDS church. Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.",nights:1,lat:48.14,lng:11.58},
       {day:2,date:"Sep 28",location:"Neuschwanstein & Bavaria",type:"nature",icon:"mountain",country:"Germany",desc:"Day trip to fairytale castle and Bavarian Alps. Village of Füssen. Bakery crawl.",nights:1,lat:47.56,lng:10.75},
       {day:3,date:"Sep 29",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5 hrs). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
@@ -304,10 +304,10 @@ const ROUTES = [
       {day:7,date:"Oct 3",location:"Split",type:"city",icon:"camera",country:"Croatia",desc:"Diocletian's Palace, Riva promenade, fresh market. Swim or explore Trogir. Seafood dinner.",nights:1,lat:43.51,lng:16.44},
       {day:8,date:"Oct 4",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls.",nights:1,lat:42.65,lng:18.09},
       {day:9,date:"Oct 5",location:"Dubrovnik",type:"highlight",icon:"heart",country:"Croatia",desc:"Walk full city walls. Kayaking optional. Cobblestone exploring, bakeries. Farewell dinner.",nights:1,lat:42.65,lng:18.09},
-      {day:10,date:"Oct 6",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive SLC late evening.",nights:0,lat:42.65,lng:18.09},
+      {day:10,date:"Oct 6",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive U.S. late evening.",nights:0,lat:42.65,lng:18.09},
     ]},
     spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
-      {day:0,date:"Apr 24",location:"SLC → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart SLC afternoon. Overnight flight.",nights:0,lat:48.14,lng:11.58},
+      {day:0,date:"Apr 24",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
       {day:1,date:"Apr 25",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. LDS church. Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.",nights:1,lat:48.14,lng:11.58},
       {day:2,date:"Apr 26",location:"Neuschwanstein & Bavaria",type:"nature",icon:"mountain",country:"Germany",desc:"Day trip to fairytale castle and Bavarian Alps. Village of Füssen. Bakery crawl.",nights:1,lat:47.56,lng:10.75},
       {day:3,date:"Apr 27",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5 hrs). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
@@ -317,7 +317,7 @@ const ROUTES = [
       {day:7,date:"May 1",location:"Split",type:"city",icon:"camera",country:"Croatia",desc:"Diocletian's Palace, Riva promenade, fresh market. Swim or explore Trogir. Seafood dinner.",nights:1,lat:43.51,lng:16.44},
       {day:8,date:"May 2",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls.",nights:1,lat:42.65,lng:18.09},
       {day:9,date:"May 3",location:"Dubrovnik",type:"highlight",icon:"heart",country:"Croatia",desc:"Walk full city walls. Kayaking optional. Cobblestone exploring, bakeries. Farewell dinner.",nights:1,lat:42.65,lng:18.09},
-      {day:10,date:"May 4",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive SLC late evening.",nights:0,lat:42.65,lng:18.09},
+      {day:10,date:"May 4",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive U.S. late evening.",nights:0,lat:42.65,lng:18.09},
     ]}
   },
   budgetTiers: {
@@ -565,7 +565,7 @@ function OverviewTab({route,season}) {
         React.createElement(MiniStat, {icon:Users,label:"Travelers",value:"16",color:T.green,sub:"8 couples"}),
         React.createElement(MiniStat, {icon:MapPin,label:"Cities",value:String(route.cities.length),color:T.purple,sub:route.cities[0]+" → "+route.cities.at(-1)}),
         React.createElement(MiniStat, {icon:Train,label:"Train Legs",value:String(route.trainLegs.length),color:T.cyan,sub:"Point-to-point"}),
-        React.createElement(MiniStat, {icon:DollarSign,label:"Base Gift",value:"$3K",color:T.accent,sub:"per couple"}),
+
       )
     ),
     React.createElement(AnimIn, {delay:100},
@@ -601,7 +601,7 @@ function OverviewTab({route,season}) {
             ],cx:"50%",cy:"50%",innerRadius:60,outerRadius:100,paddingAngle:3,dataKey:"value",label:({name,value})=>name+" $"+value,labelLine:{stroke:T.textDim}},
               CC.map((c,i) => React.createElement(Cell,{key:i,fill:c}))
             ),
-            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},formatter:v=>"$"+v})
+            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},itemStyle:{color:T.text},labelStyle:{color:T.white},formatter:v=>"$"+v})
           )
         )
       )
@@ -661,6 +661,16 @@ function ItineraryTab({route,season}) {
           )
         )
       )
+    ),
+    route.bonusExtension && React.createElement(AnimIn, {delay:700},
+      React.createElement(GlowCard, {glow:T.green,style:{marginTop:20,background:`${T.green}08`,border:`1px solid ${T.green}25`}},
+        React.createElement("h3", {style:{margin:"0 0 8px",color:T.green,fontSize:16,display:"flex",alignItems:"center",gap:8}}, React.createElement(Plane,{size:18,color:T.green}), route.bonusExtension.title),
+        React.createElement("p", {style:{margin:"0 0 12px",fontSize:13,color:T.text,lineHeight:1.6}}, route.bonusExtension.desc),
+        React.createElement("div", {style:{display:"flex",alignItems:"center",gap:12,flexWrap:"wrap"}},
+          React.createElement("span", {style:{fontSize:12,color:T.textMuted,fontWeight:600}}, route.bonusExtension.cost),
+          route.bonusExtension.url && React.createElement(LinkBtn, {href:route.bonusExtension.url,label:"Rome Temple Info →",color:T.green,small:true})
+        )
+      )
     )
   );
 }
@@ -675,7 +685,7 @@ function StaysTab({route,season}) {
             React.createElement("h3", {style:{margin:0,color:T.white,fontSize:18}}, a.loc),
             React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginTop:4,flexWrap:"wrap"}},
               React.createElement("span", {style:{fontSize:12,color:T.textMuted}}, a.n+" night"+(a.n>1?"s":"")),
-              a.url && React.createElement(LinkBtn, {href:a.url,label:"Browse Airbnb →",color:CC[i],small:true})
+              a.url && React.createElement(LinkBtn, {href:a.url,label:"View Lodging →",color:CC[i],small:true})
             )
           ),
           React.createElement("span", {style:{fontSize:11,background:`${CC[i]}18`,color:CC[i],padding:"4px 12px",borderRadius:99,fontWeight:700}}, a.rec)
@@ -700,7 +710,7 @@ function StaysTab({route,season}) {
             React.createElement(CartesianGrid, {strokeDasharray:"3 3",stroke:T.border}),
             React.createElement(XAxis, {dataKey:"loc",tick:{fill:T.textMuted,fontSize:10}}),
             React.createElement(YAxis, {tickFormatter:v=>"$"+v,tick:{fill:T.textMuted,fontSize:11}}),
-            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},formatter:v=>"$"+v+"/pp/nt"}),
+            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},itemStyle:{color:T.text},labelStyle:{color:T.white},formatter:v=>"$"+v+"/pp/nt"}),
             React.createElement(Legend),
             React.createElement(Bar, {dataKey:"Fall",fill:T.accent,radius:[6,6,0,0]}),
             React.createElement(Bar, {dataKey:"Spring",fill:T.green,radius:[6,6,0,0]}),
@@ -810,7 +820,7 @@ function FamilyTab({route}) {
             React.createElement(CartesianGrid, {strokeDasharray:"3 3",stroke:T.border}),
             React.createElement(XAxis, {type:"number",domain:[0,10],tick:{fill:T.textMuted,fontSize:11}}),
             React.createElement(YAxis, {dataKey:"name",type:"category",width:140,tick:{fill:T.textMuted,fontSize:12}}),
-            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text}}),
+            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},itemStyle:{color:T.text},labelStyle:{color:T.white}}),
             React.createElement(Bar, {dataKey:"votes",name:"Mentions",radius:[0,8,8,0]},
               destinationVotes.map((_,i)=>React.createElement(Cell,{key:i,fill:CC[i%CC.length]}))
             )
@@ -848,21 +858,7 @@ function FamilyTab({route}) {
         })
       )
     ),
-    React.createElement(AnimIn, {delay:300},
-      React.createElement(GlowCard, {glow:T.cyan},
-        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16}}, "Budget Range (Anonymous)"),
-        React.createElement("div", {style:{display:"flex",gap:16,justifyContent:"center",flexWrap:"wrap"}},
-          [{label:"Base (Gifted)",val:"$3,000",sub:"per couple",color:T.accent,bg:T.accentSoft},
-           {label:"Additional Out-of-Pocket",val:"$3K–$5K",sub:"most common range",color:T.blue,bg:T.blueSoft},
-           {label:"Total Target",val:"$6K–$8K",sub:"per couple all-in",color:T.green,bg:T.greenSoft}
-          ].map((b,i) => React.createElement("div", {key:i,style:{textAlign:"center",background:b.bg,borderRadius:12,padding:16,minWidth:140,border:`1px solid ${b.color}25`}},
-            React.createElement("div", {style:{fontSize:11,color:T.textMuted,marginBottom:4}}, b.label),
-            React.createElement("div", {style:{fontSize:24,fontWeight:900,color:b.color}}, b.val),
-            React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, b.sub)
-          ))
-        )
-      )
-    )
+
   );
 }
 
@@ -934,7 +930,7 @@ function CompareTab({route,season}) {
             React.createElement(CartesianGrid, {strokeDasharray:"3 3",stroke:T.border}),
             React.createElement(XAxis, {dataKey:"city",tick:{fill:T.textMuted,fontSize:11}}),
             React.createElement(YAxis, {domain:[30,80],tick:{fill:T.textMuted,fontSize:11}}),
-            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text}}),
+            React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},itemStyle:{color:T.text},labelStyle:{color:T.white}}),
             React.createElement(Legend),
             React.createElement(Bar, {dataKey:"Fall High",fill:T.accent,radius:[4,4,0,0]}),
             React.createElement(Bar, {dataKey:"Spring High",fill:T.green,radius:[4,4,0,0]}),
