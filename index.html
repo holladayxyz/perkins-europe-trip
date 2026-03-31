@@ -10,6 +10,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <style>
       *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
       body {
@@ -23,12 +25,15 @@
       }
       /* Hide scrollbar on tab nav */
       .hide-scrollbar::-webkit-scrollbar { display: none; }
+      .route-tooltip { background: #151929 !important; color: #e8eaf0 !important; border: 1px solid #1e2540 !important; border-radius: 8px !important; padding: 4px 10px !important; font-family: 'Inter', sans-serif !important; font-size: 12px !important; font-weight: 600 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important; }
+      .route-tooltip::before { border-top-color: #1e2540 !important; }
+      .leaflet-container { background: #0c0f1a !important; }
     </style>
   </head>
   <body>
     <div id="root"></div>
     <script type="module">
-import { useState, useEffect, useRef } from "https://esm.sh/react@18.3.1";
+import React, { useState, useEffect, useRef } from "https://esm.sh/react@18.3.1";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "https://esm.sh/recharts@2.12.7?deps=react@18.3.1,react-dom@18.3.1";
 import { Plane, Train, MapPin, Calendar, Users, DollarSign, Utensils, Camera, Sun, Moon, ChevronRight, Star, Heart, Mountain, Building, Music, Church, Backpack, Shield, Coffee, Bed, ArrowRight, Globe, Compass, Check, X as XIcon, TrendingDown, TrendingUp, Info } from "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1";
 
@@ -322,6 +327,37 @@ function ScenicDots({ count }) {
 const iconMap = { plane: Plane, train: Train, church: Church, mountain: Mountain, music: Music, camera: Camera, compass: Compass, heart: Heart };
 
 // ============ SECTIONS ============
+function RouteMap() {
+  const mapRef = useRef(null);
+  const mapInstance = useRef(null);
+  const stops = [
+    { name: "Munich", lat: 48.14, lng: 11.58, flag: "\u{1F1E9}\u{1F1EA}" },
+    { name: "Salzburg", lat: 47.80, lng: 13.04, flag: "\u{1F1E6}\u{1F1F9}" },
+    { name: "Lake Bled", lat: 46.37, lng: 14.09, flag: "\u{1F1F8}\u{1F1EE}" },
+    { name: "Split", lat: 43.51, lng: 16.44, flag: "\u{1F1ED}\u{1F1F7}" },
+    { name: "Dubrovnik", lat: 42.65, lng: 18.09, flag: "\u{1F1ED}\u{1F1F7}" },
+  ];
+  useEffect(() => {
+    if (!mapRef.current || mapInstance.current) return;
+    const L = window.L;
+    if (!L) return;
+    const map = L.map(mapRef.current, { scrollWheelZoom: false, zoomControl: false, attributionControl: false, dragging: true });
+    L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", { maxZoom: 19 }).addTo(map);
+    const coords = stops.map(s => [s.lat, s.lng]);
+    L.polyline(coords, { color: "#f0a050", weight: 3, opacity: 0.7, dashArray: "10, 8" }).addTo(map);
+    stops.forEach((stop, i) => {
+      const m = L.circleMarker([stop.lat, stop.lng], { radius: 7, fillColor: "#f0a050", color: "#fff", weight: 2, opacity: 1, fillOpacity: 0.9 }).addTo(map);
+      m.bindTooltip(stop.flag + " " + stop.name, { permanent: true, direction: i <= 2 ? "top" : "bottom", className: "route-tooltip", offset: [0, i <= 2 ? -10 : 10] });
+    });
+    map.fitBounds(L.latLngBounds(coords).pad(0.15));
+    mapInstance.current = map;
+    return () => { map.remove(); mapInstance.current = null; };
+  }, []);
+  return React.createElement("div", { style: { marginBottom: 20 } },
+    React.createElement("div", { ref: mapRef, style: { height: 300, borderRadius: 16, border: "1px solid " + T.border, overflow: "hidden" } })
+  );
+}
+
 function HeroSection({ season, setSeason, setTab }) {
   const cities = ["Munich", "Salzburg", "Lake Bled", "Split", "Dubrovnik"];
   const flags = ["🇩🇪", "🇦🇹", "🇸🇮", "🇭🇷", "🇭🇷"];
@@ -911,6 +947,7 @@ function App() {
     } },
       React.createElement("div", { style: { maxWidth: 900, margin: "0 auto", padding: "0 16px calc(40px + env(safe-area-inset-bottom, 0px))", paddingTop: "env(safe-area-inset-top, 0px)" } },
         React.createElement(HeroSection, { season: season, setSeason: setSeason, setTab: setTab }),
+        React.createElement(RouteMap, null),
 
         React.createElement("div", { style: {
           display: "flex", gap: 4, justifyContent: "center", flexWrap: "wrap",
