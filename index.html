@@ -31,7 +31,7 @@ import React, { useState, useEffect, useRef } from "https://esm.sh/react@18.3.1"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, RadarChart, Radar, PolarGrid, PolarAngleAxis, PolarRadiusAxis } from "https://esm.sh/recharts@2.12.7?deps=react@18.3.1,react-dom@18.3.1";
 import { Plane, Train, MapPin, Calendar, Users, DollarSign, Utensils, Camera, Sun, Moon, ChevronRight, Star, Heart, Mountain, Building, Music, Church, Backpack, Shield, Coffee, Bed, ArrowRight, Globe, Compass, Check, X as XIcon, TrendingDown, TrendingUp, Info, ChevronLeft } from "https://esm.sh/lucide-react@0.383.0?deps=react@18.3.1";
 
-const T = { bg:"#0c0f1a", card:"#151929", cardHover:"#1a2035", border:"#1e2540", accent:"#f0a050", accentSoft:"rgba(240,160,80,0.12)", blue:"#5b9bf5", blueSoft:"rgba(91,155,245,0.12)", green:"#4ade80", greenSoft:"rgba(74,222,128,0.1)", purple:"#a78bfa", purpleSoft:"rgba(167,139,250,0.1)", rose:"#fb7185", roseSoft:"rgba(251,113,133,0.1)", cyan:"#22d3ee", cyanSoft:"rgba(34,211,238,0.1)", text:"#e8eaf0", textMuted:"#8892a8", textDim:"#505a72", white:"#ffffff", gradient1:"linear-gradient(135deg,#f0a050 0%,#e06830 100%)", gradient2:"linear-gradient(135deg,#5b9bf5 0%,#7c5bf5 100%)", gradient3:"linear-gradient(135deg,#4ade80 0%,#22d3ee 100%)" };
+const T = { bg:"#0c0f1a", card:"#151929", cardHover:"#1a2035", border:"#1e2540", accent:"#f0a050", accentSoft:"rgba(240,160,80,0.12)", blue:"#5b9bf5", blueSoft:"rgba(91,155,245,0.12)", green:"#4ade80", greenSoft:"rgba(74,222,128,0.1)", purple:"#a78bfa", purpleSoft:"rgba(167,139,250,0.1)", rose:"#fb7185", roseSoft:"rgba(251,113,133,0.1)", cyan:"#22d3ee", cyanSoft:"rgba(34,211,238,0.1)", text:"#e8eaf0", textMuted:"#8892a8", textDim:"#505a72", white:"#ffffff", gradient1:"linear-gradient(135deg,#f0a050 0%,#e06830 100%)", gradient2:"linear-gradient(135deg,#5b9bf5 0%,#7c5bf5 100%)", gradient3:"linear-gradient(135deg,#4ade80 0%,#22d3ee 100%)", gradient4:"linear-gradient(135deg,#a78bfa 0%,#7c3aed 100%)", gradient5:"linear-gradient(135deg,#fb7185 0%,#f43f5e 100%)", gradient6:"linear-gradient(135deg,#22d3ee 0%,#0ea5e9 100%)" };
 const CC = [T.accent, T.blue, T.green, T.purple, T.rose, T.cyan, "#fbbf24", "#f472b6"];
 const glass = { background:"rgba(21,25,41,0.7)", WebkitBackdropFilter:"blur(12px)", backdropFilter:"blur(12px)", border:"1px solid "+T.border, borderRadius:16 };
 const NIGHTS = 9;
@@ -526,6 +526,455 @@ const ROUTES = [
     {factor:"Childcare",fall:"Kids slightly younger",spring:"Kids older = easier",winner:"spring",icon:"Shield"},
   ],
 },
+// --- ROUTE 4: Germany, Austria & Prague ---
+{
+  id: "germany-austria-prague",
+  name: "Germany, Austria & Prague",
+  tagline: "Castles, Culture & Central Europe",
+  color: T.purple,
+  gradient: T.gradient4,
+  countries: ["Germany","Austria","Czech Republic"],
+  countryFlags: ["🇩🇪","🇦🇹","🇨🇿"],
+  cities: ["Munich","Salzburg","Vienna","Prague","Nuremberg"],
+  cityFlags: ["🇩🇪","🇦🇹","🇦🇹","🇨🇿","🇩🇪"],
+  highlights: ["Sound of Music Salzburg tour","Prague's fairy-tale old town & castle","Vienna coffeehouses & classical concert","Neuschwanstein & Bavarian castles","Beer halls, bakeries & Christmas-market charm"],
+  itinerary: {
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+      {day:0,date:"Sep 26",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
+      {day:1,date:"Sep 27",location:"Munich",type:"highlight",icon:"building",country:"Germany",desc:"Arrive Munich. Marienplatz & Glockenspiel. Viktualienmarkt lunch. Afternoon at Nymphenburg Palace. Beer hall dinner at Augustiner.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Sep 28",location:"Neuschwanstein & Salzburg",type:"train",icon:"train",country:"Germany → Austria",desc:"Morning day trip to Neuschwanstein Castle (2h drive). Fairy-tale castle tour. Continue to Salzburg (2h). Evening stroll through Old Town.",nights:1,lat:47.80,lng:13.04},
+      {day:3,date:"Sep 29",location:"Salzburg",type:"highlight",icon:"music",country:"Austria",desc:"Sound of Music tour morning. Hohensalzburg Fortress afternoon. Mozart's Birthplace. Stiegl brewery. Mirabell Gardens sunset.",nights:1,lat:47.80,lng:13.04},
+      {day:4,date:"Sep 30",location:"Salzburg → Vienna",type:"train",icon:"train",country:"Austria",desc:"Scenic train to Vienna (2.5h). Settle in. Afternoon at Schönbrunn Palace & gardens. Sachertorte at Hotel Sacher. Evening concert.",nights:1,lat:48.21,lng:16.37},
+      {day:5,date:"Oct 1",location:"Vienna",type:"highlight",icon:"building",country:"Austria",desc:"Hofburg Palace morning. Naschmarkt lunch crawl. Belvedere Museum (Klimt's The Kiss). Coffeehouse afternoon. Opera or classical concert evening.",nights:1,lat:48.21,lng:16.37},
+      {day:6,date:"Oct 2",location:"Vienna → Prague",type:"train",icon:"train",country:"Czech Republic",desc:"Morning train to Prague (4h, scenic Moravia). Arrive early afternoon. Charles Bridge at sunset. Old Town Square dinner.",nights:1,lat:50.08,lng:14.44},
+      {day:7,date:"Oct 3",location:"Prague",type:"highlight",icon:"camera",country:"Czech Republic",desc:"Prague Castle & St. Vitus Cathedral morning. Petřín Hill tower. Lunch at a classic Czech pub. Astronomical Clock. Evening Vltava river walk.",nights:1,lat:50.08,lng:14.44},
+      {day:8,date:"Oct 4",location:"Prague",type:"highlight",icon:"compass",country:"Czech Republic",desc:"Jewish Quarter morning. Lennon Wall & Kampa Island. Czech bakery crawl (trdelník). Vyšehrad fortress sunset. Farewell dinner.",nights:1,lat:50.08,lng:14.44},
+      {day:9,date:"Oct 5",location:"Prague → Nuremberg",type:"train",icon:"train",country:"Germany",desc:"Train to Nuremberg (3.5h). Kaiserburg Castle. Old Town walk. Nuremberg sausages & gingerbread. WWII Documentation Center if time.",nights:1,lat:49.45,lng:11.08},
+      {day:10,date:"Oct 6",location:"Nuremberg → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning Handwerkerhof stroll. Fly home from Nuremberg (or connect Munich).",nights:0,lat:49.45,lng:11.08},
+    ]},
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+      {day:0,date:"Apr 24",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
+      {day:1,date:"Apr 25",location:"Munich",type:"highlight",icon:"building",country:"Germany",desc:"Arrive Munich. Marienplatz & Glockenspiel. Viktualienmarkt lunch. Afternoon at Nymphenburg Palace. Beer hall dinner at Augustiner.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Apr 26",location:"Neuschwanstein & Salzburg",type:"train",icon:"train",country:"Germany → Austria",desc:"Morning day trip to Neuschwanstein Castle (2h drive). Fairy-tale castle tour. Continue to Salzburg (2h). Evening stroll through Old Town.",nights:1,lat:47.80,lng:13.04},
+      {day:3,date:"Apr 27",location:"Salzburg",type:"highlight",icon:"music",country:"Austria",desc:"Sound of Music tour morning. Hohensalzburg Fortress afternoon. Mozart's Birthplace. Stiegl brewery. Mirabell Gardens sunset.",nights:1,lat:47.80,lng:13.04},
+      {day:4,date:"Apr 28",location:"Salzburg → Vienna",type:"train",icon:"train",country:"Austria",desc:"Scenic train to Vienna (2.5h). Settle in. Afternoon at Schönbrunn Palace & gardens. Sachertorte at Hotel Sacher. Evening concert.",nights:1,lat:48.21,lng:16.37},
+      {day:5,date:"Apr 29",location:"Vienna",type:"highlight",icon:"building",country:"Austria",desc:"Hofburg Palace morning. Naschmarkt lunch crawl. Belvedere Museum (Klimt's The Kiss). Coffeehouse afternoon. Opera or classical concert evening.",nights:1,lat:48.21,lng:16.37},
+      {day:6,date:"Apr 30",location:"Vienna → Prague",type:"train",icon:"train",country:"Czech Republic",desc:"Morning train to Prague (4h, scenic Moravia). Arrive early afternoon. Charles Bridge at sunset. Old Town Square dinner.",nights:1,lat:50.08,lng:14.44},
+      {day:7,date:"May 1",location:"Prague",type:"highlight",icon:"camera",country:"Czech Republic",desc:"Prague Castle & St. Vitus Cathedral morning. Petřín Hill tower. Lunch at a classic Czech pub. Astronomical Clock. Evening Vltava river walk.",nights:1,lat:50.08,lng:14.44},
+      {day:8,date:"May 2",location:"Prague",type:"highlight",icon:"compass",country:"Czech Republic",desc:"Jewish Quarter morning. Lennon Wall & Kampa Island. Czech bakery crawl (trdelník). Vyšehrad fortress sunset. Farewell dinner.",nights:1,lat:50.08,lng:14.44},
+      {day:9,date:"May 3",location:"Prague → Nuremberg",type:"train",icon:"train",country:"Germany",desc:"Train to Nuremberg (3.5h). Kaiserburg Castle. Old Town walk. Nuremberg sausages & gingerbread. WWII Documentation Center if time.",nights:1,lat:49.45,lng:11.08},
+      {day:10,date:"May 4",location:"Nuremberg → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning Handwerkerhof stroll. Fly home from Nuremberg (or connect Munich).",nights:0,lat:49.45,lng:11.08},
+    ]}
+  },
+  budgetTiers: {
+    fall: {
+      value:{label:"Value",emoji:"🎒",flights:1800,accommodation:52,trains:95,food:55,activities:180,misc:22},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2200,accommodation:75,trains:95,food:72,activities:260,misc:32},
+      premium:{label:"Premium",emoji:"👑",flights:2600,accommodation:110,trains:95,food:95,activities:350,misc:45},
+    },
+    spring: {
+      value:{label:"Value",emoji:"🎒",flights:1650,accommodation:45,trains:95,food:50,activities:180,misc:20},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2000,accommodation:65,trains:95,food:65,activities:260,misc:28},
+      premium:{label:"Premium",emoji:"👑",flights:2350,accommodation:95,trains:95,food:85,activities:350,misc:40},
+    }
+  },
+  trainLegs: [
+    {from:"Munich",to:"Füssen (Neuschwanstein)",hrs:"2h",cost:30,scenic:4,type:"DB Regional",url:"https://www.bahn.com/en"},
+    {from:"Füssen",to:"Salzburg",hrs:"2h",cost:25,scenic:4,type:"DB/ÖBB",url:"https://www.bahn.com/en"},
+    {from:"Salzburg",to:"Vienna",hrs:"2.5h",cost:30,scenic:3,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
+    {from:"Vienna",to:"Prague",hrs:"4h",cost:20,scenic:3,type:"RegioJet",url:"https://www.regiojet.com/"},
+    {from:"Prague",to:"Nuremberg",hrs:"3.5h",cost:20,scenic:3,type:"DB/ČD",url:"https://www.cd.cz/en/"},
+  ],
+  activities: [
+    {name:"Neuschwanstein Castle",cost:17,loc:"Bavaria",icon:"🏰",url:"https://www.neuschwanstein.de/englisch/tourist/index.htm"},
+    {name:"Hohensalzburg Fortress",cost:14,loc:"Salzburg",icon:"🏰",url:"https://www.salzburg-burgen.at/en/hohensalzburg-castle/"},
+    {name:"Sound of Music Tour",cost:55,loc:"Salzburg",icon:"🎵",url:"https://www.salzburg.info/en/sights/sound-of-music"},
+    {name:"Schönbrunn Palace",cost:22,loc:"Vienna",icon:"🏛️",url:"https://www.schoenbrunn.at/en/"},
+    {name:"Belvedere Museum",cost:18,loc:"Vienna",icon:"🎨",url:"https://www.belvedere.at/en"},
+    {name:"Vienna Concert",cost:45,loc:"Vienna",icon:"🎶",url:"https://www.musikverein.at/en"},
+    {name:"Prague Castle",cost:14,loc:"Prague",icon:"🏰",url:"https://www.hrad.cz/en/prague-castle-for-visitors"},
+    {name:"Kaiserburg (Nuremberg Castle)",cost:7,loc:"Nuremberg",icon:"🏰",url:"https://www.kaiserburg-nuernberg.de/englisch/castle/index.htm"},
+    {name:"Nymphenburg Palace",cost:8,loc:"Munich",icon:"🏛️",url:"https://www.schloss-nymphenburg.de/englisch/palace/index.htm"},
+  ],
+  foodByCountry: [
+    {country:"Germany",breakfast:12,lunch:16,dinner:24,snacks:8,flag:"🇩🇪"},
+    {country:"Austria",breakfast:14,lunch:18,dinner:28,snacks:9,flag:"🇦🇹"},
+    {country:"Czech Republic",breakfast:8,lunch:12,dinner:18,snacks:5,flag:"🇨🇿"},
+  ],
+  accomData: [
+    {loc:"Munich",n:1,rate:[62,52],rec:"Hotel · central near Marienplatz · breakfast included",unique:"🏨 Group rate at 3-star in Altstadt",url:"https://www.booking.com/searchresults.html?ss=Munich+Altstadt&group_adults=16&nflt=class%3D3"},
+    {loc:"Salzburg",n:2,rate:[68,58],rec:"Guesthouse · 8 rooms · Old Town · breakfast",unique:"🏡 Traditional Austrian Gasthof near Getreidegasse",url:"https://www.booking.com/searchresults.html?ss=Salzburg+Old+Town&group_adults=16&nflt=class%3D3"},
+    {loc:"Vienna",n:2,rate:[72,60],rec:"Hotel · 8 rooms · near Ringstrasse · breakfast",unique:"🏨 Boutique hotel in Innere Stadt",url:"https://www.booking.com/searchresults.html?ss=Vienna+Innere+Stadt&group_adults=16&nflt=class%3D3"},
+    {loc:"Prague",n:3,rate:[48,40],rec:"Apartment block · Old Town · self-catering option",unique:"🏡 Renovated flat near Charles Bridge",url:"https://www.booking.com/searchresults.html?ss=Prague+Old+Town&group_adults=16&nflt=class%3D3"},
+    {loc:"Nuremberg",n:1,rate:[55,48],rec:"Hotel · near Kaiserburg · breakfast included",unique:"🏨 Medieval quarter boutique hotel",url:"https://www.booking.com/searchresults.html?ss=Nuremberg+Old+Town&group_adults=16&nflt=class%3D3"},
+  ],
+  hiddenGems: [
+    {region:"Munich",color:T.purple,flag:"🇩🇪",gems:[
+      {name:"Viktualienmarkt",desc:"Munich's open-air food market since 1807. Weisswurst, pretzels, artisan cheese stalls under chestnut trees.",url:"https://www.google.com/maps/place/Viktualienmarkt,+Munich/"},
+      {name:"Asam Church",desc:"Tiny Baroque jewel box hidden on a shopping street. Over-the-top gilded interior built by two brothers as their private chapel.",url:"https://www.google.com/maps/place/Asamkirche,+Munich/"},
+      {name:"English Garden Beer Garden",desc:"Largest urban park in Europe. Sit at the Chinese Tower beer garden with thousands of locals.",url:"https://www.google.com/maps/place/Chinesischer+Turm/"},
+    ]},
+    {region:"Salzburg",color:T.green,flag:"🇦🇹",gems:[
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery in Salzburg (since 1160). Wood-fired bread in a medieval monastery.",url:"https://www.google.com/maps/place/Stiftsbäckerei+St.+Peter/"},
+      {name:"Augustiner Bräustübl",desc:"Monks have brewed beer here since 1621. Enormous beer hall — bring your own food from the market stalls.",url:"https://www.google.com/maps/place/Augustiner+Bräustübl/"},
+      {name:"Mönchsberg Walk",desc:"Elevator up to the modern art museum terrace. Walk the cliff path above the city. Zero tourists, epic views.",url:"https://www.google.com/maps/place/Mönchsberg,+Salzburg/"},
+    ]},
+    {region:"Vienna",color:T.accent,flag:"🇦🇹",gems:[
+      {name:"Café Central",desc:"Freud, Trotsky, and Tito were regulars. Vaulted ceilings, marble columns, and the best Apfelstrudel in Vienna.",url:"https://www.google.com/maps/place/Café+Central,+Vienna/"},
+      {name:"Hundertwasserhaus",desc:"Wild, undulating apartment block with trees growing from balconies. No straight lines anywhere.",url:"https://www.google.com/maps/place/Hundertwasserhaus,+Vienna/"},
+      {name:"Naschmarkt",desc:"Vienna's biggest outdoor market. 120+ stalls: falafel, Viennese sausage, oysters, spices, antiques on Saturdays.",url:"https://www.google.com/maps/place/Naschmarkt,+Vienna/"},
+    ]},
+    {region:"Prague",color:T.blue,flag:"🇨🇿",gems:[
+      {name:"Vyšehrad",desc:"Ancient fortress above the Vltava. Quiet gardens, stunning city views, almost no tourists. Cemetery of Czech legends.",url:"https://www.google.com/maps/place/Vyšehrad,+Prague/"},
+      {name:"Lokál Dlouhááá",desc:"Best traditional Czech pub. Tank beer, svíčková (beef in cream sauce), and homemade bread dumplings.",url:"https://www.google.com/maps/place/Lokál+Dlouhááá,+Prague/"},
+      {name:"Kampa Island",desc:"Quiet island between the Charles Bridge and the river. Art installations, watermill views, locals only.",url:"https://www.google.com/maps/place/Kampa,+Prague/"},
+    ]},
+  ],
+  weather: [
+    {city:"Munich",fH:62,fL:44,sH:60,sL:42,fR:8,sR:10},
+    {city:"Salzburg",fH:60,fL:42,sH:58,sL:40,fR:8,sR:11},
+    {city:"Vienna",fH:61,fL:45,sH:63,sL:46,fR:7,sR:9},
+    {city:"Prague",fH:58,fL:42,sH:60,sL:43,fR:7,sR:8},
+    {city:"Nuremberg",fH:59,fL:42,sH:59,sL:41,fR:7,sR:9},
+  ],
+  inspiration: [
+    {loc:"Munich",photos:[
+      {url:"https://images.unsplash.com/photo-1595867818082-083862f3d630?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1577462781427-e77744657e18?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1573164574572-cb89e39749b4?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1597160310033-fd0e0fbb3e3f?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Salzburg",photos:[
+      {url:"https://images.unsplash.com/photo-1609942548526-3ee20fdf6b86?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1582638241674-2cdf79a17f56?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1577445115235-e9cf0fb4a2c0?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1599923136993-c82e39c61f97?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Vienna",photos:[
+      {url:"https://images.unsplash.com/photo-1516550893923-42d28e5677af?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1573599852326-2d4da0bbe613?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1609856878074-cf31e532a71a?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1544085311-11a028465b03?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Prague",photos:[
+      {url:"https://images.unsplash.com/photo-1519677100203-a0e668c92439?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1541849546-216549ae216d?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1562624475-96c2bc08fab9?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1592906209472-a36b1f3782ef?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1578260523081-ea7af09ffef9?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Nuremberg",photos:[
+      {url:"https://images.unsplash.com/photo-1577462781427-e77744657e18?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1570521462033-3015e76e7432?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=600&fit=crop&q=80"}
+    ]},
+  ],
+  compareScorecard: [
+    {factor:"Price",fall:"Moderate",spring:"Best value",winner:"spring",icon:"DollarSign"},
+    {factor:"Castle Factor",fall:"Spectacular fall colors",spring:"Green & blooming",winner:"fall",icon:"Star"},
+    {factor:"Weather",fall:"Crisp & comfortable",spring:"Mild, more rain",winner:"fall",icon:"Sun"},
+    {factor:"Crowd Level",fall:"Low shoulder season",spring:"Moderate",winner:"fall",icon:"Users"},
+    {factor:"Schedule Fit",fall:"Most prefer",spring:"Fewer prefer",winner:"fall",icon:"Calendar"},
+    {factor:"Anniversary",fall:"Celebrate on trip!",spring:"Already passed",winner:"fall",icon:"Heart"},
+    {factor:"Sound of Music",fall:"Peak beauty",spring:"Also gorgeous",winner:"tie",icon:"Music"},
+  ],
+},
+// --- ROUTE 5: Wild Card — Portugal & Spain ---
+{
+  id: "wild-card-iberia",
+  name: "Portugal & Spain",
+  tagline: "The Wild Card — Best Value in Europe",
+  color: T.rose,
+  gradient: T.gradient5,
+  countries: ["Portugal","Spain"],
+  countryFlags: ["🇵🇹","🇪🇸"],
+  cities: ["Lisbon","Sintra","Porto","Santiago","San Sebastián"],
+  cityFlags: ["🇵🇹","🇵🇹","🇵🇹","🇪🇸","🇪🇸"],
+  highlights: ["40–50% cheaper than Central Europe","Stunning Atlantic coastlines & tile-covered cities","Porto wine cellars & port tastings","Pintxos crawl in San Sebastián","Ancient pilgrimage city of Santiago de Compostela"],
+  itinerary: {
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+      {day:0,date:"Sep 26",location:"U.S. → Lisbon",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Lisbon.",nights:0,lat:38.72,lng:-9.14},
+      {day:1,date:"Sep 27",location:"Lisbon",type:"highlight",icon:"camera",country:"Portugal",desc:"Arrive Lisbon. Alfama neighborhood walk. Tram 28 ride. Pastéis de Belém. Sunset at Miradouro da Graça. Fado dinner.",nights:1,lat:38.72,lng:-9.14},
+      {day:2,date:"Sep 28",location:"Lisbon & Sintra",type:"highlight",icon:"building",country:"Portugal",desc:"Morning train to Sintra (40min). Pena Palace & Moorish Castle. Sintra pastry shops. Return to Lisbon. Time Out Market dinner.",nights:1,lat:38.72,lng:-9.14},
+      {day:3,date:"Sep 29",location:"Lisbon",type:"highlight",icon:"compass",country:"Portugal",desc:"Belém Tower & Jerónimos Monastery. LX Factory lunch. Tile Museum. Bairro Alto evening — wine bars & rooftop views.",nights:1,lat:38.72,lng:-9.14},
+      {day:4,date:"Sep 30",location:"Lisbon → Porto",type:"train",icon:"train",country:"Portugal",desc:"High-speed train to Porto (2.5h). São Bento Station tiles. Ribeira waterfront lunch. Port wine cellar tour & tasting. Dom Luís I Bridge sunset.",nights:1,lat:41.15,lng:-8.61},
+      {day:5,date:"Oct 1",location:"Porto",type:"highlight",icon:"heart",country:"Portugal",desc:"Livraria Lello morning. Clérigos Tower. Bolhão Market lunch. Serralves contemporary art park. Francesinha dinner.",nights:1,lat:41.15,lng:-8.61},
+      {day:6,date:"Oct 2",location:"Porto → Santiago",type:"train",icon:"train",country:"Spain",desc:"Train to Santiago de Compostela (3h, scenic coast). Cathedral & old town walk. Pilgrim arrival at Praza do Obradoiro. Galician seafood dinner.",nights:1,lat:42.88,lng:-8.54},
+      {day:7,date:"Oct 3",location:"Santiago → San Sebastián",type:"travel",icon:"plane",country:"Spain",desc:"Morning flight to Bilbao (1h). Bus to San Sebastián (1.5h). La Concha beach walk. First pintxos bar crawl in Parte Vieja.",nights:1,lat:43.32,lng:-1.98},
+      {day:8,date:"Oct 4",location:"San Sebastián",type:"highlight",icon:"star",country:"Spain",desc:"Monte Urgull morning hike. La Bretxa market. Pintxos masterclass crawl (5–6 bars). Afternoon at La Concha. Basque cider house dinner.",nights:1,lat:43.32,lng:-1.98},
+      {day:9,date:"Oct 5",location:"San Sebastián",type:"highlight",icon:"compass",country:"Spain",desc:"Day trip option: Getaria fishing village or Hondarribia on the French border. Fresh grilled fish lunch. Sunset pintxos farewell dinner.",nights:1,lat:43.32,lng:-1.98},
+      {day:10,date:"Oct 6",location:"San Sebastián → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning café con leche. Bus to Bilbao airport (1.5h). Fly home.",nights:0,lat:43.32,lng:-1.98},
+    ]},
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+      {day:0,date:"Apr 24",location:"U.S. → Lisbon",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Lisbon.",nights:0,lat:38.72,lng:-9.14},
+      {day:1,date:"Apr 25",location:"Lisbon",type:"highlight",icon:"camera",country:"Portugal",desc:"Arrive Lisbon. Alfama neighborhood walk. Tram 28 ride. Pastéis de Belém. Sunset at Miradouro da Graça. Fado dinner.",nights:1,lat:38.72,lng:-9.14},
+      {day:2,date:"Apr 26",location:"Lisbon & Sintra",type:"highlight",icon:"building",country:"Portugal",desc:"Morning train to Sintra (40min). Pena Palace & Moorish Castle. Sintra pastry shops. Return to Lisbon. Time Out Market dinner.",nights:1,lat:38.72,lng:-9.14},
+      {day:3,date:"Apr 27",location:"Lisbon",type:"highlight",icon:"compass",country:"Portugal",desc:"Belém Tower & Jerónimos Monastery. LX Factory lunch. Tile Museum. Bairro Alto evening — wine bars & rooftop views.",nights:1,lat:38.72,lng:-9.14},
+      {day:4,date:"Apr 28",location:"Lisbon → Porto",type:"train",icon:"train",country:"Portugal",desc:"High-speed train to Porto (2.5h). São Bento Station tiles. Ribeira waterfront lunch. Port wine cellar tour & tasting. Dom Luís I Bridge sunset.",nights:1,lat:41.15,lng:-8.61},
+      {day:5,date:"Apr 29",location:"Porto",type:"highlight",icon:"heart",country:"Portugal",desc:"Livraria Lello morning. Clérigos Tower. Bolhão Market lunch. Serralves contemporary art park. Francesinha dinner.",nights:1,lat:41.15,lng:-8.61},
+      {day:6,date:"Apr 30",location:"Porto → Santiago",type:"train",icon:"train",country:"Spain",desc:"Train to Santiago de Compostela (3h, scenic coast). Cathedral & old town walk. Pilgrim arrival at Praza do Obradoiro. Galician seafood dinner.",nights:1,lat:42.88,lng:-8.54},
+      {day:7,date:"May 1",location:"Santiago → San Sebastián",type:"travel",icon:"plane",country:"Spain",desc:"Morning flight to Bilbao (1h). Bus to San Sebastián (1.5h). La Concha beach walk. First pintxos bar crawl in Parte Vieja.",nights:1,lat:43.32,lng:-1.98},
+      {day:8,date:"May 2",location:"San Sebastián",type:"highlight",icon:"star",country:"Spain",desc:"Monte Urgull morning hike. La Bretxa market. Pintxos masterclass crawl (5–6 bars). Afternoon at La Concha. Basque cider house dinner.",nights:1,lat:43.32,lng:-1.98},
+      {day:9,date:"May 3",location:"San Sebastián",type:"highlight",icon:"compass",country:"Spain",desc:"Day trip option: Getaria fishing village or Hondarribia on the French border. Fresh grilled fish lunch. Sunset pintxos farewell dinner.",nights:1,lat:43.32,lng:-1.98},
+      {day:10,date:"May 4",location:"San Sebastián → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning café con leche. Bus to Bilbao airport (1.5h). Fly home.",nights:0,lat:43.32,lng:-1.98},
+    ]}
+  },
+  budgetTiers: {
+    fall: {
+      value:{label:"Value",emoji:"🎒",flights:1600,accommodation:38,trains:55,food:42,activities:120,misc:18},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:1950,accommodation:55,trains:55,food:58,activities:190,misc:25},
+      premium:{label:"Premium",emoji:"👑",flights:2300,accommodation:82,trains:55,food:78,activities:270,misc:38},
+    },
+    spring: {
+      value:{label:"Value",emoji:"🎒",flights:1500,accommodation:35,trains:55,food:40,activities:120,misc:16},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:1800,accommodation:48,trains:55,food:52,activities:190,misc:22},
+      premium:{label:"Premium",emoji:"👑",flights:2100,accommodation:72,trains:55,food:70,activities:270,misc:34},
+    }
+  },
+  trainLegs: [
+    {from:"Lisbon",to:"Sintra",hrs:"0.7h",cost:5,scenic:3,type:"CP Comboios",url:"https://www.cp.pt/"},
+    {from:"Lisbon",to:"Porto",hrs:"2.5h",cost:25,scenic:4,type:"Alfa Pendular",url:"https://www.cp.pt/"},
+    {from:"Porto",to:"Santiago de Compostela",hrs:"3h",cost:22,scenic:4,type:"Renfe/CP",url:"https://www.renfe.com/"},
+  ],
+  activities: [
+    {name:"Pena Palace (Sintra)",cost:14,loc:"Sintra",icon:"🏰",url:"https://www.parquesdesintra.pt/en/parks-and-monuments/park-and-national-palace-of-pena/"},
+    {name:"Jerónimos Monastery",cost:10,loc:"Lisbon",icon:"⛪",url:"https://www.patrimoniocultural.gov.pt/en/museus-e-monumentos/dgpc/m/mosteiro-dos-jeronimos/"},
+    {name:"Port Wine Cellar Tour",cost:18,loc:"Porto",icon:"🍷",url:"https://www.google.com/maps/search/port+wine+cellar+tour+porto/"},
+    {name:"Livraria Lello",cost:5,loc:"Porto",icon:"📚",url:"https://www.livrarialello.pt/en/"},
+    {name:"Santiago Cathedral",cost:0,loc:"Santiago",icon:"⛪",url:"https://www.catedraldesantiago.es/en/"},
+    {name:"La Concha Beach",cost:0,loc:"San Sebastián",icon:"🏖️",url:"https://www.google.com/maps/place/Playa+de+la+Concha/"},
+    {name:"Pintxos Crawl",cost:25,loc:"San Sebastián",icon:"🍽️",url:"https://www.google.com/maps/search/pintxos+parte+vieja+san+sebastian/"},
+    {name:"Basque Cider House",cost:30,loc:"San Sebastián",icon:"🍏",url:"https://www.google.com/maps/search/sidreria+san+sebastian/"},
+  ],
+  foodByCountry: [
+    {country:"Portugal",breakfast:7,lunch:12,dinner:18,snacks:5,flag:"🇵🇹"},
+    {country:"Spain",breakfast:8,lunch:14,dinner:22,snacks:6,flag:"🇪🇸"},
+  ],
+  accomData: [
+    {loc:"Lisbon",n:3,rate:[42,35],rec:"Apartment block · Alfama · terrace views · self-catering",unique:"🏡 Tile-covered building in historic Alfama",url:"https://www.booking.com/searchresults.html?ss=Lisbon+Alfama&group_adults=16&nflt=class%3D3"},
+    {loc:"Porto",n:2,rate:[38,32],rec:"Guesthouse · Ribeira · river views · breakfast",unique:"🏡 Restored townhouse overlooking the Douro",url:"https://www.booking.com/searchresults.html?ss=Porto+Ribeira&group_adults=16&nflt=class%3D3"},
+    {loc:"Santiago",n:1,rate:[42,36],rec:"Hotel · Old Town · near cathedral · breakfast",unique:"🏨 Stone building in the pilgrim quarter",url:"https://www.booking.com/searchresults.html?ss=Santiago+de+Compostela&group_adults=16&nflt=class%3D3"},
+    {loc:"San Sebastián",n:3,rate:[55,48],rec:"Apartments · Parte Vieja · walk to beach",unique:"🏡 Belle époque building near La Concha",url:"https://www.booking.com/searchresults.html?ss=San+Sebastian+Parte+Vieja&group_adults=16&nflt=class%3D3"},
+  ],
+  hiddenGems: [
+    {region:"Lisbon",color:T.rose,flag:"🇵🇹",gems:[
+      {name:"Alfama Backstreets",desc:"Get lost in the oldest neighborhood. Laundry between buildings, fado from open windows, hole-in-the-wall tascas.",url:"https://www.google.com/maps/place/Alfama,+Lisbon/"},
+      {name:"LX Factory",desc:"Creative hub in an old industrial complex. Design shops, street art, brunch spots. Lisbon's coolest neighborhood.",url:"https://www.google.com/maps/place/LX+Factory,+Lisbon/"},
+      {name:"Miradouro da Graça",desc:"Best free viewpoint in Lisbon. Sunset over the city and the Tagus. Locals bring wine and guitars.",url:"https://www.google.com/maps/place/Miradouro+da+Graça/"},
+    ]},
+    {region:"Porto",color:T.accent,flag:"🇵🇹",gems:[
+      {name:"São Bento Station",desc:"A train station covered in 20,000 hand-painted azulejo tiles. One of the most beautiful stations in the world.",url:"https://www.google.com/maps/place/São+Bento+Station/"},
+      {name:"Bolhão Market",desc:"Freshly renovated two-story market. Locals shop for dried cod, olives, fresh flowers. Great for coffee and a pastel de nata.",url:"https://www.google.com/maps/place/Mercado+do+Bolhão/"},
+      {name:"Ribeira Waterfront",desc:"UNESCO World Heritage riverfront. Sunset drinks at the water's edge watching rabelo boats on the Douro.",url:"https://www.google.com/maps/place/Ribeira,+Porto/"},
+    ]},
+    {region:"Santiago",color:T.green,flag:"🇪🇸",gems:[
+      {name:"Praza do Obradoiro",desc:"Watch pilgrims arrive at the end of the Camino. The most emotional square in Europe. Cathedral bells at noon.",url:"https://www.google.com/maps/place/Praza+do+Obradoiro/"},
+      {name:"Mercado de Abastos",desc:"Santiago's food market. Galician oysters, octopus, Albariño wine. Locals eat at the counters.",url:"https://www.google.com/maps/place/Mercado+de+Abastos,+Santiago/"},
+      {name:"Alameda Park",desc:"Shaded park overlooking the Old Town. Perfect for an afternoon sit with a coffee and cathedral views.",url:"https://www.google.com/maps/place/Alameda+Park,+Santiago/"},
+    ]},
+    {region:"San Sebastián",color:T.blue,flag:"🇪🇸",gems:[
+      {name:"Parte Vieja Pintxos Bars",desc:"The world's greatest bar-hop. Each bar has one specialty. Gilda, txakoli, foie, anchovy… move to the next.",url:"https://www.google.com/maps/search/pintxos+parte+vieja+san+sebastian/"},
+      {name:"Monte Urgull",desc:"Free hilltop walk with a fort, hidden paths, and 360° views of the bay. Almost no tourists despite being central.",url:"https://www.google.com/maps/place/Monte+Urgull/"},
+      {name:"Getaria Day Trip",desc:"Tiny fishing village 30min west. Grilled turbot on the harbor. Cristóbal Balenciaga museum. Wine with sea views.",url:"https://www.google.com/maps/place/Getaria,+Spain/"},
+    ]},
+  ],
+  weather: [
+    {city:"Lisbon",fH:77,fL:61,sH:72,sL:55,fR:5,sR:7},
+    {city:"Porto",fH:72,fL:55,sH:65,sL:50,fR:7,sR:9},
+    {city:"Santiago",fH:66,fL:50,sH:62,sL:46,fR:10,sR:10},
+    {city:"San Sebastián",fH:68,fL:54,sH:63,sL:50,fR:9,sR:10},
+  ],
+  inspiration: [
+    {loc:"Lisbon",photos:[
+      {url:"https://images.unsplash.com/photo-1585208798174-6cedd86e019a?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1555881400-74d7acaacd8b?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1536663815808-535e2280d2c2?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1548707309-dcebeab426c8?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1580323956656-26bbb7206e8e?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Porto",photos:[
+      {url:"https://images.unsplash.com/photo-1555881400-69b37cefd5b0?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1569959220744-ff553533f492?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1548659698-e32d2d59a7d7?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1563906267088-b029e7101114?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1595249890350-3e23c3e3c7b6?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Santiago de Compostela",photos:[
+      {url:"https://images.unsplash.com/photo-1568889939-81f8a2811a98?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1565882694744-0724bc499b37?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1581538417739-28d2c5c95b7a?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1602941525421-8f8b81d3edbb?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1590503910410-83a90d05b7c0?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"San Sebastián",photos:[
+      {url:"https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1558642452-9d2a7deb7f62?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1590503910489-1d27c1b88e4c?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1579282240050-352db0a14c21?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1515443961218-a51367888e4b?w=600&fit=crop&q=80"}
+    ]},
+  ],
+  compareScorecard: [
+    {factor:"Price",fall:"Lowest of all routes",spring:"Even cheaper",winner:"spring",icon:"DollarSign"},
+    {factor:"Food Scene",fall:"Peak season seafood",spring:"Also incredible",winner:"tie",icon:"Coffee"},
+    {factor:"Weather",fall:"Warm & sunny 70s",spring:"Mild, some rain",winner:"fall",icon:"Sun"},
+    {factor:"Crowd Level",fall:"Low shoulder",spring:"Low",winner:"tie",icon:"Users"},
+    {factor:"Schedule Fit",fall:"Most prefer",spring:"Fewer prefer",winner:"fall",icon:"Calendar"},
+    {factor:"Anniversary",fall:"Celebrate on trip!",spring:"Already passed",winner:"fall",icon:"Heart"},
+    {factor:"Uniqueness",fall:"Off the beaten path",spring:"Equally unique",winner:"tie",icon:"Compass"},
+  ],
+},
+// --- ROUTE 6: Family Favorites — Salzburg, Dubrovnik & Rome ---
+{
+  id: "family-favorites",
+  name: "Salzburg, Dubrovnik & Rome",
+  tagline: "Built from What the Family Wants",
+  color: T.cyan,
+  gradient: T.gradient6,
+  countries: ["Austria","Croatia","Italy"],
+  countryFlags: ["🇦🇹","🇭🇷","🇮🇹"],
+  cities: ["Salzburg","Ljubljana","Dubrovnik","Rome"],
+  cityFlags: ["🇦🇹","🇸🇮","🇭🇷","🇮🇹"],
+  highlights: ["#1 & #2 family destinations combined","Sound of Music + Adriatic coast + Rome Temple","Ljubljana — Europe's hidden gem capital","Dubrovnik Old Town & coastal sunsets","Rome Temple visit & ancient city exploration"],
+  itinerary: {
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+      {day:0,date:"Sep 26",location:"U.S. → Salzburg",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich, short transfer to Salzburg.",nights:0,lat:47.80,lng:13.04},
+      {day:1,date:"Sep 27",location:"Salzburg",type:"highlight",icon:"music",country:"Austria",desc:"Arrive Salzburg. Old Town walk. Getreidegasse shopping street. Stiegl brewery lunch. Mirabell Gardens. Mozart dinner concert.",nights:1,lat:47.80,lng:13.04},
+      {day:2,date:"Sep 28",location:"Salzburg",type:"highlight",icon:"mountain",country:"Austria",desc:"Sound of Music tour morning. Hohensalzburg Fortress afternoon. St. Peter Stiftskeller dinner (Europe's oldest restaurant, 803 AD).",nights:1,lat:47.80,lng:13.04},
+      {day:3,date:"Sep 29",location:"Salzburg → Ljubljana",type:"train",icon:"train",country:"Slovenia",desc:"Scenic drive/bus to Ljubljana (3.5h via lake country). Dragon Bridge walk. Ljubljana Castle funicular. Riverside café dinner.",nights:1,lat:46.05,lng:14.51},
+      {day:4,date:"Sep 30",location:"Ljubljana → Dubrovnik",type:"travel",icon:"plane",country:"Croatia",desc:"Morning Central Market & Metelkova art district. Afternoon flight to Dubrovnik (1.5h). Sunset from Stradun. Seafood dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:5,date:"Oct 1",location:"Dubrovnik",type:"highlight",icon:"building",country:"Croatia",desc:"City Walls walk morning (the highlight). Lokrum Island afternoon (monastery ruins, peacocks, swimming). Old Town seafood dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:6,date:"Oct 2",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Cable car to Mount Srđ panorama. Kayak around the walls. War Photo Limited museum. Buža Bar sunset drinks on the cliffs.",nights:1,lat:42.65,lng:18.09},
+      {day:7,date:"Oct 3",location:"Dubrovnik → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Morning Dubrovnik farmers market. Afternoon flight to Rome (1.5h). Settle in Trastevere. Evening cobblestone walk & trattoria dinner.",nights:1,lat:41.90,lng:12.50},
+      {day:8,date:"Oct 4",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Rome Italy Temple morning visit. Colosseum & Roman Forum afternoon. Piazza Navona evening. Gelato crawl through the centro.",nights:1,lat:41.90,lng:12.50},
+      {day:9,date:"Oct 5",location:"Rome",type:"highlight",icon:"heart",country:"Italy",desc:"Vatican Museums & Sistine Chapel morning. Pantheon, Trevi Fountain, Spanish Steps. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
+      {day:10,date:"Oct 6",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+    ]},
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+      {day:0,date:"Apr 24",location:"U.S. → Salzburg",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich, short transfer to Salzburg.",nights:0,lat:47.80,lng:13.04},
+      {day:1,date:"Apr 25",location:"Salzburg",type:"highlight",icon:"music",country:"Austria",desc:"Arrive Salzburg. Old Town walk. Getreidegasse shopping street. Stiegl brewery lunch. Mirabell Gardens. Mozart dinner concert.",nights:1,lat:47.80,lng:13.04},
+      {day:2,date:"Apr 26",location:"Salzburg",type:"highlight",icon:"mountain",country:"Austria",desc:"Sound of Music tour morning. Hohensalzburg Fortress afternoon. St. Peter Stiftskeller dinner (Europe's oldest restaurant, 803 AD).",nights:1,lat:47.80,lng:13.04},
+      {day:3,date:"Apr 27",location:"Salzburg → Ljubljana",type:"train",icon:"train",country:"Slovenia",desc:"Scenic drive/bus to Ljubljana (3.5h via lake country). Dragon Bridge walk. Ljubljana Castle funicular. Riverside café dinner.",nights:1,lat:46.05,lng:14.51},
+      {day:4,date:"Apr 28",location:"Ljubljana → Dubrovnik",type:"travel",icon:"plane",country:"Croatia",desc:"Morning Central Market & Metelkova art district. Afternoon flight to Dubrovnik (1.5h). Sunset from Stradun. Seafood dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:5,date:"Apr 29",location:"Dubrovnik",type:"highlight",icon:"building",country:"Croatia",desc:"City Walls walk morning (the highlight). Lokrum Island afternoon (monastery ruins, peacocks, swimming). Old Town seafood dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:6,date:"Apr 30",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Cable car to Mount Srđ panorama. Kayak around the walls. War Photo Limited museum. Buža Bar sunset drinks on the cliffs.",nights:1,lat:42.65,lng:18.09},
+      {day:7,date:"May 1",location:"Dubrovnik → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Morning Dubrovnik farmers market. Afternoon flight to Rome (1.5h). Settle in Trastevere. Evening cobblestone walk & trattoria dinner.",nights:1,lat:41.90,lng:12.50},
+      {day:8,date:"May 2",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Rome Italy Temple morning visit. Colosseum & Roman Forum afternoon. Piazza Navona evening. Gelato crawl through the centro.",nights:1,lat:41.90,lng:12.50},
+      {day:9,date:"May 3",location:"Rome",type:"highlight",icon:"heart",country:"Italy",desc:"Vatican Museums & Sistine Chapel morning. Pantheon, Trevi Fountain, Spanish Steps. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
+      {day:10,date:"May 4",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+    ]}
+  },
+  budgetTiers: {
+    fall: {
+      value:{label:"Value",emoji:"🎒",flights:1850,accommodation:52,trains:45,food:52,activities:170,misc:22},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2250,accommodation:72,trains:45,food:70,activities:250,misc:32},
+      premium:{label:"Premium",emoji:"👑",flights:2650,accommodation:105,trains:45,food:92,activities:340,misc:45},
+    },
+    spring: {
+      value:{label:"Value",emoji:"🎒",flights:1700,accommodation:45,trains:45,food:48,activities:170,misc:20},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:2050,accommodation:62,trains:45,food:62,activities:250,misc:28},
+      premium:{label:"Premium",emoji:"👑",flights:2400,accommodation:90,trains:45,food:82,activities:340,misc:40},
+    }
+  },
+  trainLegs: [
+    {from:"Salzburg",to:"Ljubljana",hrs:"3.5h",cost:35,scenic:4,type:"Bus/FlixBus",url:"https://www.flixbus.com/"},
+  ],
+  activities: [
+    {name:"Sound of Music Tour",cost:55,loc:"Salzburg",icon:"🎵",url:"https://www.salzburg.info/en/sights/sound-of-music"},
+    {name:"Hohensalzburg Fortress",cost:14,loc:"Salzburg",icon:"🏰",url:"https://www.salzburg-burgen.at/en/hohensalzburg-castle/"},
+    {name:"Mozart Dinner Concert",cost:65,loc:"Salzburg",icon:"🎶",url:"https://www.mozart-dinner-concert-salzburg.com/"},
+    {name:"Ljubljana Castle",cost:10,loc:"Ljubljana",icon:"🏰",url:"https://www.ljubljanskigrad.si/en/"},
+    {name:"Dubrovnik City Walls",cost:35,loc:"Dubrovnik",icon:"🏛️",url:"https://www.wallsofdubrovnik.com/"},
+    {name:"Lokrum Island Ferry",cost:12,loc:"Dubrovnik",icon:"🏝️",url:"https://www.google.com/maps/place/Lokrum/"},
+    {name:"Colosseum & Forum",cost:22,loc:"Rome",icon:"🏟️",url:"https://colosseo.it/en/"},
+    {name:"Vatican Museums",cost:20,loc:"Rome",icon:"🎨",url:"https://www.museivaticani.va/content/museivaticani/en.html"},
+    {name:"Rome Italy Temple",cost:0,loc:"Rome",icon:"⛪",url:"https://www.churchofjesuschrist.org/temples/details/rome-italy-temple"},
+  ],
+  foodByCountry: [
+    {country:"Austria",breakfast:14,lunch:18,dinner:28,snacks:9,flag:"🇦🇹"},
+    {country:"Slovenia",breakfast:8,lunch:12,dinner:20,snacks:5,flag:"🇸🇮"},
+    {country:"Croatia",breakfast:9,lunch:14,dinner:24,snacks:6,flag:"🇭🇷"},
+    {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
+  ],
+  accomData: [
+    {loc:"Salzburg",n:2,rate:[68,58],rec:"Guesthouse · 8 rooms · Old Town · breakfast",unique:"🏡 Traditional Austrian Gasthof near Getreidegasse",url:"https://www.booking.com/searchresults.html?ss=Salzburg+Old+Town&group_adults=16&nflt=class%3D3"},
+    {loc:"Ljubljana",n:1,rate:[45,38],rec:"Hotel · central · river views · breakfast",unique:"🏨 Boutique hotel on the Ljubljanica River",url:"https://www.booking.com/searchresults.html?ss=Ljubljana+Center&group_adults=16&nflt=class%3D3"},
+    {loc:"Dubrovnik",n:3,rate:[62,50],rec:"Apartment block · Old Town or Lapad · sea views",unique:"🏡 Stone house apartments near Stradun",url:"https://www.booking.com/searchresults.html?ss=Dubrovnik+Old+Town&group_adults=16&nflt=class%3D3"},
+    {loc:"Rome",n:3,rate:[81,68],rec:"Villa LINA · 9BR · 14 beds · 4.98★ · 59 reviews",unique:"🏡 Guest Favorite · 5 min to metro",url:"https://www.airbnb.com/rooms/1136343333895843954"},
+  ],
+  hiddenGems: [
+    {region:"Salzburg",color:T.green,flag:"🇦🇹",gems:[
+      {name:"Stiftsbäckerei St. Peter",desc:"Oldest bakery in Salzburg (since 1160). Wood-fired bread in a medieval monastery.",url:"https://www.google.com/maps/place/Stiftsbäckerei+St.+Peter/"},
+      {name:"Augustiner Bräustübl",desc:"Monks have brewed beer here since 1621. Enormous beer hall — bring your own food from the market stalls.",url:"https://www.google.com/maps/place/Augustiner+Bräustübl/"},
+      {name:"St. Peter Stiftskeller",desc:"Europe's oldest restaurant (803 AD). Candlelit dining inside a cliff face. Mozart ate here.",url:"https://www.google.com/maps/place/St.+Peter+Stiftskeller/"},
+    ]},
+    {region:"Ljubljana",color:T.purple,flag:"🇸🇮",gems:[
+      {name:"Central Market (Plečnik)",desc:"Architect Jože Plečnik's riverside market. Local cheese, honey, dried meats. Slovenians' favorite morning ritual.",url:"https://www.google.com/maps/place/Central+Market,+Ljubljana/"},
+      {name:"Metelkova City",desc:"Abandoned military barracks turned into an autonomous art district. Murals, galleries, and weird bars.",url:"https://www.google.com/maps/place/Metelkova,+Ljubljana/"},
+      {name:"Dragon Bridge",desc:"Art Nouveau bridge guarded by four copper dragons. The symbol of Ljubljana. Walk it at dawn for no crowds.",url:"https://www.google.com/maps/place/Dragon+Bridge,+Ljubljana/"},
+    ]},
+    {region:"Dubrovnik",color:T.accent,flag:"🇭🇷",gems:[
+      {name:"Buža Bar",desc:"Hidden cliffside bar outside the city walls. No sign, just a hole in the wall. Drinks on the rocks above the Adriatic.",url:"https://www.google.com/maps/place/Buža+Bar,+Dubrovnik/"},
+      {name:"Lokrum Island",desc:"10-minute ferry from Old Town. Monastery ruins, botanical garden, peacocks everywhere, swimming in the Dead Sea saltwater lake.",url:"https://www.google.com/maps/place/Lokrum/"},
+      {name:"War Photo Limited",desc:"Powerful, sobering photography museum documenting the Yugoslav Wars. Small but unforgettable.",url:"https://www.google.com/maps/place/War+Photo+Limited,+Dubrovnik/"},
+    ]},
+    {region:"Rome",color:T.blue,flag:"🇮🇹",gems:[
+      {name:"Trastevere",desc:"Rome's bohemian neighborhood. Cobblestoned, ivy-covered, the best trattorias in the city.",url:"https://www.google.com/maps/place/Trastevere,+Rome/"},
+      {name:"Aventine Keyhole",desc:"Peek through this famous keyhole for a perfectly framed view of St. Peter's dome.",url:"https://www.google.com/maps/place/Knights+of+Malta+Keyhole/"},
+      {name:"Testaccio Market",desc:"Where Romans actually eat. No tourists. Best supplì and porchetta in the city.",url:"https://www.google.com/maps/place/Mercato+Testaccio/"},
+    ]},
+  ],
+  weather: [
+    {city:"Salzburg",fH:60,fL:42,sH:58,sL:40,fR:8,sR:11},
+    {city:"Ljubljana",fH:62,fL:44,sH:64,sL:46,fR:9,sR:11},
+    {city:"Dubrovnik",fH:73,fL:58,sH:68,sL:52,fR:7,sR:8},
+    {city:"Rome",fH:74,fL:56,sH:68,sL:50,fR:6,sR:8},
+  ],
+  inspiration: [
+    {loc:"Salzburg",photos:[
+      {url:"https://images.unsplash.com/photo-1609942548526-3ee20fdf6b86?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1582638241674-2cdf79a17f56?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1577445115235-e9cf0fb4a2c0?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1599923136993-c82e39c61f97?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1613395877344-13d4a8e0d49e?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Ljubljana",photos:[
+      {url:"https://images.unsplash.com/photo-1569144654912-5f146d2b0b6e?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1551867633-194f1232e237?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1588262790061-c5e219ed028c?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1570520401411-0c8c9ea29fc7?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1589130053028-4a3e1a6e1a4d?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Dubrovnik",photos:[
+      {url:"https://images.unsplash.com/photo-1555990538-c76e1b3cb657?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1580137189272-c9379f8864fd?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1565898905928-4eca7bd0e40e?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1591556525421-a403e69d3536?w=600&fit=crop&q=80"}
+    ]},
+    {loc:"Rome",photos:[
+      {url:"https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1525874684015-58379d421a52?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1555992828-ca4dbe41d294?w=600&fit=crop&q=80"}
+    ]},
+  ],
+  compareScorecard: [
+    {factor:"Price",fall:"Moderate",spring:"Good savings",winner:"spring",icon:"DollarSign"},
+    {factor:"Family Match",fall:"Top-voted destinations",spring:"Same match",winner:"tie",icon:"Heart"},
+    {factor:"Weather",fall:"Warm coast + crisp alps",spring:"Mild, more rain",winner:"fall",icon:"Sun"},
+    {factor:"Crowd Level",fall:"Low shoulder",spring:"Low",winner:"tie",icon:"Users"},
+    {factor:"Schedule Fit",fall:"Most prefer",spring:"Fewer prefer",winner:"fall",icon:"Calendar"},
+    {factor:"Anniversary",fall:"Celebrate on trip!",spring:"Already passed",winner:"fall",icon:"Heart"},
+    {factor:"Rome Temple",fall:"Perfect timing",spring:"Also available",winner:"tie",icon:"Church"},
+  ],
+},
 ];
 
 // ============ SHARED DATA ============
@@ -640,7 +1089,7 @@ function OverviewScreen({onSelect}) {
         React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.accent,fontWeight:700,textTransform:"uppercase",marginBottom:8}}, "Choose Your Adventure"),
         React.createElement("h1", {style:{fontSize:"clamp(24px,6vw,36px)",fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, "Perkins Family Europe Trip"),
         React.createElement("p", {style:{color:T.textMuted,fontSize:14,margin:"0 0 8px"}}, "Celebrating 50 Years of Marriage"),
-        React.createElement("p", {style:{color:T.textDim,fontSize:12,margin:0,lineHeight:1.5}}, "3 curated routes focused on quaint villages, local food & culture · 16 travelers · 8 couples · Fall 2026 or Spring 2027"),
+        React.createElement("p", {style:{color:T.textDim,fontSize:12,margin:0,lineHeight:1.5}}, "6 curated routes focused on quaint villages, local food & culture · 16 travelers · 8 couples · Fall 2026 or Spring 2027"),
       )
     ),
     React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(280px,100%),1fr))",gap:16}},
