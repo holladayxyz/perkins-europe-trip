@@ -1745,10 +1745,14 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
   const pp = flightCost + t.accommodation*rn + t.trains + t.food*rn + t.activities + t.misc*rn;
   const couple = pp*2;
   const oop = Math.max(0, couple - 3000);
-  const pieData = [
-    {name:"Lodging",value:t.accommodation*rn},{name:"Food",value:t.food*rn},{name:"Transport",value:t.trains},{name:"Activities",value:t.activities},{name:"Misc",value:t.misc*rn},
-  ];
-  if (includeFlights) pieData.unshift({name:"Flights",value:t.flights});
+  const pieData = [];
+  if (t.accommodation===0 && t.flights>0) {
+    if (includeFlights) pieData.push({name:"Flights + Hotel",value:t.flights});
+  } else {
+    if (includeFlights) pieData.push({name:"Flights",value:t.flights});
+    pieData.push({name:"Lodging",value:t.accommodation*rn});
+  }
+  pieData.push({name:"Food",value:t.food*rn},{name:"Transport",value:t.trains},{name:"Activities",value:t.activities},{name:"Misc",value:t.misc*rn});
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
     route.dealBadge && React.createElement(AnimIn, null,
       React.createElement("div", {style:{background:"rgba(249,115,22,0.1)",border:"1px solid rgba(249,115,22,0.35)",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"flex-start",gap:12}},
@@ -1796,7 +1800,17 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
           ),
         ),
         React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:6,fontSize:12,color:T.textMuted}},
-          (includeFlights?[["Flights","$"+t.flights]]:[]).concat([["Lodging ("+rn+"n)","$"+(t.accommodation*rn)],["Food ("+rn+"d)","$"+(t.food*rn)],["Transport","$"+t.trains],["Activities","$"+t.activities]]).map(([l,v])=>
+          (function(){
+            var rows = [];
+            if (t.accommodation===0 && t.flights>0) {
+              if (includeFlights) rows.push(["Flights + Hotel (bundled)","$"+t.flights]);
+            } else {
+              if (includeFlights) rows.push(["Flights","$"+t.flights]);
+              rows.push(["Lodging ("+rn+"n)","$"+(t.accommodation*rn)]);
+            }
+            rows.push(["Food ("+rn+"d)","$"+(t.food*rn)],["Transport","$"+t.trains],["Activities","$"+t.activities]);
+            return rows;
+          })().map(([l,v])=>
             React.createElement("div",{key:l,style:{display:"flex",justifyContent:"space-between"}},React.createElement("span",null,l),React.createElement("span",{style:{color:T.text,fontWeight:600}},v))
           )
         )
