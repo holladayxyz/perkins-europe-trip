@@ -18,6 +18,7 @@
       .hide-scrollbar::-webkit-scrollbar { display: none; }
       .route-tooltip { background: #151929 !important; color: #e8eaf0 !important; border: 1px solid #1e2540 !important; border-radius: 8px !important; padding: 4px 10px !important; font-family: 'Inter', sans-serif !important; font-size: 12px !important; font-weight: 600 !important; box-shadow: 0 4px 12px rgba(0,0,0,0.4) !important; }
       .route-tooltip::before { border-top-color: #1e2540 !important; }
+      @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
       .leaflet-container { background: #0c0f1a !important; }
       @media (max-width: 640px) {
         .route-tooltip { font-size: 10px !important; padding: 2px 6px !important; }
@@ -1098,6 +1099,7 @@ function InlineNotes({routeId,contextType,contextLabel,user,color}) {
   const [submitting,setSubmitting] = useState(false);
   const [count,setCount] = useState(0);
   const fetched = useRef(false);
+  const inputRef = useRef(null);
 
   const fetchNotes = async () => {
     const {data} = await sb.from("perkins_notes").select("*").eq("route_id",routeId).eq("context_type",contextType).eq("context_label",contextLabel).order("created_at",{ascending:true});
@@ -1105,12 +1107,12 @@ function InlineNotes({routeId,contextType,contextLabel,user,color}) {
     setCount((data||[]).length);
   };
 
-  // Fetch count on mount, full notes when opened
   useEffect(() => {
     sb.from("perkins_notes").select("id",{count:"exact",head:true}).eq("route_id",routeId).eq("context_type",contextType).eq("context_label",contextLabel).then(({count:c})=>setCount(c||0));
   }, [routeId,contextType,contextLabel]);
 
   useEffect(() => { if (open && !fetched.current) { fetched.current=true; fetchNotes(); } }, [open]);
+  useEffect(() => { if (open && inputRef.current) inputRef.current.focus(); }, [open]);
 
   const addNote = async () => {
     if (!text.trim()||!user) return;
@@ -1127,36 +1129,46 @@ function InlineNotes({routeId,contextType,contextLabel,user,color}) {
   };
 
   const c = color||T.accent;
-  return React.createElement("div", {style:{position:"relative",display:"inline-flex",flexDirection:"column",alignItems:"flex-start"}},
-    // Toggle button
+  // Toggle button only — panel renders as fixed bottom sheet
+  return React.createElement(React.Fragment, null,
     React.createElement("button", {onClick:(e)=>{e.stopPropagation();setOpen(!open);},title:"Notes",style:{display:"inline-flex",alignItems:"center",gap:3,background:count>0?`${c}18`:"transparent",border:count>0?`1px solid ${c}30`:"1px solid transparent",borderRadius:99,padding:"3px 8px",cursor:"pointer",transition:"all 0.2s",flexShrink:0}},
       React.createElement(MessageCircle, {size:13,color:count>0?c:T.textDim,fill:count>0?`${c}40`:"none"}),
       count>0 && React.createElement("span", {style:{fontSize:10,fontWeight:700,color:c}}, count)
     ),
-    // Expanded panel
-    open && React.createElement("div", {onClick:e=>e.stopPropagation(),style:{width:"min(380px,calc(100vw - 40px))",marginTop:8,background:T.card,border:"1px solid "+T.border,borderRadius:12,padding:14,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",zIndex:30,position:"relative"}},
-      React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:10}},
-        React.createElement("span", {style:{fontSize:12,fontWeight:700,color:c}}, contextLabel),
-        React.createElement("button", {onClick:(e)=>{e.stopPropagation();setOpen(false);},style:{background:"transparent",border:"none",cursor:"pointer",color:T.textDim,padding:2}}, React.createElement(XIcon,{size:14}))
-      ),
-      notes.length > 0 ? React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:6,marginBottom:10,maxHeight:200,overflowY:"auto"}},
-        notes.map(n => React.createElement("div", {key:n.id,style:{background:T.bg,borderRadius:8,padding:"8px 10px",border:"1px solid "+T.border}},
-          React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:2}},
-            React.createElement("span", {style:{fontSize:11,fontWeight:700,color:T.text}}, n.author),
-            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:4}},
-              React.createElement("span", {style:{fontSize:10,color:T.textDim}}, new Date(n.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"})),
-              user===n.author && React.createElement("button", {onClick:()=>deleteNote(n.id),style:{background:"transparent",border:"none",cursor:"pointer",color:T.textDim,padding:0}}, React.createElement(XIcon,{size:11}))
-            )
+    // Backdrop + bottom sheet
+    open && React.createElement("div", {onClick:(e)=>{e.stopPropagation();setOpen(false);},style:{position:"fixed",inset:0,background:"rgba(0,0,0,0.5)",zIndex:100,display:"flex",alignItems:"flex-end",justifyContent:"center"}},
+      React.createElement("div", {onClick:e=>e.stopPropagation(),style:{width:"100%",maxWidth:500,maxHeight:"70vh",background:T.card,borderTop:`2px solid ${c}`,borderRadius:"16px 16px 0 0",padding:"16px 16px calc(16px + env(safe-area-inset-bottom,0px))",display:"flex",flexDirection:"column",boxShadow:"0 -8px 40px rgba(0,0,0,0.5)",animation:"slideUp 0.25s ease-out"}},
+        // Header
+        React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:12,flexShrink:0}},
+          React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8}},
+            React.createElement(MessageCircle, {size:16,color:c}),
+            React.createElement("span", {style:{fontSize:14,fontWeight:700,color:T.white}}, contextLabel)
           ),
-          React.createElement("p", {style:{fontSize:12,color:T.textMuted,margin:0,lineHeight:1.5}}, n.note)
-        ))
-      ) : React.createElement("div", {style:{fontSize:12,color:T.textDim,padding:"8px 0",textAlign:"center"}}, "No notes yet"),
-      user ? React.createElement("div", {style:{display:"flex",gap:6}},
-        React.createElement("input", {value:text,onChange:e=>setText(e.target.value),onKeyDown:e=>{if(e.key==="Enter"&&!e.shiftKey)addNote();},placeholder:"Add a note...",style:{flex:1,background:T.bg,border:"1px solid "+T.border,borderRadius:8,padding:"6px 10px",color:T.text,fontSize:12,outline:"none",fontFamily:"inherit"}}),
-        React.createElement("button", {onClick:addNote,disabled:!text.trim()||submitting,style:{background:text.trim()?c:T.textDim,border:"none",borderRadius:8,padding:"6px 10px",cursor:text.trim()?"pointer":"default",display:"flex",alignItems:"center",opacity:submitting?0.5:1}},
-          React.createElement(Send, {size:13,color:T.white})
-        )
-      ) : React.createElement("div", {style:{fontSize:11,color:T.textDim,textAlign:"center",padding:4}}, "Enter your name above to add notes")
+          React.createElement("button", {onClick:(e)=>{e.stopPropagation();setOpen(false);},style:{background:T.bg,border:"1px solid "+T.border,borderRadius:99,width:28,height:28,display:"flex",alignItems:"center",justifyContent:"center",cursor:"pointer",flexShrink:0}}, React.createElement(XIcon,{size:14,color:T.textMuted}))
+        ),
+        // Notes list
+        React.createElement("div", {style:{flex:1,overflowY:"auto",marginBottom:12,minHeight:0}},
+          notes.length > 0 ? React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:8}},
+            notes.map(n => React.createElement("div", {key:n.id,style:{background:T.bg,borderRadius:10,padding:"10px 12px",border:"1px solid "+T.border}},
+              React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}},
+                React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6}},
+                  React.createElement("span", {style:{fontSize:12,fontWeight:700,color:T.text}}, n.author),
+                  React.createElement("span", {style:{fontSize:10,color:T.textDim}}, new Date(n.created_at).toLocaleDateString("en-US",{month:"short",day:"numeric"}))
+                ),
+                user===n.author && React.createElement("button", {onClick:()=>deleteNote(n.id),style:{background:"transparent",border:"none",cursor:"pointer",color:T.textDim,padding:2}}, React.createElement(XIcon,{size:12}))
+              ),
+              React.createElement("p", {style:{fontSize:13,color:T.text,margin:0,lineHeight:1.6}}, n.note)
+            ))
+          ) : React.createElement("div", {style:{fontSize:13,color:T.textDim,padding:"24px 0",textAlign:"center"}}, "No notes yet — be the first!")
+        ),
+        // Input
+        user ? React.createElement("div", {style:{display:"flex",gap:8,flexShrink:0}},
+          React.createElement("input", {ref:inputRef,value:text,onChange:e=>setText(e.target.value),onKeyDown:e=>{if(e.key==="Enter"&&!e.shiftKey)addNote();},placeholder:"Add a note...",style:{flex:1,background:T.bg,border:"1px solid "+T.border,borderRadius:10,padding:"10px 14px",color:T.text,fontSize:14,outline:"none",fontFamily:"inherit"}}),
+          React.createElement("button", {onClick:addNote,disabled:!text.trim()||submitting,style:{background:text.trim()?c:T.textDim,border:"none",borderRadius:10,padding:"10px 14px",cursor:text.trim()?"pointer":"default",display:"flex",alignItems:"center",opacity:submitting?0.5:1,flexShrink:0}},
+            React.createElement(Send, {size:16,color:T.white})
+          )
+        ) : React.createElement("div", {style:{fontSize:12,color:T.textDim,textAlign:"center",padding:8,flexShrink:0}}, "Enter your name at the top to add notes")
+      )
     )
   );
 }
