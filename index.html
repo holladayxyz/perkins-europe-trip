@@ -9,8 +9,8 @@
     <meta property="og:title" content="Perkins Family Europe Trip" />
     <meta property="og:description" content="Celebrating 50 Years of Marriage — 8 curated routes through Europe for 16 travelers. Vote, explore & plan together." />
     <meta property="og:image" content="https://perkins-europe-trip.vercel.app/og-logo.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
+    <meta property="og:image:width" content="2508" />
+    <meta property="og:image:height" content="1736" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://perkins-europe-trip.vercel.app" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -966,6 +966,7 @@ const ROUTES = [
   name: "Amalfi Coast & Rome",
   tagline: "Great Value Vacations deal — true all-in cost shown",
   nights: 6,
+  azToJfk: 337,
   dealBadge: {
     label: "Based on: Great Value Vacations '$899' deal",
     note: "$899/pp from JFK — flights + hotel bundled. Everyone flies to JFK, then departs together. Food, activities, parking, car upgrade & insurance are all extra. True all-in cost shown below.",
@@ -1095,6 +1096,7 @@ const ROUTES = [
   name: "Eastern Europe Elegance",
   tagline: "TripToGo deal — Budapest, Bratislava, Vienna, Prague",
   nights: 6,
+  azToJfk: 337,
   dealBadge: {
     label: "Based on: TripToGo '$399+' Eastern Europe Elegance tour",
     note: "$399/pp land-only + ~$650 JFK→Budapest flights = ~$1,049/pp to start. Everyone flies to JFK, then departs together. Breakfast included; lunch, dinner, activities & tips are extra. Guided group tour — joins strangers (group size 20–35).",
@@ -1669,7 +1671,7 @@ function OverviewScreen({onSelect,user}) {
             React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid "+T.border,marginTop:"auto"}},
               React.createElement("div", null,
                 React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, "Est. out-of-pocket · Fall"),
-                React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+Math.max(0,calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)-3000).toLocaleString()),
+                React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+Math.max(0,calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)+(route.azToJfk||0)*2-3000).toLocaleString()),
               ),
               React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,color:route.color,fontSize:13,fontWeight:700}},
                 "Explore Route", React.createElement(ChevronRight, {size:16})
@@ -1741,7 +1743,8 @@ function OverviewScreen({onSelect,user}) {
 function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
   const t = route.budgetTiers[season].value;
   const rn = route.nights||NIGHTS;
-  const flightCost = includeFlights ? t.flights : 0;
+  const azJfk = route.azToJfk||0;
+  const flightCost = includeFlights ? t.flights + azJfk : 0;
   const pp = flightCost + t.accommodation*rn + t.trains + t.food*rn + t.activities + t.misc*rn;
   const couple = pp*2;
   const oop = Math.max(0, couple - 3000);
@@ -1752,6 +1755,7 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
     if (includeFlights) pieData.push({name:"Flights",value:t.flights});
     pieData.push({name:"Lodging",value:t.accommodation*rn});
   }
+  if (includeFlights && azJfk) pieData.push({name:"AZ → JFK",value:azJfk});
   pieData.push({name:"Food",value:t.food*rn},{name:"Transport",value:t.trains},{name:"Activities",value:t.activities},{name:"Misc",value:t.misc*rn});
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
     route.dealBadge && React.createElement(AnimIn, null,
@@ -1808,6 +1812,7 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
               if (includeFlights) rows.push(["Flights","$"+t.flights]);
               rows.push(["Lodging ("+rn+"n)","$"+(t.accommodation*rn)]);
             }
+            if (includeFlights && azJfk) rows.push(["Flights: AZ → JFK","$"+azJfk]);
             rows.push(["Food ("+rn+"d)","$"+(t.food*rn)],["Transport","$"+t.trains],["Activities","$"+t.activities]);
             return rows;
           })().map(([l,v])=>
@@ -2165,7 +2170,8 @@ function InspirationTab({route}) {
 
 function CompareTab({route,season,includeFlights}) {
   const rn = route.nights||NIGHTS;
-  const calcDisplay = (t) => { const base = t.accommodation*rn + t.trains + t.food*rn + t.activities + t.misc*rn + (includeFlights?t.flights:0); return base*2; };
+  const azJfk = route.azToJfk||0;
+  const calcDisplay = (t) => { const base = t.accommodation*rn + t.trains + t.food*rn + t.activities + t.misc*rn + (includeFlights?t.flights+azJfk:0); return base*2; };
   const fMid = calcDisplay(route.budgetTiers.fall.value);
   const sMid = calcDisplay(route.budgetTiers.spring.value);
   const save = fMid - sMid;
