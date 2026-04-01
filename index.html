@@ -47,7 +47,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const T = { bg:"#0c0f1a", card:"#151929", cardHover:"#1a2035", border:"#1e2540", accent:"#f0a050", accentSoft:"rgba(240,160,80,0.12)", blue:"#5b9bf5", blueSoft:"rgba(91,155,245,0.12)", green:"#4ade80", greenSoft:"rgba(74,222,128,0.1)", purple:"#a78bfa", purpleSoft:"rgba(167,139,250,0.1)", rose:"#fb7185", roseSoft:"rgba(251,113,133,0.1)", cyan:"#22d3ee", cyanSoft:"rgba(34,211,238,0.1)", text:"#e8eaf0", textMuted:"#8892a8", textDim:"#505a72", white:"#ffffff", gradient1:"linear-gradient(135deg,#f0a050 0%,#e06830 100%)", gradient2:"linear-gradient(135deg,#5b9bf5 0%,#7c5bf5 100%)", gradient3:"linear-gradient(135deg,#4ade80 0%,#22d3ee 100%)", gradient4:"linear-gradient(135deg,#a78bfa 0%,#7c3aed 100%)", gradient5:"linear-gradient(135deg,#fb7185 0%,#f43f5e 100%)", gradient6:"linear-gradient(135deg,#22d3ee 0%,#0ea5e9 100%)" };
 const CC = [T.accent, T.blue, T.green, T.purple, T.rose, T.cyan, "#fbbf24", "#f472b6"];
 const glass = { background:"rgba(21,25,41,0.7)", WebkitBackdropFilter:"blur(12px)", backdropFilter:"blur(12px)", border:"1px solid "+T.border, borderRadius:16 };
-const NIGHTS = 9;
+const NIGHTS = 7;
 const calcPP = t => t.flights + t.accommodation*NIGHTS + t.trains + t.food*NIGHTS + t.activities + t.misc*NIGHTS;
 const calcCouple = t => calcPP(t)*2;
 const iconMap = { plane:Plane, train:Train, church:Church, mountain:Mountain, music:Music, camera:Camera, compass:Compass, heart:Heart, building:Building, star:Star, coffee:Coffee };
@@ -73,33 +73,29 @@ const ROUTES = [
   countryFlags: ["🇬🇧","🇫🇷","🇮🇹"],
   cities: ["Cotswolds","London","Paris","Rome"],
   cityFlags: ["🇬🇧","🇬🇧","🇫🇷","🇮🇹"],
-  highlights: ["3 days in the English countryside","Churchill War Rooms + quiet London gems","Eurostar through the Channel Tunnel","Rome Italy Temple + Vatican + Colosseum","Non-tourist villages, markets & hidden streets"],
+  highlights: ["2 days in the English countryside","Churchill War Rooms + quiet London gems","Eurostar through the Channel Tunnel","Rome Italy Temple + Vatican + Colosseum","Non-tourist villages, markets & hidden streets"],
   itinerary: {
-    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 4, 2026", legs:[
       {day:0,date:"Sep 26",location:"U.S. → London",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to London Heathrow.",nights:0,lat:51.51,lng:-0.13},
       {day:1,date:"Sep 27",location:"Cotswolds",type:"nature",icon:"heart",country:"United Kingdom",desc:"Arrive London, transfer to Cotswolds (1.5h). Settle into stone manor house. Bibury and Arlington Row afternoon stroll.",nights:1,lat:51.87,lng:-1.70},
-      {day:2,date:"Sep 28",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Bourton-on-the-Water, Stow-on-the-Wold. Cream tea at a village pub. Broadway Tower sunset.",nights:1,lat:51.87,lng:-1.70},
-      {day:3,date:"Sep 29",location:"Cotswolds",type:"highlight",icon:"compass",country:"United Kingdom",desc:"Blenheim Palace morning. Chipping Campden walk. Farm shop lunch. Quiet evening in the village.",nights:1,lat:51.87,lng:-1.70},
-      {day:4,date:"Sep 30",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Churchill War Rooms. Borough Market lunch. Thames walk to Tower Bridge. Pub dinner.",nights:1,lat:51.51,lng:-0.13},
-      {day:5,date:"Oct 1",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
-      {day:6,date:"Oct 2",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
-      {day:7,date:"Oct 3",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon flight to Rome (2h). Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
-      {day:8,date:"Oct 4",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Colosseum & Roman Forum morning. Afternoon Rome Italy Temple visit. Piazza Navona. Gelato crawl.",nights:1,lat:41.90,lng:12.50},
-      {day:9,date:"Oct 5",location:"Rome",type:"highlight",icon:"heart",country:"Italy",desc:"Vatican Museums & Sistine Chapel morning. Pantheon, Trevi Fountain, Spanish Steps. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
-      {day:10,date:"Oct 6",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+      {day:2,date:"Sep 28",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Bourton-on-the-Water, Blenheim Palace visit. Cream tea at a village pub. Broadway Tower sunset.",nights:1,lat:51.87,lng:-1.70},
+      {day:3,date:"Sep 29",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Churchill War Rooms. Borough Market lunch. Thames walk to Tower Bridge. Pub dinner.",nights:1,lat:51.51,lng:-0.13},
+      {day:4,date:"Sep 30",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
+      {day:5,date:"Oct 1",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
+      {day:6,date:"Oct 2",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon flight to Rome (2h). Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
+      {day:7,date:"Oct 3",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Colosseum & Roman Forum morning. Rome Italy Temple visit. Vatican Museums & Sistine Chapel. Trevi Fountain. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
+      {day:8,date:"Oct 4",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
     ]},
-    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 2, 2027", legs:[
       {day:0,date:"Apr 24",location:"U.S. → London",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to London Heathrow.",nights:0,lat:51.51,lng:-0.13},
       {day:1,date:"Apr 25",location:"Cotswolds",type:"nature",icon:"heart",country:"United Kingdom",desc:"Arrive London, transfer to Cotswolds (1.5h). Settle into stone manor house. Bibury and Arlington Row afternoon stroll.",nights:1,lat:51.87,lng:-1.70},
-      {day:2,date:"Apr 26",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Bourton-on-the-Water, Stow-on-the-Wold. Cream tea at a village pub. Broadway Tower sunset.",nights:1,lat:51.87,lng:-1.70},
-      {day:3,date:"Apr 27",location:"Cotswolds",type:"highlight",icon:"compass",country:"United Kingdom",desc:"Blenheim Palace morning. Chipping Campden walk. Farm shop lunch. Quiet evening in the village.",nights:1,lat:51.87,lng:-1.70},
-      {day:4,date:"Apr 28",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Churchill War Rooms. Borough Market lunch. Thames walk to Tower Bridge. Pub dinner.",nights:1,lat:51.51,lng:-0.13},
-      {day:5,date:"Apr 29",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
-      {day:6,date:"Apr 30",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
-      {day:7,date:"May 1",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon flight to Rome (2h). Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
-      {day:8,date:"May 2",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Colosseum & Roman Forum morning. Afternoon Rome Italy Temple visit. Piazza Navona. Gelato crawl.",nights:1,lat:41.90,lng:12.50},
-      {day:9,date:"May 3",location:"Rome",type:"highlight",icon:"heart",country:"Italy",desc:"Vatican Museums & Sistine Chapel morning. Pantheon, Trevi Fountain, Spanish Steps. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
-      {day:10,date:"May 4",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+      {day:2,date:"Apr 26",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Bourton-on-the-Water, Blenheim Palace visit. Cream tea at a village pub. Broadway Tower sunset.",nights:1,lat:51.87,lng:-1.70},
+      {day:3,date:"Apr 27",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Churchill War Rooms. Borough Market lunch. Thames walk to Tower Bridge. Pub dinner.",nights:1,lat:51.51,lng:-0.13},
+      {day:4,date:"Apr 28",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
+      {day:5,date:"Apr 29",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
+      {day:6,date:"Apr 30",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon flight to Rome (2h). Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
+      {day:7,date:"May 1",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Colosseum & Roman Forum morning. Rome Italy Temple visit. Vatican Museums & Sistine Chapel. Trevi Fountain. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
+      {day:8,date:"May 2",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
     ]}
   },
   budgetTiers: {
@@ -135,10 +131,10 @@ const ROUTES = [
     {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
   ],
   accomData: [
-    {loc:"Cotswolds",n:3,rate:[59,50],rec:"Middle Stanley Manor · 10BR · 4.84★ · 111 reviews",unique:"🏡 Stone manor in classic Cotswolds village",url:"https://www.airbnb.com/rooms/29120101"},
+    {loc:"Cotswolds",n:2,rate:[59,50],rec:"Middle Stanley Manor · 10BR · 4.84★ · 111 reviews",unique:"🏡 Stone manor in classic Cotswolds village",url:"https://www.airbnb.com/rooms/29120101"},
     {loc:"London",n:1,rate:[75,65],rec:"Hotel · 8 rooms · central location · breakfast included",unique:"🏨 Group rate at 3-star near Westminster",url:"https://www.booking.com/searchresults.html?ss=London+Westminster&group_adults=16&checkin=2026-09-30&checkout=2026-10-01&nflt=class%3D3"},
     {loc:"Paris",n:2,rate:[80,68],rec:"Hotel · 8 rooms · Marais or Saint-Germain · breakfast",unique:"🏨 Group rate at boutique hotel in central Paris",url:"https://www.booking.com/searchresults.html?ss=Paris+Marais&group_adults=16&checkin=2026-10-01&checkout=2026-10-03&nflt=class%3D3"},
-    {loc:"Rome",n:3,rate:[81,68],rec:"Villa LINA · 9BR · 14 beds · 4.98★ · 59 reviews",unique:"🏡 Guest Favorite · 5 min to metro",url:"https://www.airbnb.com/rooms/1136343333895843954"},
+    {loc:"Rome",n:2,rate:[81,68],rec:"Villa LINA · 9BR · 14 beds · 4.98★ · 59 reviews",unique:"🏡 Guest Favorite · 5 min to metro",url:"https://www.airbnb.com/rooms/1136343333895843954"},
   ],
   hiddenGems: [
     {region:"Cotswolds",color:"#fbbf24",flag:"🇬🇧",gems:[
@@ -225,31 +221,27 @@ const ROUTES = [
   cityFlags: ["🇩🇪","🇦🇹","🇦🇹","🇮🇹","🇮🇹"],
   highlights: ["Best food of all routes — Italian + Austrian","Quaint lakeside villages + Dolomite peaks","Every stop is a charming small town","Sound of Music + Neuschwanstein included","Ends in Milan — optional Rome Temple extension"],
   itinerary: {
-    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 4, 2026", legs:[
       {day:0,date:"Sep 26",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
-      {day:1,date:"Sep 27",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner.",nights:1,lat:48.14,lng:11.58},
-      {day:2,date:"Sep 28",location:"Neuschwanstein & Bavaria",type:"highlight",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Füssen village. Bavarian Alps. Bakery crawl.",nights:1,lat:48.14,lng:11.58},
-      {day:3,date:"Sep 29",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
-      {day:4,date:"Sep 30",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
-      {day:5,date:"Oct 1",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
-      {day:6,date:"Oct 2",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Brenner Pass train (2h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
-      {day:7,date:"Oct 3",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
-      {day:8,date:"Oct 4",location:"Lake Como",type:"train",icon:"train",country:"Italy",desc:"Train to Varenna (3h). Lakeside village stroll. Villa Monastero gardens. Aperitivo on the waterfront.",nights:1,lat:46.01,lng:9.28},
-      {day:9,date:"Oct 5",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Ferry to Bellagio (Pearl of the Lake). Cobblestone lanes, gelato, Villa Melzi. Farewell Italian dinner.",nights:1,lat:46.01,lng:9.28},
-      {day:10,date:"Oct 6",location:"Milan → Home",type:"travel",icon:"plane",country:"Transit",desc:"Train to Milan (1h). Fly home. Arrive U.S. late evening.",nights:0,lat:45.63,lng:8.72},
+      {day:1,date:"Sep 27",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner. Optional Neuschwanstein day trip.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Sep 28",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:3,date:"Sep 29",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Sep 30",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
+      {day:5,date:"Oct 1",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Brenner Pass train (2h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
+      {day:6,date:"Oct 2",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
+      {day:7,date:"Oct 3",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Train to Varenna (3h). Lakeside stroll, Villa Monastero. Ferry to Bellagio, Villa Melzi. Farewell Italian dinner.",nights:1,lat:46.01,lng:9.28},
+      {day:8,date:"Oct 4",location:"Milan → Home",type:"travel",icon:"plane",country:"Transit",desc:"Train to Milan (1h). Fly home. Arrive U.S. late evening.",nights:0,lat:45.63,lng:8.72},
     ]},
-    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 2, 2027", legs:[
       {day:0,date:"Apr 24",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
-      {day:1,date:"Apr 25",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner.",nights:1,lat:48.14,lng:11.58},
-      {day:2,date:"Apr 26",location:"Neuschwanstein & Bavaria",type:"highlight",icon:"mountain",country:"Germany",desc:"Fairytale castle day trip. Füssen village. Bavarian Alps. Bakery crawl.",nights:1,lat:48.14,lng:11.58},
-      {day:3,date:"Apr 27",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
-      {day:4,date:"Apr 28",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
-      {day:5,date:"Apr 29",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
-      {day:6,date:"Apr 30",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Brenner Pass train (2h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
-      {day:7,date:"May 1",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
-      {day:8,date:"May 2",location:"Lake Como",type:"train",icon:"train",country:"Italy",desc:"Train to Varenna (3h). Lakeside village stroll. Villa Monastero gardens. Aperitivo on the waterfront.",nights:1,lat:46.01,lng:9.28},
-      {day:9,date:"May 3",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Ferry to Bellagio (Pearl of the Lake). Cobblestone lanes, gelato, Villa Melzi. Farewell Italian dinner.",nights:1,lat:46.01,lng:9.28},
-      {day:10,date:"May 4",location:"Milan → Home",type:"travel",icon:"plane",country:"Transit",desc:"Train to Milan (1h). Fly home. Arrive U.S. late evening.",nights:0,lat:45.63,lng:8.72},
+      {day:1,date:"Apr 25",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. Marienplatz, Viktualienmarkt, English Garden. Traditional beer hall dinner. Optional Neuschwanstein day trip.",nights:1,lat:48.14,lng:11.58},
+      {day:2,date:"Apr 26",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5h). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:3,date:"Apr 27",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Mondsee church. Hohensalzburg Fortress. Bakeries and local eats.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Apr 28",location:"Innsbruck",type:"train",icon:"train",country:"Austria",desc:"Scenic train (2h). Golden Roof, Nordkette cable car, Old Town stroll.",nights:1,lat:47.26,lng:11.39},
+      {day:5,date:"Apr 29",location:"Bolzano / Dolomites",type:"train",icon:"train",country:"Italy",desc:"Brenner Pass train (2h). South Tyrolean wine country. Ötzi Museum. Bolzano farmer's market.",nights:1,lat:46.50,lng:11.35},
+      {day:6,date:"Apr 30",location:"Dolomites Day",type:"highlight",icon:"mountain",country:"Italy",desc:"Seceda cable car or Alpe di Siusi. Mountain hut lunch. Val di Funes iconic church meadow.",nights:1,lat:46.50,lng:11.35},
+      {day:7,date:"May 1",location:"Lake Como",type:"highlight",icon:"heart",country:"Italy",desc:"Train to Varenna (3h). Lakeside stroll, Villa Monastero. Ferry to Bellagio, Villa Melzi. Farewell Italian dinner.",nights:1,lat:46.01,lng:9.28},
+      {day:8,date:"May 2",location:"Milan → Home",type:"travel",icon:"plane",country:"Transit",desc:"Train to Milan (1h). Fly home. Arrive U.S. late evening.",nights:0,lat:45.63,lng:8.72},
     ]}
   },
   budgetTiers: {
@@ -289,11 +281,11 @@ const ROUTES = [
     {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
   ],
   accomData: [
-    {loc:"Munich / Bavaria",n:2,rate:[80,70],rec:"Historic Rectory near Neuschwanstein · 5BR · 4.99★ · 93 reviews",unique:"🏰 Near the castle, charming village setting",url:"https://www.airbnb.com/rooms/17010988"},
+    {loc:"Munich / Bavaria",n:1,rate:[80,70],rec:"Historic Rectory near Neuschwanstein · 5BR · 4.99★ · 93 reviews",unique:"🏰 Near the castle, charming village setting",url:"https://www.airbnb.com/rooms/17010988"},
     {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · 4.94★ · 161 reviews",unique:"🏡 Guest Favorite · countryside estate",url:"https://www.airbnb.com/rooms/9474529"},
     {loc:"Innsbruck",n:1,rate:[45,40],rec:"Hotel 8 rooms · Old Town · most cost-effective option",unique:"🏔️ Walking distance to Golden Roof & cable car",url:"https://www.booking.com/searchresults.html?ss=Innsbruck&group_adults=16&checkin=2026-10-01&checkout=2026-10-02"},
     {loc:"Bolzano / Dolomites",n:2,rate:[55,45],rec:"Hotel 8 rooms · Dolomite village · breakfast included",unique:"🏔️ Agriturismo with vineyard & mountain views",url:"https://www.booking.com/searchresults.html?dest_id=-111126&dest_type=city&group_adults=16&nflt=roomfacility%3D81&checkin=2026-09-29&checkout=2026-10-01"},
-    {loc:"Lake Como (Varenna)",n:2,rate:[91,78],rec:"Villa del Lago · 7BR · 14 beds · 4.83★ · lake views",unique:"🏡 Private pool, lakefront terrace",url:"https://www.airbnb.com/rooms/801954418870522697"},
+    {loc:"Lake Como (Varenna)",n:1,rate:[91,78],rec:"Villa del Lago · 7BR · 14 beds · 4.83★ · lake views",unique:"🏡 Private pool, lakefront terrace",url:"https://www.airbnb.com/rooms/801954418870522697"},
   ],
   hiddenGems: [
     {region:"Salzburg & Bavaria",color:"#fbbf24",flag:"🇦🇹🇩🇪",gems:[
@@ -396,31 +388,27 @@ const ROUTES = [
   cityFlags: ["🇩🇪","🇦🇹","🇸🇮","🇭🇷","🇭🇷"],
   highlights: ["Charming villages from Alps to Adriatic","Sound of Music in Salzburg","Cobblestone old towns in every country","Best weather variety","4 countries, most culturally diverse"],
   itinerary: {
-    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 4, 2026", legs:[
       {day:0,date:"Sep 26",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
       {day:1,date:"Sep 27",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. LDS church. Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.",nights:1,lat:48.14,lng:11.58},
-      {day:2,date:"Sep 28",location:"Neuschwanstein & Bavaria",type:"nature",icon:"mountain",country:"Germany",desc:"Day trip to fairytale castle and Bavarian Alps. Village of Füssen. Bakery crawl.",nights:1,lat:47.56,lng:10.75},
-      {day:3,date:"Sep 29",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5 hrs). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
-      {day:4,date:"Sep 30",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress.",nights:1,lat:47.8,lng:13.04},
-      {day:5,date:"Oct 1",location:"Lake Bled",type:"nature",icon:"mountain",country:"Slovenia",desc:"Train via Ljubljana. Pletna boat to island church. Bled cream cake. Julian Alps sunset.",nights:1,lat:46.37,lng:14.09},
-      {day:6,date:"Oct 2",location:"→ Split",type:"train",icon:"train",country:"Croatia",desc:"Bled Castle morning. Train to Ljubljana → Zagreb → Split. Diocletian's Palace by night.",nights:1,lat:43.51,lng:16.44},
-      {day:7,date:"Oct 3",location:"Split",type:"city",icon:"camera",country:"Croatia",desc:"Diocletian's Palace, Riva promenade, fresh market. Swim or explore Trogir. Seafood dinner.",nights:1,lat:43.51,lng:16.44},
-      {day:8,date:"Oct 4",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls.",nights:1,lat:42.65,lng:18.09},
-      {day:9,date:"Oct 5",location:"Dubrovnik",type:"highlight",icon:"heart",country:"Croatia",desc:"Walk full city walls. Kayaking optional. Cobblestone exploring, bakeries. Farewell dinner.",nights:1,lat:42.65,lng:18.09},
-      {day:10,date:"Oct 6",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive U.S. late evening.",nights:0,lat:42.65,lng:18.09},
+      {day:2,date:"Sep 28",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5 hrs). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:3,date:"Sep 29",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Sep 30",location:"Lake Bled",type:"nature",icon:"mountain",country:"Slovenia",desc:"Train via Ljubljana. Pletna boat to island church. Bled cream cake. Julian Alps sunset.",nights:1,lat:46.37,lng:14.09},
+      {day:5,date:"Oct 1",location:"→ Split",type:"train",icon:"train",country:"Croatia",desc:"Bled Castle morning. Train to Ljubljana → Zagreb → Split. Diocletian's Palace, Riva promenade. Seafood dinner.",nights:1,lat:43.51,lng:16.44},
+      {day:6,date:"Oct 2",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls.",nights:1,lat:42.65,lng:18.09},
+      {day:7,date:"Oct 3",location:"Dubrovnik",type:"highlight",icon:"heart",country:"Croatia",desc:"Walk full city walls. Kayaking optional. Cobblestone exploring, bakeries. Farewell dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:8,date:"Oct 4",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive U.S. late evening.",nights:0,lat:42.65,lng:18.09},
     ]},
-    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 2, 2027", legs:[
       {day:0,date:"Apr 24",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
       {day:1,date:"Apr 25",location:"Munich",type:"city",icon:"church",country:"Germany",desc:"Arrive morning. LDS church. Marienplatz & Viktualienmarkt. Group dinner at traditional beer hall.",nights:1,lat:48.14,lng:11.58},
-      {day:2,date:"Apr 26",location:"Neuschwanstein & Bavaria",type:"nature",icon:"mountain",country:"Germany",desc:"Day trip to fairytale castle and Bavarian Alps. Village of Füssen. Bakery crawl.",nights:1,lat:47.56,lng:10.75},
-      {day:3,date:"Apr 27",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5 hrs). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
-      {day:4,date:"Apr 28",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress.",nights:1,lat:47.8,lng:13.04},
-      {day:5,date:"Apr 29",location:"Lake Bled",type:"nature",icon:"mountain",country:"Slovenia",desc:"Train via Ljubljana. Pletna boat to island church. Bled cream cake. Julian Alps sunset.",nights:1,lat:46.37,lng:14.09},
-      {day:6,date:"Apr 30",location:"→ Split",type:"train",icon:"train",country:"Croatia",desc:"Bled Castle morning. Train to Ljubljana → Zagreb → Split. Diocletian's Palace by night.",nights:1,lat:43.51,lng:16.44},
-      {day:7,date:"May 1",location:"Split",type:"city",icon:"camera",country:"Croatia",desc:"Diocletian's Palace, Riva promenade, fresh market. Swim or explore Trogir. Seafood dinner.",nights:1,lat:43.51,lng:16.44},
-      {day:8,date:"May 2",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls.",nights:1,lat:42.65,lng:18.09},
-      {day:9,date:"May 3",location:"Dubrovnik",type:"highlight",icon:"heart",country:"Croatia",desc:"Walk full city walls. Kayaking optional. Cobblestone exploring, bakeries. Farewell dinner.",nights:1,lat:42.65,lng:18.09},
-      {day:10,date:"May 4",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive U.S. late evening.",nights:0,lat:42.65,lng:18.09},
+      {day:2,date:"Apr 26",location:"Salzburg",type:"train",icon:"train",country:"Austria",desc:"Scenic train (1.5 hrs). Old Town, Getreidegasse. Mozart's birthplace. Evening concert.",nights:1,lat:47.8,lng:13.04},
+      {day:3,date:"Apr 27",location:"Sound of Music Day",type:"highlight",icon:"music",country:"Austria",desc:"Mirabell Gardens, Leopoldskron, Mondsee church. Hohensalzburg Fortress.",nights:1,lat:47.8,lng:13.04},
+      {day:4,date:"Apr 28",location:"Lake Bled",type:"nature",icon:"mountain",country:"Slovenia",desc:"Train via Ljubljana. Pletna boat to island church. Bled cream cake. Julian Alps sunset.",nights:1,lat:46.37,lng:14.09},
+      {day:5,date:"Apr 29",location:"→ Split",type:"train",icon:"train",country:"Croatia",desc:"Bled Castle morning. Train to Ljubljana → Zagreb → Split. Diocletian's Palace, Riva promenade. Seafood dinner.",nights:1,lat:43.51,lng:16.44},
+      {day:6,date:"Apr 30",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Scenic Adriatic coastal transfer (4-5 hrs). Stroll Stradun. Sunset from city walls.",nights:1,lat:42.65,lng:18.09},
+      {day:7,date:"May 1",location:"Dubrovnik",type:"highlight",icon:"heart",country:"Croatia",desc:"Walk full city walls. Kayaking optional. Cobblestone exploring, bakeries. Farewell dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:8,date:"May 2",location:"Dubrovnik → Home",type:"travel",icon:"plane",country:"Transit",desc:"Fly home via connecting city. Arrive U.S. late evening.",nights:0,lat:42.65,lng:18.09},
     ]}
   },
   budgetTiers: {
@@ -462,10 +450,10 @@ const ROUTES = [
     {country:"Croatia",breakfast:10,lunch:15,dinner:24,snacks:6,flag:"🇭🇷"},
   ],
   accomData: [
-    {loc:"Munich / Bavaria",n:2,rate:[80,70],rec:"Historic Rectory near Neuschwanstein · 5BR · 4.99★ · 93 reviews",unique:"🏰 Near the castle, charming village setting",url:"https://www.airbnb.com/rooms/17010988"},
+    {loc:"Munich / Bavaria",n:1,rate:[80,70],rec:"Historic Rectory near Neuschwanstein · 5BR · 4.99★ · 93 reviews",unique:"🏰 Near the castle, charming village setting",url:"https://www.airbnb.com/rooms/17010988"},
     {loc:"Salzburg Region",n:2,rate:[50,42],rec:"Forsthaus Neuberg · 9BR · 4.94★ · 161 reviews",unique:"🏡 Guest Favorite · countryside estate",url:"https://www.airbnb.com/rooms/9474529"},
     {loc:"Lake Bled",n:1,rate:[85,75],rec:"Hotel Vila Bled · lakefront · 8 rooms for group",unique:"🦅 Former royal residence on the lake",url:"https://www.vilabled.com/"},
-    {loc:"Split / Dalmatia",n:2,rate:[41,35],rec:"Apartments Kaja · 7BR · 5.0★ · 14 reviews · fits 20",unique:"🏛️ Walking distance to Diocletian's Palace",url:"https://www.airbnb.com/rooms/1094351562839288240"},
+    {loc:"Split / Dalmatia",n:1,rate:[41,35],rec:"Apartments Kaja · 7BR · 5.0★ · 14 reviews · fits 20",unique:"🏛️ Walking distance to Diocletian's Palace",url:"https://www.airbnb.com/rooms/1094351562839288240"},
     {loc:"Dubrovnik",n:2,rate:[50,42],rec:"Luxury Villa · 7BR · pool + gym · 4.97★ · 31 reviews",unique:"🏊 Private pool, panoramic views",url:"https://www.airbnb.com/rooms/902592797476215166"},
   ],
   hiddenGems: [
@@ -556,11 +544,11 @@ const ROUTES = [
   gradient: T.gradient4,
   countries: ["Germany","Austria","Czech Republic"],
   countryFlags: ["🇩🇪","🇦🇹","🇨🇿"],
-  cities: ["Munich","Salzburg","Vienna","Prague","Nuremberg"],
-  cityFlags: ["🇩🇪","🇦🇹","🇦🇹","🇨🇿","🇩🇪"],
+  cities: ["Munich","Salzburg","Vienna","Prague"],
+  cityFlags: ["🇩🇪","🇦🇹","🇦🇹","🇨🇿"],
   highlights: ["Sound of Music Salzburg tour","Prague's fairy-tale old town & castle","Vienna coffeehouses & classical concert","Neuschwanstein & Bavarian castles","Beer halls, bakeries & Christmas-market charm"],
   itinerary: {
-    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 4, 2026", legs:[
       {day:0,date:"Sep 26",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
       {day:1,date:"Sep 27",location:"Munich",type:"highlight",icon:"building",country:"Germany",desc:"Arrive Munich. Marienplatz & Glockenspiel. Viktualienmarkt lunch. Afternoon at Nymphenburg Palace. Beer hall dinner at Augustiner.",nights:1,lat:48.14,lng:11.58},
       {day:2,date:"Sep 28",location:"Neuschwanstein & Salzburg",type:"train",icon:"train",country:"Germany → Austria",desc:"Morning day trip to Neuschwanstein Castle (2h drive). Fairy-tale castle tour. Continue to Salzburg (2h). Evening stroll through Old Town.",nights:1,lat:47.80,lng:13.04},
@@ -568,12 +556,10 @@ const ROUTES = [
       {day:4,date:"Sep 30",location:"Salzburg → Vienna",type:"train",icon:"train",country:"Austria",desc:"Scenic train to Vienna (2.5h). Settle in. Afternoon at Schönbrunn Palace & gardens. Sachertorte at Hotel Sacher. Evening concert.",nights:1,lat:48.21,lng:16.37},
       {day:5,date:"Oct 1",location:"Vienna",type:"highlight",icon:"building",country:"Austria",desc:"Hofburg Palace morning. Naschmarkt lunch crawl. Belvedere Museum (Klimt's The Kiss). Coffeehouse afternoon. Opera or classical concert evening.",nights:1,lat:48.21,lng:16.37},
       {day:6,date:"Oct 2",location:"Vienna → Prague",type:"train",icon:"train",country:"Czech Republic",desc:"Morning train to Prague (4h, scenic Moravia). Arrive early afternoon. Charles Bridge at sunset. Old Town Square dinner.",nights:1,lat:50.08,lng:14.44},
-      {day:7,date:"Oct 3",location:"Prague",type:"highlight",icon:"camera",country:"Czech Republic",desc:"Prague Castle & St. Vitus Cathedral morning. Petřín Hill tower. Lunch at a classic Czech pub. Astronomical Clock. Evening Vltava river walk.",nights:1,lat:50.08,lng:14.44},
-      {day:8,date:"Oct 4",location:"Prague",type:"highlight",icon:"compass",country:"Czech Republic",desc:"Jewish Quarter morning. Lennon Wall & Kampa Island. Czech bakery crawl (trdelník). Vyšehrad fortress sunset. Farewell dinner.",nights:1,lat:50.08,lng:14.44},
-      {day:9,date:"Oct 5",location:"Prague → Nuremberg",type:"train",icon:"train",country:"Germany",desc:"Train to Nuremberg (3.5h). Kaiserburg Castle. Old Town walk. Nuremberg sausages & gingerbread. WWII Documentation Center if time.",nights:1,lat:49.45,lng:11.08},
-      {day:10,date:"Oct 6",location:"Nuremberg → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning Handwerkerhof stroll. Fly home from Nuremberg (or connect Munich).",nights:0,lat:49.45,lng:11.08},
+      {day:7,date:"Oct 3",location:"Prague",type:"highlight",icon:"camera",country:"Czech Republic",desc:"Prague Castle & St. Vitus Cathedral morning. Petřín Hill tower. Astronomical Clock. Jewish Quarter, Lennon Wall. Farewell dinner.",nights:1,lat:50.08,lng:14.44},
+      {day:8,date:"Oct 4",location:"Prague → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning walk, last Czech coffee. Fly home from Prague.",nights:0,lat:50.08,lng:14.44},
     ]},
-    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 2, 2027", legs:[
       {day:0,date:"Apr 24",location:"U.S. → Munich",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich.",nights:0,lat:48.14,lng:11.58},
       {day:1,date:"Apr 25",location:"Munich",type:"highlight",icon:"building",country:"Germany",desc:"Arrive Munich. Marienplatz & Glockenspiel. Viktualienmarkt lunch. Afternoon at Nymphenburg Palace. Beer hall dinner at Augustiner.",nights:1,lat:48.14,lng:11.58},
       {day:2,date:"Apr 26",location:"Neuschwanstein & Salzburg",type:"train",icon:"train",country:"Germany → Austria",desc:"Morning day trip to Neuschwanstein Castle (2h drive). Fairy-tale castle tour. Continue to Salzburg (2h). Evening stroll through Old Town.",nights:1,lat:47.80,lng:13.04},
@@ -581,10 +567,8 @@ const ROUTES = [
       {day:4,date:"Apr 28",location:"Salzburg → Vienna",type:"train",icon:"train",country:"Austria",desc:"Scenic train to Vienna (2.5h). Settle in. Afternoon at Schönbrunn Palace & gardens. Sachertorte at Hotel Sacher. Evening concert.",nights:1,lat:48.21,lng:16.37},
       {day:5,date:"Apr 29",location:"Vienna",type:"highlight",icon:"building",country:"Austria",desc:"Hofburg Palace morning. Naschmarkt lunch crawl. Belvedere Museum (Klimt's The Kiss). Coffeehouse afternoon. Opera or classical concert evening.",nights:1,lat:48.21,lng:16.37},
       {day:6,date:"Apr 30",location:"Vienna → Prague",type:"train",icon:"train",country:"Czech Republic",desc:"Morning train to Prague (4h, scenic Moravia). Arrive early afternoon. Charles Bridge at sunset. Old Town Square dinner.",nights:1,lat:50.08,lng:14.44},
-      {day:7,date:"May 1",location:"Prague",type:"highlight",icon:"camera",country:"Czech Republic",desc:"Prague Castle & St. Vitus Cathedral morning. Petřín Hill tower. Lunch at a classic Czech pub. Astronomical Clock. Evening Vltava river walk.",nights:1,lat:50.08,lng:14.44},
-      {day:8,date:"May 2",location:"Prague",type:"highlight",icon:"compass",country:"Czech Republic",desc:"Jewish Quarter morning. Lennon Wall & Kampa Island. Czech bakery crawl (trdelník). Vyšehrad fortress sunset. Farewell dinner.",nights:1,lat:50.08,lng:14.44},
-      {day:9,date:"May 3",location:"Prague → Nuremberg",type:"train",icon:"train",country:"Germany",desc:"Train to Nuremberg (3.5h). Kaiserburg Castle. Old Town walk. Nuremberg sausages & gingerbread. WWII Documentation Center if time.",nights:1,lat:49.45,lng:11.08},
-      {day:10,date:"May 4",location:"Nuremberg → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning Handwerkerhof stroll. Fly home from Nuremberg (or connect Munich).",nights:0,lat:49.45,lng:11.08},
+      {day:7,date:"May 1",location:"Prague",type:"highlight",icon:"camera",country:"Czech Republic",desc:"Prague Castle & St. Vitus Cathedral morning. Petřín Hill tower. Astronomical Clock. Jewish Quarter, Lennon Wall. Farewell dinner.",nights:1,lat:50.08,lng:14.44},
+      {day:8,date:"May 2",location:"Prague → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning walk, last Czech coffee. Fly home from Prague.",nights:0,lat:50.08,lng:14.44},
     ]}
   },
   budgetTiers: {
@@ -604,7 +588,6 @@ const ROUTES = [
     {from:"Füssen",to:"Salzburg",hrs:"2h",cost:25,scenic:4,type:"DB/ÖBB",url:"https://www.bahn.com/en"},
     {from:"Salzburg",to:"Vienna",hrs:"2.5h",cost:30,scenic:3,type:"ÖBB Railjet",url:"https://www.oebb.at/en/"},
     {from:"Vienna",to:"Prague",hrs:"4h",cost:20,scenic:3,type:"RegioJet",url:"https://www.regiojet.com/"},
-    {from:"Prague",to:"Nuremberg",hrs:"3.5h",cost:20,scenic:3,type:"DB/ČD",url:"https://www.cd.cz/en/"},
   ],
   activities: [
     {name:"Neuschwanstein Castle",cost:17,loc:"Bavaria",icon:"🏰",url:"https://www.neuschwanstein.de/englisch/tourist/index.htm"},
@@ -614,7 +597,6 @@ const ROUTES = [
     {name:"Belvedere Museum",cost:18,loc:"Vienna",icon:"🎨",url:"https://www.belvedere.at/en"},
     {name:"Vienna Concert",cost:45,loc:"Vienna",icon:"🎶",url:"https://www.musikverein.at/en"},
     {name:"Prague Castle",cost:14,loc:"Prague",icon:"🏰",url:"https://www.hrad.cz/en/prague-castle-for-visitors"},
-    {name:"Kaiserburg (Nuremberg Castle)",cost:7,loc:"Nuremberg",icon:"🏰",url:"https://www.kaiserburg-nuernberg.de/englisch/castle/index.htm"},
     {name:"Nymphenburg Palace",cost:8,loc:"Munich",icon:"🏛️",url:"https://www.schloss-nymphenburg.de/englisch/palace/index.htm"},
   ],
   foodByCountry: [
@@ -626,8 +608,7 @@ const ROUTES = [
     {loc:"Munich",n:1,rate:[62,52],rec:"Hotel · central near Marienplatz · breakfast included",unique:"🏨 Group rate at 3-star in Altstadt",url:"https://www.booking.com/searchresults.html?ss=Munich+Altstadt&group_adults=16&nflt=class%3D3"},
     {loc:"Salzburg",n:2,rate:[68,58],rec:"Guesthouse · 8 rooms · Old Town · breakfast",unique:"🏡 Traditional Austrian Gasthof near Getreidegasse",url:"https://www.booking.com/searchresults.html?ss=Salzburg+Old+Town&group_adults=16&nflt=class%3D3"},
     {loc:"Vienna",n:2,rate:[72,60],rec:"Hotel · 8 rooms · near Ringstrasse · breakfast",unique:"🏨 Boutique hotel in Innere Stadt",url:"https://www.booking.com/searchresults.html?ss=Vienna+Innere+Stadt&group_adults=16&nflt=class%3D3"},
-    {loc:"Prague",n:3,rate:[48,40],rec:"Apartment block · Old Town · self-catering option",unique:"🏡 Renovated flat near Charles Bridge",url:"https://www.booking.com/searchresults.html?ss=Prague+Old+Town&group_adults=16&nflt=class%3D3"},
-    {loc:"Nuremberg",n:1,rate:[55,48],rec:"Hotel · near Kaiserburg · breakfast included",unique:"🏨 Medieval quarter boutique hotel",url:"https://www.booking.com/searchresults.html?ss=Nuremberg+Old+Town&group_adults=16&nflt=class%3D3"},
+    {loc:"Prague",n:2,rate:[48,40],rec:"Apartment block · Old Town · self-catering option",unique:"🏡 Renovated flat near Charles Bridge",url:"https://www.booking.com/searchresults.html?ss=Prague+Old+Town&group_adults=16&nflt=class%3D3"},
   ],
   hiddenGems: [
     {region:"Munich",color:T.purple,flag:"🇩🇪",gems:[
@@ -656,7 +637,6 @@ const ROUTES = [
     {city:"Salzburg",fH:60,fL:42,sH:58,sL:40,fR:8,sR:11},
     {city:"Vienna",fH:61,fL:45,sH:63,sL:46,fR:7,sR:9},
     {city:"Prague",fH:58,fL:42,sH:60,sL:43,fR:7,sR:8},
-    {city:"Nuremberg",fH:59,fL:42,sH:59,sL:41,fR:7,sR:9},
   ],
   inspiration: [
     {loc:"Munich",photos:[
@@ -687,13 +667,6 @@ const ROUTES = [
       {url:"https://images.unsplash.com/photo-1592906209472-a36b1f3782ef?w=600&fit=crop&q=80"},
       {url:"https://images.unsplash.com/photo-1578260523081-ea7af09ffef9?w=600&fit=crop&q=80"}
     ]},
-    {loc:"Nuremberg",photos:[
-      {url:"https://images.unsplash.com/photo-1577462781427-e77744657e18?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1560969184-10fe8719e047?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1570521462033-3015e76e7432?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1560179707-f14e90ef3623?w=600&fit=crop&q=80"}
-    ]},
   ],
   compareScorecard: [
     {factor:"Price",fall:"Moderate",spring:"Best value",winner:"spring",icon:"DollarSign"},
@@ -718,31 +691,27 @@ const ROUTES = [
   cityFlags: ["🇵🇹","🇵🇹","🇵🇹","🇪🇸","🇪🇸"],
   highlights: ["40–50% cheaper than Central Europe","Stunning Atlantic coastlines & tile-covered cities","Porto wine cellars & port tastings","Pintxos crawl in San Sebastián","Ancient pilgrimage city of Santiago de Compostela"],
   itinerary: {
-    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 4, 2026", legs:[
       {day:0,date:"Sep 26",location:"U.S. → Lisbon",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Lisbon.",nights:0,lat:38.72,lng:-9.14},
       {day:1,date:"Sep 27",location:"Lisbon",type:"highlight",icon:"camera",country:"Portugal",desc:"Arrive Lisbon. Alfama neighborhood walk. Tram 28 ride. Pastéis de Belém. Sunset at Miradouro da Graça. Fado dinner.",nights:1,lat:38.72,lng:-9.14},
-      {day:2,date:"Sep 28",location:"Lisbon & Sintra",type:"highlight",icon:"building",country:"Portugal",desc:"Morning train to Sintra (40min). Pena Palace & Moorish Castle. Sintra pastry shops. Return to Lisbon. Time Out Market dinner.",nights:1,lat:38.72,lng:-9.14},
-      {day:3,date:"Sep 29",location:"Lisbon",type:"highlight",icon:"compass",country:"Portugal",desc:"Belém Tower & Jerónimos Monastery. LX Factory lunch. Tile Museum. Bairro Alto evening — wine bars & rooftop views.",nights:1,lat:38.72,lng:-9.14},
-      {day:4,date:"Sep 30",location:"Lisbon → Porto",type:"train",icon:"train",country:"Portugal",desc:"High-speed train to Porto (2.5h). São Bento Station tiles. Ribeira waterfront lunch. Port wine cellar tour & tasting. Dom Luís I Bridge sunset.",nights:1,lat:41.15,lng:-8.61},
-      {day:5,date:"Oct 1",location:"Porto",type:"highlight",icon:"heart",country:"Portugal",desc:"Livraria Lello morning. Clérigos Tower. Bolhão Market lunch. Serralves contemporary art park. Francesinha dinner.",nights:1,lat:41.15,lng:-8.61},
-      {day:6,date:"Oct 2",location:"Porto → Santiago",type:"train",icon:"train",country:"Spain",desc:"Train to Santiago de Compostela (3h, scenic coast). Cathedral & old town walk. Pilgrim arrival at Praza do Obradoiro. Galician seafood dinner.",nights:1,lat:42.88,lng:-8.54},
-      {day:7,date:"Oct 3",location:"Santiago → San Sebastián",type:"travel",icon:"plane",country:"Spain",desc:"Morning flight to Bilbao (1h). Bus to San Sebastián (1.5h). La Concha beach walk. First pintxos bar crawl in Parte Vieja.",nights:1,lat:43.32,lng:-1.98},
-      {day:8,date:"Oct 4",location:"San Sebastián",type:"highlight",icon:"star",country:"Spain",desc:"Monte Urgull morning hike. La Bretxa market. Pintxos masterclass crawl (5–6 bars). Afternoon at La Concha. Basque cider house dinner.",nights:1,lat:43.32,lng:-1.98},
-      {day:9,date:"Oct 5",location:"San Sebastián",type:"highlight",icon:"compass",country:"Spain",desc:"Day trip option: Getaria fishing village or Hondarribia on the French border. Fresh grilled fish lunch. Sunset pintxos farewell dinner.",nights:1,lat:43.32,lng:-1.98},
-      {day:10,date:"Oct 6",location:"San Sebastián → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning café con leche. Bus to Bilbao airport (1.5h). Fly home.",nights:0,lat:43.32,lng:-1.98},
+      {day:2,date:"Sep 28",location:"Lisbon & Sintra",type:"highlight",icon:"building",country:"Portugal",desc:"Morning train to Sintra (40min). Pena Palace. Belém Tower & Jerónimos Monastery. Time Out Market dinner.",nights:1,lat:38.72,lng:-9.14},
+      {day:3,date:"Sep 29",location:"Lisbon → Porto",type:"train",icon:"train",country:"Portugal",desc:"High-speed train to Porto (2.5h). São Bento Station tiles. Ribeira waterfront lunch. Port wine cellar tour & tasting. Dom Luís I Bridge sunset.",nights:1,lat:41.15,lng:-8.61},
+      {day:4,date:"Sep 30",location:"Porto",type:"highlight",icon:"heart",country:"Portugal",desc:"Livraria Lello morning. Clérigos Tower. Bolhão Market lunch. Serralves contemporary art park. Francesinha dinner.",nights:1,lat:41.15,lng:-8.61},
+      {day:5,date:"Oct 1",location:"Porto → Santiago",type:"train",icon:"train",country:"Spain",desc:"Train to Santiago de Compostela (3h, scenic coast). Cathedral & old town walk. Pilgrim arrival at Praza do Obradoiro. Galician seafood dinner.",nights:1,lat:42.88,lng:-8.54},
+      {day:6,date:"Oct 2",location:"Santiago → San Sebastián",type:"travel",icon:"plane",country:"Spain",desc:"Morning flight to Bilbao (1h). Bus to San Sebastián (1.5h). La Concha beach walk. First pintxos bar crawl in Parte Vieja.",nights:1,lat:43.32,lng:-1.98},
+      {day:7,date:"Oct 3",location:"San Sebastián",type:"highlight",icon:"star",country:"Spain",desc:"Monte Urgull morning hike. La Bretxa market. Pintxos masterclass crawl (5–6 bars). Afternoon at La Concha. Basque cider house. Farewell dinner.",nights:1,lat:43.32,lng:-1.98},
+      {day:8,date:"Oct 4",location:"San Sebastián → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning café con leche. Bus to Bilbao airport (1.5h). Fly home.",nights:0,lat:43.32,lng:-1.98},
     ]},
-    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 2, 2027", legs:[
       {day:0,date:"Apr 24",location:"U.S. → Lisbon",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Lisbon.",nights:0,lat:38.72,lng:-9.14},
       {day:1,date:"Apr 25",location:"Lisbon",type:"highlight",icon:"camera",country:"Portugal",desc:"Arrive Lisbon. Alfama neighborhood walk. Tram 28 ride. Pastéis de Belém. Sunset at Miradouro da Graça. Fado dinner.",nights:1,lat:38.72,lng:-9.14},
-      {day:2,date:"Apr 26",location:"Lisbon & Sintra",type:"highlight",icon:"building",country:"Portugal",desc:"Morning train to Sintra (40min). Pena Palace & Moorish Castle. Sintra pastry shops. Return to Lisbon. Time Out Market dinner.",nights:1,lat:38.72,lng:-9.14},
-      {day:3,date:"Apr 27",location:"Lisbon",type:"highlight",icon:"compass",country:"Portugal",desc:"Belém Tower & Jerónimos Monastery. LX Factory lunch. Tile Museum. Bairro Alto evening — wine bars & rooftop views.",nights:1,lat:38.72,lng:-9.14},
-      {day:4,date:"Apr 28",location:"Lisbon → Porto",type:"train",icon:"train",country:"Portugal",desc:"High-speed train to Porto (2.5h). São Bento Station tiles. Ribeira waterfront lunch. Port wine cellar tour & tasting. Dom Luís I Bridge sunset.",nights:1,lat:41.15,lng:-8.61},
-      {day:5,date:"Apr 29",location:"Porto",type:"highlight",icon:"heart",country:"Portugal",desc:"Livraria Lello morning. Clérigos Tower. Bolhão Market lunch. Serralves contemporary art park. Francesinha dinner.",nights:1,lat:41.15,lng:-8.61},
-      {day:6,date:"Apr 30",location:"Porto → Santiago",type:"train",icon:"train",country:"Spain",desc:"Train to Santiago de Compostela (3h, scenic coast). Cathedral & old town walk. Pilgrim arrival at Praza do Obradoiro. Galician seafood dinner.",nights:1,lat:42.88,lng:-8.54},
-      {day:7,date:"May 1",location:"Santiago → San Sebastián",type:"travel",icon:"plane",country:"Spain",desc:"Morning flight to Bilbao (1h). Bus to San Sebastián (1.5h). La Concha beach walk. First pintxos bar crawl in Parte Vieja.",nights:1,lat:43.32,lng:-1.98},
-      {day:8,date:"May 2",location:"San Sebastián",type:"highlight",icon:"star",country:"Spain",desc:"Monte Urgull morning hike. La Bretxa market. Pintxos masterclass crawl (5–6 bars). Afternoon at La Concha. Basque cider house dinner.",nights:1,lat:43.32,lng:-1.98},
-      {day:9,date:"May 3",location:"San Sebastián",type:"highlight",icon:"compass",country:"Spain",desc:"Day trip option: Getaria fishing village or Hondarribia on the French border. Fresh grilled fish lunch. Sunset pintxos farewell dinner.",nights:1,lat:43.32,lng:-1.98},
-      {day:10,date:"May 4",location:"San Sebastián → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning café con leche. Bus to Bilbao airport (1.5h). Fly home.",nights:0,lat:43.32,lng:-1.98},
+      {day:2,date:"Apr 26",location:"Lisbon & Sintra",type:"highlight",icon:"building",country:"Portugal",desc:"Morning train to Sintra (40min). Pena Palace. Belém Tower & Jerónimos Monastery. Time Out Market dinner.",nights:1,lat:38.72,lng:-9.14},
+      {day:3,date:"Apr 27",location:"Lisbon → Porto",type:"train",icon:"train",country:"Portugal",desc:"High-speed train to Porto (2.5h). São Bento Station tiles. Ribeira waterfront lunch. Port wine cellar tour & tasting. Dom Luís I Bridge sunset.",nights:1,lat:41.15,lng:-8.61},
+      {day:4,date:"Apr 28",location:"Porto",type:"highlight",icon:"heart",country:"Portugal",desc:"Livraria Lello morning. Clérigos Tower. Bolhão Market lunch. Serralves contemporary art park. Francesinha dinner.",nights:1,lat:41.15,lng:-8.61},
+      {day:5,date:"Apr 29",location:"Porto → Santiago",type:"train",icon:"train",country:"Spain",desc:"Train to Santiago de Compostela (3h, scenic coast). Cathedral & old town walk. Pilgrim arrival at Praza do Obradoiro. Galician seafood dinner.",nights:1,lat:42.88,lng:-8.54},
+      {day:6,date:"Apr 30",location:"Santiago → San Sebastián",type:"travel",icon:"plane",country:"Spain",desc:"Morning flight to Bilbao (1h). Bus to San Sebastián (1.5h). La Concha beach walk. First pintxos bar crawl in Parte Vieja.",nights:1,lat:43.32,lng:-1.98},
+      {day:7,date:"May 1",location:"San Sebastián",type:"highlight",icon:"star",country:"Spain",desc:"Monte Urgull morning hike. La Bretxa market. Pintxos masterclass crawl (5–6 bars). Afternoon at La Concha. Basque cider house. Farewell dinner.",nights:1,lat:43.32,lng:-1.98},
+      {day:8,date:"May 2",location:"San Sebastián → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning café con leche. Bus to Bilbao airport (1.5h). Fly home.",nights:0,lat:43.32,lng:-1.98},
     ]}
   },
   budgetTiers: {
@@ -777,10 +746,10 @@ const ROUTES = [
     {country:"Spain",breakfast:8,lunch:14,dinner:22,snacks:6,flag:"🇪🇸"},
   ],
   accomData: [
-    {loc:"Lisbon",n:3,rate:[42,35],rec:"Apartment block · Alfama · terrace views · self-catering",unique:"🏡 Tile-covered building in historic Alfama",url:"https://www.booking.com/searchresults.html?ss=Lisbon+Alfama&group_adults=16&nflt=class%3D3"},
+    {loc:"Lisbon",n:2,rate:[42,35],rec:"Apartment block · Alfama · terrace views · self-catering",unique:"🏡 Tile-covered building in historic Alfama",url:"https://www.booking.com/searchresults.html?ss=Lisbon+Alfama&group_adults=16&nflt=class%3D3"},
     {loc:"Porto",n:2,rate:[38,32],rec:"Guesthouse · Ribeira · river views · breakfast",unique:"🏡 Restored townhouse overlooking the Douro",url:"https://www.booking.com/searchresults.html?ss=Porto+Ribeira&group_adults=16&nflt=class%3D3"},
     {loc:"Santiago",n:1,rate:[42,36],rec:"Hotel · Old Town · near cathedral · breakfast",unique:"🏨 Stone building in the pilgrim quarter",url:"https://www.booking.com/searchresults.html?ss=Santiago+de+Compostela&group_adults=16&nflt=class%3D3"},
-    {loc:"San Sebastián",n:3,rate:[55,48],rec:"Apartments · Parte Vieja · walk to beach",unique:"🏡 Belle époque building near La Concha",url:"https://www.booking.com/searchresults.html?ss=San+Sebastian+Parte+Vieja&group_adults=16&nflt=class%3D3"},
+    {loc:"San Sebastián",n:2,rate:[55,48],rec:"Apartments · Parte Vieja · walk to beach",unique:"🏡 Belle époque building near La Concha",url:"https://www.booking.com/searchresults.html?ss=San+Sebastian+Parte+Vieja&group_adults=16&nflt=class%3D3"},
   ],
   hiddenGems: [
     {region:"Lisbon",color:T.rose,flag:"🇵🇹",gems:[
@@ -863,31 +832,27 @@ const ROUTES = [
   cityFlags: ["🇦🇹","🇸🇮","🇭🇷","🇮🇹"],
   highlights: ["#1 & #2 family destinations combined","Sound of Music + Adriatic coast + Rome Temple","Ljubljana — Europe's hidden gem capital","Dubrovnik Old Town & coastal sunsets","Rome Temple visit & ancient city exploration"],
   itinerary: {
-    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 6, 2026", legs:[
+    fall: { label:"Fall 2026", dates:"Sep 26 – Oct 4, 2026", legs:[
       {day:0,date:"Sep 26",location:"U.S. → Salzburg",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich, short transfer to Salzburg.",nights:0,lat:47.80,lng:13.04},
       {day:1,date:"Sep 27",location:"Salzburg",type:"highlight",icon:"music",country:"Austria",desc:"Arrive Salzburg. Old Town walk. Getreidegasse shopping street. Stiegl brewery lunch. Mirabell Gardens. Mozart dinner concert.",nights:1,lat:47.80,lng:13.04},
       {day:2,date:"Sep 28",location:"Salzburg",type:"highlight",icon:"mountain",country:"Austria",desc:"Sound of Music tour morning. Hohensalzburg Fortress afternoon. St. Peter Stiftskeller dinner (Europe's oldest restaurant, 803 AD).",nights:1,lat:47.80,lng:13.04},
       {day:3,date:"Sep 29",location:"Salzburg → Ljubljana",type:"train",icon:"train",country:"Slovenia",desc:"Scenic drive/bus to Ljubljana (3.5h via lake country). Dragon Bridge walk. Ljubljana Castle funicular. Riverside café dinner.",nights:1,lat:46.05,lng:14.51},
       {day:4,date:"Sep 30",location:"Ljubljana → Dubrovnik",type:"travel",icon:"plane",country:"Croatia",desc:"Morning Central Market & Metelkova art district. Afternoon flight to Dubrovnik (1.5h). Sunset from Stradun. Seafood dinner.",nights:1,lat:42.65,lng:18.09},
-      {day:5,date:"Oct 1",location:"Dubrovnik",type:"highlight",icon:"building",country:"Croatia",desc:"City Walls walk morning (the highlight). Lokrum Island afternoon (monastery ruins, peacocks, swimming). Old Town seafood dinner.",nights:1,lat:42.65,lng:18.09},
-      {day:6,date:"Oct 2",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Cable car to Mount Srđ panorama. Kayak around the walls. War Photo Limited museum. Buža Bar sunset drinks on the cliffs.",nights:1,lat:42.65,lng:18.09},
-      {day:7,date:"Oct 3",location:"Dubrovnik → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Morning Dubrovnik farmers market. Afternoon flight to Rome (1.5h). Settle in Trastevere. Evening cobblestone walk & trattoria dinner.",nights:1,lat:41.90,lng:12.50},
-      {day:8,date:"Oct 4",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Rome Italy Temple morning visit. Colosseum & Roman Forum afternoon. Piazza Navona evening. Gelato crawl through the centro.",nights:1,lat:41.90,lng:12.50},
-      {day:9,date:"Oct 5",location:"Rome",type:"highlight",icon:"heart",country:"Italy",desc:"Vatican Museums & Sistine Chapel morning. Pantheon, Trevi Fountain, Spanish Steps. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
-      {day:10,date:"Oct 6",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+      {day:5,date:"Oct 1",location:"Dubrovnik",type:"highlight",icon:"building",country:"Croatia",desc:"City Walls walk morning. Lokrum Island. Cable car to Mt Srđ. Kayak around the walls. Old Town dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:6,date:"Oct 2",location:"Dubrovnik → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Morning Dubrovnik farmers market. Afternoon flight to Rome (1.5h). Settle in Trastevere. Evening cobblestone walk & trattoria dinner.",nights:1,lat:41.90,lng:12.50},
+      {day:7,date:"Oct 3",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Rome Italy Temple morning visit. Colosseum & Roman Forum. Vatican Museums & Sistine Chapel. Trevi Fountain. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
+      {day:8,date:"Oct 4",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
     ]},
-    spring: { label:"Spring 2027", dates:"Apr 24 – May 4, 2027", legs:[
+    spring: { label:"Spring 2027", dates:"Apr 24 – May 2, 2027", legs:[
       {day:0,date:"Apr 24",location:"U.S. → Salzburg",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to Munich, short transfer to Salzburg.",nights:0,lat:47.80,lng:13.04},
       {day:1,date:"Apr 25",location:"Salzburg",type:"highlight",icon:"music",country:"Austria",desc:"Arrive Salzburg. Old Town walk. Getreidegasse shopping street. Stiegl brewery lunch. Mirabell Gardens. Mozart dinner concert.",nights:1,lat:47.80,lng:13.04},
       {day:2,date:"Apr 26",location:"Salzburg",type:"highlight",icon:"mountain",country:"Austria",desc:"Sound of Music tour morning. Hohensalzburg Fortress afternoon. St. Peter Stiftskeller dinner (Europe's oldest restaurant, 803 AD).",nights:1,lat:47.80,lng:13.04},
       {day:3,date:"Apr 27",location:"Salzburg → Ljubljana",type:"train",icon:"train",country:"Slovenia",desc:"Scenic drive/bus to Ljubljana (3.5h via lake country). Dragon Bridge walk. Ljubljana Castle funicular. Riverside café dinner.",nights:1,lat:46.05,lng:14.51},
       {day:4,date:"Apr 28",location:"Ljubljana → Dubrovnik",type:"travel",icon:"plane",country:"Croatia",desc:"Morning Central Market & Metelkova art district. Afternoon flight to Dubrovnik (1.5h). Sunset from Stradun. Seafood dinner.",nights:1,lat:42.65,lng:18.09},
-      {day:5,date:"Apr 29",location:"Dubrovnik",type:"highlight",icon:"building",country:"Croatia",desc:"City Walls walk morning (the highlight). Lokrum Island afternoon (monastery ruins, peacocks, swimming). Old Town seafood dinner.",nights:1,lat:42.65,lng:18.09},
-      {day:6,date:"Apr 30",location:"Dubrovnik",type:"highlight",icon:"compass",country:"Croatia",desc:"Cable car to Mount Srđ panorama. Kayak around the walls. War Photo Limited museum. Buža Bar sunset drinks on the cliffs.",nights:1,lat:42.65,lng:18.09},
-      {day:7,date:"May 1",location:"Dubrovnik → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Morning Dubrovnik farmers market. Afternoon flight to Rome (1.5h). Settle in Trastevere. Evening cobblestone walk & trattoria dinner.",nights:1,lat:41.90,lng:12.50},
-      {day:8,date:"May 2",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Rome Italy Temple morning visit. Colosseum & Roman Forum afternoon. Piazza Navona evening. Gelato crawl through the centro.",nights:1,lat:41.90,lng:12.50},
-      {day:9,date:"May 3",location:"Rome",type:"highlight",icon:"heart",country:"Italy",desc:"Vatican Museums & Sistine Chapel morning. Pantheon, Trevi Fountain, Spanish Steps. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
-      {day:10,date:"May 4",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+      {day:5,date:"Apr 29",location:"Dubrovnik",type:"highlight",icon:"building",country:"Croatia",desc:"City Walls walk morning. Lokrum Island. Cable car to Mt Srđ. Kayak around the walls. Old Town dinner.",nights:1,lat:42.65,lng:18.09},
+      {day:6,date:"Apr 30",location:"Dubrovnik → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Morning Dubrovnik farmers market. Afternoon flight to Rome (1.5h). Settle in Trastevere. Evening cobblestone walk & trattoria dinner.",nights:1,lat:41.90,lng:12.50},
+      {day:7,date:"May 1",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Rome Italy Temple morning visit. Colosseum & Roman Forum. Vatican Museums & Sistine Chapel. Trevi Fountain. Farewell dinner in Trastevere.",nights:1,lat:41.90,lng:12.50},
+      {day:8,date:"May 2",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
     ]}
   },
   budgetTiers: {
@@ -925,8 +890,8 @@ const ROUTES = [
   accomData: [
     {loc:"Salzburg",n:2,rate:[68,58],rec:"Guesthouse · 8 rooms · Old Town · breakfast",unique:"🏡 Traditional Austrian Gasthof near Getreidegasse",url:"https://www.booking.com/searchresults.html?ss=Salzburg+Old+Town&group_adults=16&nflt=class%3D3"},
     {loc:"Ljubljana",n:1,rate:[45,38],rec:"Hotel · central · river views · breakfast",unique:"🏨 Boutique hotel on the Ljubljanica River",url:"https://www.booking.com/searchresults.html?ss=Ljubljana+Center&group_adults=16&nflt=class%3D3"},
-    {loc:"Dubrovnik",n:3,rate:[62,50],rec:"Apartment block · Old Town or Lapad · sea views",unique:"🏡 Stone house apartments near Stradun",url:"https://www.booking.com/searchresults.html?ss=Dubrovnik+Old+Town&group_adults=16&nflt=class%3D3"},
-    {loc:"Rome",n:3,rate:[81,68],rec:"Villa LINA · 9BR · 14 beds · 4.98★ · 59 reviews",unique:"🏡 Guest Favorite · 5 min to metro",url:"https://www.airbnb.com/rooms/1136343333895843954"},
+    {loc:"Dubrovnik",n:2,rate:[62,50],rec:"Apartment block · Old Town or Lapad · sea views",unique:"🏡 Stone house apartments near Stradun",url:"https://www.booking.com/searchresults.html?ss=Dubrovnik+Old+Town&group_adults=16&nflt=class%3D3"},
+    {loc:"Rome",n:2,rate:[81,68],rec:"Villa LINA · 9BR · 14 beds · 4.98★ · 59 reviews",unique:"🏡 Guest Favorite · 5 min to metro",url:"https://www.airbnb.com/rooms/1136343333895843954"},
   ],
   hiddenGems: [
     {region:"Salzburg",color:T.green,flag:"🇦🇹",gems:[
@@ -1506,7 +1471,7 @@ function OverviewTab({route,season}) {
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
     React.createElement(AnimIn, null,
       React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(140px,100%),1fr))",gap:10}},
-        React.createElement(MiniStat, {icon:Calendar,label:"Duration",value:"9 nights",color:route.color,sub:"+2 travel days"}),
+        React.createElement(MiniStat, {icon:Calendar,label:"Duration",value:"7 nights",color:route.color,sub:"+2 travel days"}),
         React.createElement(MiniStat, {icon:Globe,label:"Countries",value:String(route.countries.length),color:T.blue,sub:route.countryFlags.join(" ")}),
         React.createElement(MiniStat, {icon:Users,label:"Travelers",value:"16",color:T.green,sub:"8 couples"}),
         React.createElement(MiniStat, {icon:MapPin,label:"Cities",value:String(route.cities.length),color:T.purple,sub:route.cities[0]+" → "+route.cities.at(-1)}),
