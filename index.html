@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#0c0f1a" />
     <meta property="og:title" content="Perkins Family Europe Trip" />
     <meta property="og:description" content="Celebrating 50 Years of Marriage — 6 curated routes through Europe for 16 travelers. Vote, explore & plan together." />
-    <meta property="og:image" content="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1200&h=630&fit=crop&q=80" />
+    <meta property="og:image" content="https://perkins-europe-trip.vercel.app/og-image.png" />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:type" content="website" />
@@ -16,7 +16,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Perkins Family Europe Trip" />
     <meta name="twitter:description" content="Celebrating 50 Years — 6 routes through Europe for 16 travelers. Vote & plan together." />
-    <meta name="twitter:image" content="https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1200&h=630&fit=crop&q=80" />
+    <meta name="twitter:image" content="https://perkins-europe-trip.vercel.app/og-image.png" />
     <title>Perkins Family Europe Trip</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -45,11 +45,11 @@ import { Plane, Train, MapPin, Calendar, Users, DollarSign, Utensils, Camera, Su
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const T = { bg:"#0c0f1a", card:"#151929", cardHover:"#1a2035", border:"#1e2540", accent:"#f0a050", accentSoft:"rgba(240,160,80,0.12)", blue:"#5b9bf5", blueSoft:"rgba(91,155,245,0.12)", green:"#4ade80", greenSoft:"rgba(74,222,128,0.1)", purple:"#a78bfa", purpleSoft:"rgba(167,139,250,0.1)", rose:"#fb7185", roseSoft:"rgba(251,113,133,0.1)", cyan:"#22d3ee", cyanSoft:"rgba(34,211,238,0.1)", text:"#e8eaf0", textMuted:"#8892a8", textDim:"#505a72", white:"#ffffff", gradient1:"linear-gradient(135deg,#f0a050 0%,#e06830 100%)", gradient2:"linear-gradient(135deg,#5b9bf5 0%,#7c5bf5 100%)", gradient3:"linear-gradient(135deg,#4ade80 0%,#22d3ee 100%)", gradient4:"linear-gradient(135deg,#a78bfa 0%,#7c3aed 100%)", gradient5:"linear-gradient(135deg,#fb7185 0%,#f43f5e 100%)", gradient6:"linear-gradient(135deg,#22d3ee 0%,#0ea5e9 100%)" };
-const CC = [T.accent, T.blue, T.green, T.purple, T.rose, T.cyan, "#fbbf24", "#f472b6"];
+const CC = [T.accent, T.blue, T.green, T.purple, T.rose, T.cyan, "#fbbf24", "#f472b6", "#f97316", "#6366f1"];
 const glass = { background:"rgba(21,25,41,0.7)", WebkitBackdropFilter:"blur(12px)", backdropFilter:"blur(12px)", border:"1px solid "+T.border, borderRadius:16 };
 const NIGHTS = 7;
-const calcPP = t => t.flights + t.accommodation*NIGHTS + t.trains + t.food*NIGHTS + t.activities + t.misc*NIGHTS;
-const calcCouple = t => calcPP(t)*2;
+const calcPP = (t, n=NIGHTS) => t.flights + t.accommodation*n + t.trains + t.food*n + t.activities + t.misc*n;
+const calcCouple = (t, n=NIGHTS) => calcPP(t,n)*2;
 const iconMap = { plane:Plane, train:Train, church:Church, mountain:Mountain, music:Music, camera:Camera, compass:Compass, heart:Heart, building:Building, star:Star, coffee:Coffee };
 
 // ===================== SUPABASE =====================
