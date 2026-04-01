@@ -1671,7 +1671,7 @@ function OverviewScreen({onSelect,user}) {
             React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid "+T.border,marginTop:"auto"}},
               React.createElement("div", null,
                 React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, "Est. out-of-pocket · "+(calcCouple(route.budgetTiers.spring.value,route.nights||NIGHTS)-route.budgetTiers.spring.value.flights*2<=calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)-route.budgetTiers.fall.value.flights*2?"Spring":"Fall")),
-                React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+(Math.min(calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)-route.budgetTiers.fall.value.flights*2,calcCouple(route.budgetTiers.spring.value,route.nights||NIGHTS)-route.budgetTiers.spring.value.flights*2)-3000).toLocaleString()),
+                React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+Math.max(0,Math.min(calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)-route.budgetTiers.fall.value.flights*2,calcCouple(route.budgetTiers.spring.value,route.nights||NIGHTS)-route.budgetTiers.spring.value.flights*2)-3000).toLocaleString()),
               ),
               React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,color:route.color,fontSize:13,fontWeight:700}},
                 "Explore Route", React.createElement(ChevronRight, {size:16})
@@ -1746,7 +1746,7 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
   const flightCost = includeFlights ? t.flights : 0;
   const pp = flightCost + t.accommodation*rn + t.trains + t.food*rn + t.activities + t.misc*rn;
   const couple = pp*2;
-  const oop = couple - 3000;
+  const oop = Math.max(0, couple - 3000);
   const pieData = [
     {name:"Lodging",value:t.accommodation*rn},{name:"Food",value:t.food*rn},{name:"Transport",value:t.trains},{name:"Activities",value:t.activities},{name:"Misc",value:t.misc*rn},
   ];
@@ -2159,7 +2159,7 @@ function CompareTab({route,season,includeFlights}) {
           React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"🍂 Fall 2026"),
           React.createElement("div",{style:{fontSize:36,fontWeight:900,color:T.accent}},"$"+fMid.toLocaleString()),
           React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"per couple"+(includeFlights?"":" (excl. flights)")),
-          React.createElement("div",{style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}},"OOP: $"+(fMid-3000).toLocaleString()),
+          React.createElement("div",{style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}},"OOP: $"+Math.max(0,fMid-3000).toLocaleString()),
         ),
         React.createElement("div", {style:{textAlign:"center",padding:"0 8px"}},
           React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"Spring saves"),
@@ -2170,7 +2170,7 @@ function CompareTab({route,season,includeFlights}) {
           React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"🌷 Spring 2027"),
           React.createElement("div",{style:{fontSize:36,fontWeight:900,color:T.green}},"$"+sMid.toLocaleString()),
           React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"per couple"+(includeFlights?"":" (excl. flights)")),
-          React.createElement("div",{style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}},"OOP: $"+(sMid-3000).toLocaleString()),
+          React.createElement("div",{style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}},"OOP: $"+Math.max(0,sMid-3000).toLocaleString()),
         ),
       )
     ),
