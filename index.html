@@ -62,79 +62,78 @@ function useUser() {
 
 // ===================== ROUTE DATA =====================
 const ROUTES = [
-// --- ROUTE 1: London, Paris & Rome ---
+// --- ROUTE 1: Cotswolds, London, Canterbury & Paris ---
 {
-  id: "london-paris-rome",
-  name: "London, Paris & Rome",
+  id: "cotswolds-london-canterbury-paris",
+  name: "Cotswolds, London, Canterbury & Paris",
   tagline: "The Original Plan",
   color: T.blue,
   gradient: T.gradient2,
-  countries: ["United Kingdom","France","Italy"],
-  countryFlags: ["🇬🇧","🇫🇷","🇮🇹"],
-  cities: ["Cotswolds","London","Paris","Rome"],
-  cityFlags: ["🇬🇧","🇬🇧","🇫🇷","🇮🇹"],
-  highlights: ["2 days in the English countryside","Churchill War Rooms + quiet London gems","Eurostar through the Channel Tunnel","Rome Italy Temple + Vatican + Colosseum","Non-tourist villages, markets & hidden streets"],
+  countries: ["United Kingdom","France"],
+  countryFlags: ["🇬🇧","🇫🇷"],
+  cities: ["Cotswolds","London","Canterbury","Paris"],
+  cityFlags: ["🇬🇧","🇬🇧","🇬🇧","🇫🇷"],
+  highlights: ["2 days in the English countryside","Churchill War Rooms + quiet London gems","Canterbury Cathedral — UNESCO World Heritage","Eurostar round-trip through the Channel Tunnel","Non-tourist villages, markets & hidden streets"],
   itinerary: {
     fall: { label:"Fall 2026", dates:"Sep 26 – Oct 4, 2026", legs:[
       {day:0,date:"Sep 26",location:"U.S. → London",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to London Heathrow.",nights:0,lat:51.51,lng:-0.13},
       {day:1,date:"Sep 27",location:"Cotswolds",type:"nature",icon:"heart",country:"United Kingdom",desc:"Arrive London, transfer to Cotswolds (1.5h). Settle into stone manor house. Bibury and Arlington Row afternoon stroll.",nights:1,lat:51.87,lng:-1.70},
       {day:2,date:"Sep 28",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Bourton-on-the-Water, Stow-on-the-Wold. Blenheim Palace. Cream tea at a village pub. Broadway Tower sunset.",nights:1,lat:51.87,lng:-1.70},
       {day:3,date:"Sep 29",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Churchill War Rooms. Borough Market lunch. Thames walk to Tower Bridge. Pub dinner.",nights:1,lat:51.51,lng:-0.13},
-      {day:4,date:"Sep 30",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
-      {day:5,date:"Oct 1",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
-      {day:6,date:"Oct 2",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon flight to Rome (2h). Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
-      {day:7,date:"Oct 3",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Colosseum & Roman Forum morning. Afternoon Rome Italy Temple visit. Vatican Museums & Sistine Chapel. Piazza Navona. Gelato crawl.",nights:1,lat:41.90,lng:12.50},
-      {day:8,date:"Oct 4",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+      {day:4,date:"Sep 30",location:"Canterbury",type:"highlight",icon:"church",country:"United Kingdom",desc:"Train to Canterbury (1h). Canterbury Cathedral (UNESCO). Medieval city walls walk. The Canterbury Tales experience. Traditional pub lunch. Return to London.",nights:1,lat:51.28,lng:1.08},
+      {day:5,date:"Oct 1",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
+      {day:6,date:"Oct 2",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
+      {day:7,date:"Oct 3",location:"Paris → London",type:"train",icon:"train",country:"United Kingdom",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon Eurostar back to London (2.25h). Farewell dinner.",nights:1,lat:51.51,lng:-0.13},
+      {day:8,date:"Oct 4",location:"London → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning stroll, last cup of tea. Fly home from Heathrow.",nights:0,lat:51.51,lng:-0.13},
     ]},
     spring: { label:"Spring 2027", dates:"Apr 24 – May 2, 2027", legs:[
       {day:0,date:"Apr 24",location:"U.S. → London",type:"travel",icon:"plane",country:"Transit",desc:"Depart U.S. afternoon (PHX or SLC). Overnight flight to London Heathrow.",nights:0,lat:51.51,lng:-0.13},
       {day:1,date:"Apr 25",location:"Cotswolds",type:"nature",icon:"heart",country:"United Kingdom",desc:"Arrive London, transfer to Cotswolds (1.5h). Settle into stone manor house. Bibury and Arlington Row afternoon stroll.",nights:1,lat:51.87,lng:-1.70},
       {day:2,date:"Apr 26",location:"Cotswolds",type:"highlight",icon:"mountain",country:"United Kingdom",desc:"Bourton-on-the-Water, Stow-on-the-Wold. Blenheim Palace. Cream tea at a village pub. Broadway Tower sunset.",nights:1,lat:51.87,lng:-1.70},
       {day:3,date:"Apr 27",location:"London",type:"train",icon:"train",country:"United Kingdom",desc:"Train to London (1.5h). Churchill War Rooms. Borough Market lunch. Thames walk to Tower Bridge. Pub dinner.",nights:1,lat:51.51,lng:-0.13},
-      {day:4,date:"Apr 28",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
-      {day:5,date:"Apr 29",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
-      {day:6,date:"Apr 30",location:"Paris → Rome",type:"travel",icon:"plane",country:"Italy",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon flight to Rome (2h). Trastevere dinner.",nights:1,lat:41.90,lng:12.50},
-      {day:7,date:"May 1",location:"Rome",type:"highlight",icon:"church",country:"Italy",desc:"Colosseum & Roman Forum morning. Afternoon Rome Italy Temple visit. Vatican Museums & Sistine Chapel. Piazza Navona. Gelato crawl.",nights:1,lat:41.90,lng:12.50},
-      {day:8,date:"May 2",location:"Rome → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning espresso, last cobblestone walk. Fly home from Fiumicino.",nights:0,lat:41.90,lng:12.50},
+      {day:4,date:"Apr 28",location:"Canterbury",type:"highlight",icon:"church",country:"United Kingdom",desc:"Train to Canterbury (1h). Canterbury Cathedral (UNESCO). Medieval city walls walk. The Canterbury Tales experience. Traditional pub lunch. Return to London.",nights:1,lat:51.28,lng:1.08},
+      {day:5,date:"Apr 29",location:"London → Paris",type:"train",icon:"train",country:"France",desc:"Morning Neal's Yard & Covent Garden. Afternoon Eurostar to Paris (2.25h). Settle in. Eiffel Tower at sunset.",nights:1,lat:48.86,lng:2.35},
+      {day:6,date:"Apr 30",location:"Paris",type:"highlight",icon:"camera",country:"France",desc:"Louvre morning (Mona Lisa + Winged Victory). Tuileries walk. Sainte-Chapelle. Le Marais dinner.",nights:1,lat:48.86,lng:2.35},
+      {day:7,date:"May 1",location:"Paris → London",type:"train",icon:"train",country:"United Kingdom",desc:"Montmartre & Sacré-Cœur morning. Pâtisserie crawl. Afternoon Eurostar back to London (2.25h). Farewell dinner.",nights:1,lat:51.51,lng:-0.13},
+      {day:8,date:"May 2",location:"London → Home",type:"travel",icon:"plane",country:"Transit",desc:"Morning stroll, last cup of tea. Fly home from Heathrow.",nights:0,lat:51.51,lng:-0.13},
     ]}
   },
   budgetTiers: {
     fall: {
-      value:{label:"Value",emoji:"🎒",flights:1080,accommodation:65,trains:80,food:68,activities:200,misc:28},
-      mid:{label:"Mid-Tier",emoji:"✨",flights:1430,accommodation:88,trains:80,food:88,activities:290,misc:38},
-      premium:{label:"Premium",emoji:"👑",flights:1780,accommodation:125,trains:80,food:115,activities:380,misc:52},
+      value:{label:"Value",emoji:"🎒",flights:1080,accommodation:62,trains:115,food:68,activities:160,misc:28},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:1430,accommodation:82,trains:115,food:88,activities:240,misc:38},
+      premium:{label:"Premium",emoji:"👑",flights:1780,accommodation:115,trains:115,food:115,activities:320,misc:52},
     },
     spring: {
-      value:{label:"Value",emoji:"🎒",flights:1300,accommodation:55,trains:80,food:62,activities:200,misc:24},
-      mid:{label:"Mid-Tier",emoji:"✨",flights:1650,accommodation:75,trains:80,food:80,activities:290,misc:32},
-      premium:{label:"Premium",emoji:"👑",flights:2000,accommodation:108,trains:80,food:105,activities:380,misc:45},
+      value:{label:"Value",emoji:"🎒",flights:1300,accommodation:52,trains:115,food:62,activities:160,misc:24},
+      mid:{label:"Mid-Tier",emoji:"✨",flights:1650,accommodation:70,trains:115,food:80,activities:240,misc:32},
+      premium:{label:"Premium",emoji:"👑",flights:2000,accommodation:100,trains:115,food:105,activities:320,misc:45},
     }
   },
   trainLegs: [
     {from:"Moreton-in-Marsh",to:"London Paddington",hrs:"1.5h",cost:35,scenic:3,type:"GWR Rail",url:"https://www.gwr.com/"},
+    {from:"London St Pancras",to:"Canterbury West",hrs:"1h",cost:20,scenic:3,type:"Southeastern Rail",url:"https://www.southeasternrailway.co.uk/"},
     {from:"London St Pancras",to:"Paris Gare du Nord",hrs:"2.25h",cost:80,scenic:4,type:"Eurostar",url:"https://www.eurostar.com/"},
+    {from:"Paris Gare du Nord",to:"London St Pancras",hrs:"2.25h",cost:80,scenic:4,type:"Eurostar (return)",url:"https://www.eurostar.com/"},
   ],
   activities: [
     {name:"Blenheim Palace",cost:35,loc:"Cotswolds",icon:"🏛️",url:"https://www.blenheimpalace.com/"},
     {name:"Churchill War Rooms",cost:30,loc:"London",icon:"🏛️",url:"https://www.iwm.org.uk/visits/churchill-war-rooms"},
     {name:"Borough Market",cost:0,loc:"London",icon:"🧀",url:"https://boroughmarket.org.uk/"},
+    {name:"Canterbury Cathedral",cost:16,loc:"Canterbury",icon:"⛪",url:"https://www.canterbury-cathedral.org/"},
+    {name:"Canterbury Tales Experience",cost:15,loc:"Canterbury",icon:"📖",url:"https://www.canterburytales.org.uk/"},
     {name:"Louvre Museum",cost:20,loc:"Paris",icon:"🖼️",url:"https://www.louvre.fr/en"},
     {name:"Sainte-Chapelle",cost:13,loc:"Paris",icon:"⛪",url:"https://www.sainte-chapelle.fr/en"},
-    {name:"Colosseum & Forum",cost:22,loc:"Rome",icon:"🏟️",url:"https://colosseo.it/en/"},
-    {name:"Vatican Museums",cost:20,loc:"Rome",icon:"🎨",url:"https://www.museivaticani.va/content/museivaticani/en.html"},
-    {name:"Rome Italy Temple",cost:0,loc:"Rome",icon:"⛪",url:"https://www.churchofjesuschrist.org/temples/details/rome-italy-temple"},
-    {name:"Trastevere Food Walk",cost:0,loc:"Rome",icon:"🍝",url:"https://www.google.com/maps/place/Trastevere,+Rome/"},
   ],
   foodByCountry: [
     {country:"United Kingdom",breakfast:16,lunch:22,dinner:35,snacks:10,flag:"🇬🇧"},
     {country:"France",breakfast:15,lunch:24,dinner:38,snacks:10,flag:"🇫🇷"},
-    {country:"Italy",breakfast:12,lunch:18,dinner:28,snacks:7,flag:"🇮🇹"},
   ],
   accomData: [
     {loc:"Cotswolds",n:2,rate:[59,50],rec:"Middle Stanley Manor · 10BR · 4.84★ · 111 reviews",unique:"🏡 Stone manor in classic Cotswolds village",url:"https://www.airbnb.com/rooms/29120101"},
-    {loc:"London",n:1,rate:[75,65],rec:"Hotel · 8 rooms · central location · breakfast included",unique:"🏨 Group rate at 3-star near Westminster",url:"https://www.booking.com/searchresults.html?ss=London+Westminster&group_adults=16&checkin=2026-09-30&checkout=2026-10-01&nflt=class%3D3"},
-    {loc:"Paris",n:2,rate:[80,68],rec:"Hotel · 8 rooms · Marais or Saint-Germain · breakfast",unique:"🏨 Group rate at boutique hotel in central Paris",url:"https://www.booking.com/searchresults.html?ss=Paris+Marais&group_adults=16&checkin=2026-10-01&checkout=2026-10-03&nflt=class%3D3"},
-    {loc:"Rome",n:2,rate:[81,68],rec:"Villa LINA · 9BR · 14 beds · 4.98★ · 59 reviews",unique:"🏡 Guest Favorite · 5 min to metro",url:"https://www.airbnb.com/rooms/1136343333895843954"},
+    {loc:"London",n:2,rate:[75,65],rec:"Hotel · 8 rooms · central location · breakfast included",unique:"🏨 Group rate at 3-star near Westminster",url:"https://www.booking.com/searchresults.html?ss=London+Westminster&group_adults=16&nflt=class%3D3"},
+    {loc:"Canterbury",n:1,rate:[60,50],rec:"Hotel · central · near cathedral · breakfast included",unique:"🏨 Medieval quarter hotel near Westgate",url:"https://www.booking.com/searchresults.html?ss=Canterbury+City+Centre&group_adults=16&nflt=class%3D3"},
+    {loc:"Paris",n:2,rate:[80,68],rec:"Hotel · 8 rooms · Marais or Saint-Germain · breakfast",unique:"🏨 Group rate at boutique hotel in central Paris",url:"https://www.booking.com/searchresults.html?ss=Paris+Marais&group_adults=16&nflt=class%3D3"},
   ],
   hiddenGems: [
     {region:"Cotswolds",color:"#fbbf24",flag:"🇬🇧",gems:[
@@ -152,17 +151,17 @@ const ROUTES = [
       {name:"Place des Vosges",desc:"Oldest planned square in Paris. Hidden in Le Marais. Red-brick arcades, quiet benches.",url:"https://www.google.com/maps/place/Place+des+Vosges,+Paris/"},
       {name:"Marché des Enfants Rouges",desc:"Oldest covered market in Paris (since 1615). Crêpes, couscous, Japanese bento — all locals.",url:"https://www.google.com/maps/place/March%C3%A9+des+Enfants+Rouges/"},
     ]},
-    {region:"Rome",color:T.green,flag:"🇮🇹",gems:[
-      {name:"Trastevere",desc:"Rome's bohemian neighborhood. Cobblestoned, ivy-covered, the best trattorias in the city.",url:"https://www.google.com/maps/place/Trastevere,+Rome/"},
-      {name:"Aventine Keyhole",desc:"Peek through this famous keyhole for a perfectly framed view of St. Peter's dome.",url:"https://www.google.com/maps/place/Knights+of+Malta+Keyhole/"},
-      {name:"Testaccio Market",desc:"Where Romans actually eat. No tourists. Best supplì and porchetta in the city.",url:"https://www.google.com/maps/place/Mercato+Testaccio/"},
+    {region:"Canterbury",color:T.green,flag:"🇬🇧",gems:[
+      {name:"Canterbury Cathedral",desc:"UNESCO World Heritage site. Where Thomas Becket was martyred in 1170. Stunning Gothic architecture and stained glass.",url:"https://www.google.com/maps/place/Canterbury+Cathedral/"},
+      {name:"Westgate Gardens",desc:"Peaceful riverside gardens along the Great Stour. Ancient stone bridge, weeping willows, punting.",url:"https://www.google.com/maps/place/Westgate+Gardens,+Canterbury/"},
+      {name:"The Goods Shed",desc:"Daily farmers market in a converted Victorian railway shed. Local Kent produce, artisan bread, fresh oysters.",url:"https://www.google.com/maps/place/The+Goods+Shed,+Canterbury/"},
     ]},
   ],
   weather: [
     {city:"London",fH:61,fL:48,sH:59,sL:44,fR:9,sR:10},
     {city:"Cotswolds",fH:59,fL:45,sH:57,sL:42,fR:9,sR:10},
+    {city:"Canterbury",fH:60,fL:47,sH:58,sL:43,fR:9,sR:10},
     {city:"Paris",fH:63,fL:48,sH:62,sL:46,fR:8,sR:10},
-    {city:"Rome",fH:74,fL:56,sH:68,sL:50,fR:6,sR:8},
   ],
   inspiration: [
     {loc:"Cotswolds",photos:[
@@ -189,13 +188,12 @@ const ROUTES = [
       {url:"https://images.unsplash.com/photo-1478391679764-b2d8b3cd1e94?w=600&fit=crop&q=80"},
       {url:"https://images.unsplash.com/photo-1551634979-2b11f8c946fe?w=600&fit=crop&q=80"}
     ]},
-    {loc:"Rome",photos:[
-      {url:"https://images.unsplash.com/photo-1552832230-c0197dd311b5?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1525874684015-58379d421a52?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1531572753322-ad063cecc140?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1515542622106-78bda8ba0e5b?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1555992828-ca4dbe41d294?w=600&fit=crop&q=80"},
-      {url:"https://images.unsplash.com/photo-1529260830199-42c24126f198?w=600&fit=crop&q=80"}
+    {loc:"Canterbury",photos:[
+      {url:"https://images.unsplash.com/photo-1590058705297-44c2a0e1a864?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1582547131775-4b4e8d46890b?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1595167244270-801199402e44?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1543349689-9a4d426bee8e?w=600&fit=crop&q=80"},
+      {url:"https://images.unsplash.com/photo-1590503908498-0e5cacc0a4e2?w=600&fit=crop&q=80"},
     ]},
   ],
   compareScorecard: [
@@ -205,7 +203,7 @@ const ROUTES = [
     {factor:"Crowd Level",fall:"Moderate",spring:"Moderate",winner:"tie",icon:"Users"},
     {factor:"Schedule Fit",fall:"Most prefer",spring:"Fewer prefer",winner:"fall",icon:"Calendar"},
     {factor:"Anniversary",fall:"Celebrate on trip!",spring:"Already passed",winner:"fall",icon:"Heart"},
-    {factor:"Family Vibe",fall:"Cozy autumn feel",spring:"Spring bloom",winner:"tie",icon:"Shield"},
+    {factor:"Canterbury",fall:"Quieter, golden light",spring:"Gardens in bloom",winner:"tie",icon:"Church"},
   ],
 },
 // --- ROUTE 2: Italian Lakes & Alps ---
