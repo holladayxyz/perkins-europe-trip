@@ -1750,7 +1750,7 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
   const oop = Math.max(0, couple - 3000);
   const pieData = [];
   if (t.accommodation===0 && t.flights>0) {
-    if (includeFlights) pieData.push({name:"Flights + Hotel",value:t.flights});
+    if (includeFlights) pieData.push({name:"Bundle Deal",value:t.flights});
   } else {
     if (includeFlights) pieData.push({name:"Flights",value:t.flights});
     pieData.push({name:"Lodging",value:t.accommodation*rn});
@@ -1807,7 +1807,7 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
           (function(){
             var rows = [];
             if (t.accommodation===0 && t.flights>0) {
-              if (includeFlights) rows.push(["Flights + Hotel (bundled)","$"+t.flights]);
+              if (includeFlights) rows.push(["Bundle Deal (JFK flights + hotel)","$"+t.flights]);
             } else {
               if (includeFlights) rows.push(["Flights","$"+t.flights]);
               rows.push(["Lodging ("+rn+"n)","$"+(t.accommodation*rn)]);
