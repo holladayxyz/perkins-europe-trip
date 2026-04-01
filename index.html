@@ -1662,6 +1662,7 @@ function OverviewScreen({onSelect,user}) {
               React.createElement("span", {style:{fontSize:11,fontWeight:800,color:route.color,letterSpacing:1,textTransform:"uppercase"}}, "Route "+(i+1)),
               React.createElement("span", {style:{fontSize:10,color:T.textDim}}, "·"),
               React.createElement("span", {style:{fontSize:10,color:T.textMuted}}, route.countries.length+" countries"),
+              React.createElement("span", {style:{fontSize:10,fontWeight:700,color:route.color,background:`${route.color}18`,padding:"2px 8px",borderRadius:99,border:`1px solid ${route.color}30`}}, (route.nights||NIGHTS)+" nights + 2 travel days"),
             ),
             React.createElement("h2", {style:{fontSize:22,fontWeight:900,color:T.white,margin:"0 0 2px"}}, route.name),
             React.createElement("p", {style:{fontSize:13,color:T.textMuted,margin:"0 0 12px"}}, route.tagline),
@@ -1750,7 +1751,7 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
   const oop = Math.max(0, couple - 3000);
   const pieData = [];
   if (t.accommodation===0 && t.flights>0) {
-    if (includeFlights) pieData.push({name:"Flights + Hotel",value:t.flights});
+    if (includeFlights) pieData.push({name:"Bundle Deal",value:t.flights});
   } else {
     if (includeFlights) pieData.push({name:"Flights",value:t.flights});
     pieData.push({name:"Lodging",value:t.accommodation*rn});
@@ -1807,7 +1808,7 @@ function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
           (function(){
             var rows = [];
             if (t.accommodation===0 && t.flights>0) {
-              if (includeFlights) rows.push(["Flights + Hotel (bundled)","$"+t.flights]);
+              if (includeFlights) rows.push(["Bundle Deal (JFK flights + hotel)","$"+t.flights]);
             } else {
               if (includeFlights) rows.push(["Flights","$"+t.flights]);
               rows.push(["Lodging ("+rn+"n)","$"+(t.accommodation*rn)]);
