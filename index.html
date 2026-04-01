@@ -1664,7 +1664,7 @@ function OverviewScreen({onSelect,user}) {
             React.createElement("h2", {style:{fontSize:22,fontWeight:900,color:T.white,margin:"0 0 2px"}}, route.name),
             React.createElement("p", {style:{fontSize:13,color:T.textMuted,margin:"0 0 12px"}}, route.tagline),
             React.createElement("div", {style:{display:"flex",gap:4,flexWrap:"wrap",marginBottom:14,flex:1}},
-              route.cities.map((c,ci) => React.createElement("span", {key:ci,style:{fontSize:11,background:`${route.color}12`,color:route.color,padding:"3px 10px",borderRadius:99,fontWeight:600,border:`1px solid ${route.color}25`}}, route.cityFlags[ci]+" "+c))
+              route.cities.map((c,ci) => React.createElement("span", {key:ci,style:{fontSize:11,background:`${route.color}12`,color:route.color,padding:"4px 14px",borderRadius:99,fontWeight:600,border:`1px solid ${route.color}25`,whiteSpace:"nowrap"}}, route.cityFlags[ci]+" "+c))
             ),
             React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid "+T.border,marginTop:"auto"}},
               React.createElement("div", null,
