@@ -968,7 +968,7 @@ const ROUTES = [
   nights: 6,
   dealBadge: {
     label: "Based on: Great Value Vacations '$899' deal",
-    note: "$899/pp advertised from NYC (JFK) only. Phoenix travelers fall into the $1,099 tier. Flights + hotel bundled — food, activities, parking, car upgrade & insurance are all extra. True all-in cost shown in budget tiers below.",
+    note: "$899/pp from JFK — flights + hotel bundled. Everyone flies to JFK, then departs together. Food, activities, parking, car upgrade & insurance are all extra. True all-in cost shown below.",
     url: "https://www.greatvaluevacations.com/vacation-packages/italy/rome-amalfi-coast",
   },
   color: "#f97316",
@@ -978,10 +978,10 @@ const ROUTES = [
   cities: ["Minori","Positano","Capri","Rome"],
   cityFlags: ["🇮🇹","🇮🇹","🇮🇹","🇮🇹"],
   highlights: [
-    "Deal advertised at $899/pp — NYC only; Phoenix tier is $1,099",
-    "Hotel & flights bundled — food, activities, parking all extra",
+    "Deal: $899/pp from JFK — flights + hotel bundled",
+    "Everyone flies to JFK, then departs together to Rome",
     "Car rental included but manual shift — auto upgrade costs more",
-    "True all-in cost: ~$2,100–2,700/pp depending on booking approach",
+    "Food, activities, parking & insurance are extra",
     "Rome Italy Temple included — Trastevere, Colosseum, Vatican"
   ],
   itinerary: {
@@ -1008,12 +1008,12 @@ const ROUTES = [
   },
   budgetTiers: {
     fall: {
-      value:{label:"Deal Bundle",emoji:"🏷️",flights:1099,accommodation:0,trains:50,food:90,activities:200,misc:45},
+      value:{label:"Deal Bundle",emoji:"🏷️",flights:899,accommodation:0,trains:50,food:90,activities:200,misc:45},
       mid:{label:"Book Direct",emoji:"✨",flights:941,accommodation:95,trains:80,food:95,activities:290,misc:40},
       premium:{label:"Premium",emoji:"👑",flights:1100,accommodation:155,trains:80,food:125,activities:380,misc:55},
     },
     spring: {
-      value:{label:"Deal Bundle",emoji:"🏷️",flights:1199,accommodation:0,trains:50,food:90,activities:200,misc:45},
+      value:{label:"Deal Bundle",emoji:"🏷️",flights:999,accommodation:0,trains:50,food:90,activities:200,misc:45},
       mid:{label:"Book Direct",emoji:"✨",flights:850,accommodation:95,trains:80,food:95,activities:290,misc:40},
       premium:{label:"Premium",emoji:"👑",flights:1000,accommodation:155,trains:80,food:125,activities:380,misc:55},
     }
@@ -1079,7 +1079,7 @@ const ROUTES = [
     ]},
   ],
   compareScorecard: [
-    {factor:"Deal Price",fall:"Nov = cheapest ($899 JFK / $1,099 PHX)",spring:"Spring = $100–300 more",winner:"fall",icon:"DollarSign"},
+    {factor:"Deal Price",fall:"Nov = cheapest ($899 from JFK)",spring:"Spring = ~$100 more",winner:"fall",icon:"DollarSign"},
     {factor:"Family Match",fall:"Italy only — no Austria or Croatia",spring:"Same destinations",winner:"tie",icon:"Heart"},
     {factor:"Weather",fall:"Warm & uncrowded (Nov off-season)",spring:"Beautiful but peak crowds begin",winner:"fall",icon:"Sun"},
     {factor:"Crowd Level",fall:"Very low — Nov is off-season",spring:"High — spring tourist surge",winner:"fall",icon:"Users"},
@@ -1097,7 +1097,7 @@ const ROUTES = [
   nights: 6,
   dealBadge: {
     label: "Based on: TripToGo '$399+' Eastern Europe Elegance tour",
-    note: "$399/pp is land-only (no flights). Add ~$941 for PHX flights = ~$1,340/pp to start. Breakfast included; lunch, dinner, activities & tips are extra. Guided group tour — joins strangers (group size 20–35).",
+    note: "$399/pp land-only + ~$650 JFK→Budapest flights = ~$1,049/pp to start. Everyone flies to JFK, then departs together. Breakfast included; lunch, dinner, activities & tips are extra. Guided group tour — joins strangers (group size 20–35).",
     url: "https://www.triptogo.com/",
   },
   color: "#6366f1",
@@ -1107,7 +1107,7 @@ const ROUTES = [
   cities: ["Budapest","Bratislava","Vienna","Prague"],
   cityFlags: ["🇭🇺","🇸🇰","🇦🇹","🇨🇿"],
   highlights: [
-    "Deal is $399/pp land-only — flights (~$941 PHX) not included",
+    "Deal: $399/pp land-only + ~$650 JFK flights = ~$1,049/pp",
     "Guided group tour — travels with strangers, not a private group trip",
     "Breakfast included daily; all other meals are out-of-pocket",
     "Prague, Vienna, Budapest — 3 of the most beautiful cities in Europe",
@@ -1137,14 +1137,14 @@ const ROUTES = [
   },
   budgetTiers: {
     fall: {
-      value:{label:"Tour Package",emoji:"🏷️",flights:1340,accommodation:0,trains:0,food:65,activities:120,misc:30},
-      mid:{label:"Book Direct",emoji:"✨",flights:941,accommodation:80,trains:95,food:80,activities:250,misc:35},
-      premium:{label:"Premium",emoji:"👑",flights:1050,accommodation:130,trains:95,food:115,activities:360,misc:50},
+      value:{label:"Tour Package",emoji:"🏷️",flights:1049,accommodation:0,trains:0,food:65,activities:120,misc:30},
+      mid:{label:"Book Direct",emoji:"✨",flights:650,accommodation:80,trains:95,food:80,activities:250,misc:35},
+      premium:{label:"Premium",emoji:"👑",flights:750,accommodation:130,trains:95,food:115,activities:360,misc:50},
     },
     spring: {
-      value:{label:"Tour Package",emoji:"🏷️",flights:1280,accommodation:0,trains:0,food:65,activities:120,misc:30},
-      mid:{label:"Book Direct",emoji:"✨",flights:850,accommodation:80,trains:95,food:80,activities:250,misc:35},
-      premium:{label:"Premium",emoji:"👑",flights:950,accommodation:130,trains:95,food:115,activities:360,misc:50},
+      value:{label:"Tour Package",emoji:"🏷️",flights:999,accommodation:0,trains:0,food:65,activities:120,misc:30},
+      mid:{label:"Book Direct",emoji:"✨",flights:600,accommodation:80,trains:95,food:80,activities:250,misc:35},
+      premium:{label:"Premium",emoji:"👑",flights:700,accommodation:130,trains:95,food:115,activities:360,misc:50},
     }
   },
   trainLegs: [
