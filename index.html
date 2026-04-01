@@ -2227,7 +2227,7 @@ function DetailView({route,routeIndex,onBack,initTab,initSeason,user}) {
   const validTabs = ["overview","itinerary","stays","food","gems","compare","notes"];
   const [season,setSeason] = useState(initSeason==="spring"?"spring":"fall");
   const [tab,setTab] = useState(validTabs.includes(initTab)?initTab:"overview");
-  const [includeFlights,setIncludeFlights] = useState(false);
+  const [includeFlights,setIncludeFlights] = useState(true);
   const [highlightCtx,setHighlightCtx] = useState(null);
   useEffect(()=>{setHash(route.id,tab,season);},[tab,season,route.id]);
   const ctxToTab = {itinerary:"itinerary",stay:"stays",activity:"food",gem:"gems"};
