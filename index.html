@@ -1254,10 +1254,10 @@ const groupPreferences = [
 ];
 
 // ============ UTILITY COMPONENTS ============
-function AnimIn({children,delay=0}) {
+function AnimIn({children,delay=0,style:extraStyle}) {
   const [s,setS] = useState(false);
   useEffect(() => { const t = setTimeout(() => setS(true), delay); return () => clearTimeout(t); }, [delay]);
-  return React.createElement("div", {style:{opacity:s?1:0,transform:s?"translateY(0)":"translateY(16px)",transition:"all 0.5s cubic-bezier(0.16,1,0.3,1)"}}, children);
+  return React.createElement("div", {style:Object.assign({opacity:s?1:0,transform:s?"translateY(0)":"translateY(16px)",transition:"all 0.5s cubic-bezier(0.16,1,0.3,1)"},extraStyle||{})}, children);
 }
 function GlowCard({children,glow,style,onClick}) {
   const [h,setH] = useState(false);
@@ -1654,10 +1654,10 @@ function OverviewScreen({onSelect,user}) {
       )
     ),
     React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(280px,100%),1fr))",gap:16}},
-      ROUTES.map((route,i) => React.createElement(AnimIn, {key:route.id,delay:i*120},
-        React.createElement(GlowCard, {glow:route.color,onClick:()=>onSelect(i),style:{padding:0,overflow:"hidden"}},
+      ROUTES.map((route,i) => React.createElement(AnimIn, {key:route.id,delay:i*120,style:{height:"100%"}},
+        React.createElement(GlowCard, {glow:route.color,onClick:()=>onSelect(i),style:{padding:0,overflow:"hidden",height:"100%",display:"flex",flexDirection:"column"}},
           React.createElement(MiniMap, {route}),
-          React.createElement("div", {style:{padding:"20px 24px 24px",position:"relative"}},
+          React.createElement("div", {style:{padding:"20px 24px 24px",position:"relative",flex:1,display:"flex",flexDirection:"column"}},
             React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},
               React.createElement("span", {style:{fontSize:11,fontWeight:800,color:route.color,letterSpacing:1,textTransform:"uppercase"}}, "Route "+(i+1)),
               React.createElement("span", {style:{fontSize:10,color:T.textDim}}, "·"),
@@ -1665,13 +1665,13 @@ function OverviewScreen({onSelect,user}) {
             ),
             React.createElement("h2", {style:{fontSize:22,fontWeight:900,color:T.white,margin:"0 0 2px"}}, route.name),
             React.createElement("p", {style:{fontSize:13,color:T.textMuted,margin:"0 0 12px"}}, route.tagline),
-            React.createElement("div", {style:{display:"flex",gap:4,flexWrap:"wrap",marginBottom:14}},
+            React.createElement("div", {style:{display:"flex",gap:4,flexWrap:"wrap",marginBottom:14,flex:1}},
               route.cities.map((c,ci) => React.createElement("span", {key:ci,style:{fontSize:11,background:`${route.color}12`,color:route.color,padding:"3px 10px",borderRadius:99,fontWeight:600,border:`1px solid ${route.color}25`}}, route.cityFlags[ci]+" "+c))
             ),
-            React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid "+T.border}},
+            React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid "+T.border,marginTop:"auto"}},
               React.createElement("div", null,
-                React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, "Mid-tier per couple · "+(calcCouple(route.budgetTiers.spring.mid,route.nights||NIGHTS)<=calcCouple(route.budgetTiers.fall.mid,route.nights||NIGHTS)?"Spring":"Fall")),
-                React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+Math.min(calcCouple(route.budgetTiers.fall.mid,route.nights||NIGHTS),calcCouple(route.budgetTiers.spring.mid,route.nights||NIGHTS)).toLocaleString()),
+                React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, "Est. out-of-pocket · "+(calcCouple(route.budgetTiers.spring.value,route.nights||NIGHTS)-route.budgetTiers.spring.value.flights*2<=calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)-route.budgetTiers.fall.value.flights*2?"Spring":"Fall")),
+                React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+(Math.min(calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)-route.budgetTiers.fall.value.flights*2,calcCouple(route.budgetTiers.spring.value,route.nights||NIGHTS)-route.budgetTiers.spring.value.flights*2)-3000).toLocaleString()),
               ),
               React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,color:route.color,fontSize:13,fontWeight:700}},
                 "Explore Route", React.createElement(ChevronRight, {size:16})
@@ -1740,10 +1740,17 @@ function OverviewScreen({onSelect,user}) {
 }
 
 // ============ DETAIL TABS ============
-function OverviewTab({route,season}) {
-  const tiers = route.budgetTiers[season];
-  const tierKeys = ["value","mid","premium"];
-  const tierColors = [T.green, route.color, T.purple];
+function OverviewTab({route,season,includeFlights,setIncludeFlights}) {
+  const t = route.budgetTiers[season].value;
+  const rn = route.nights||NIGHTS;
+  const flightCost = includeFlights ? t.flights : 0;
+  const pp = flightCost + t.accommodation*rn + t.trains + t.food*rn + t.activities + t.misc*rn;
+  const couple = pp*2;
+  const oop = couple - 3000;
+  const pieData = [
+    {name:"Lodging",value:t.accommodation*rn},{name:"Food",value:t.food*rn},{name:"Transport",value:t.trains},{name:"Activities",value:t.activities},{name:"Misc",value:t.misc*rn},
+  ];
+  if (includeFlights) pieData.unshift({name:"Flights",value:t.flights});
   return React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:20}},
     route.dealBadge && React.createElement(AnimIn, null,
       React.createElement("div", {style:{background:"rgba(249,115,22,0.1)",border:"1px solid rgba(249,115,22,0.35)",borderRadius:12,padding:"12px 16px",display:"flex",alignItems:"flex-start",gap:12}},
@@ -1762,41 +1769,38 @@ function OverviewTab({route,season}) {
         React.createElement(MiniStat, {icon:Users,label:"Travelers",value:"16",color:T.green,sub:"8 couples"}),
         React.createElement(MiniStat, {icon:MapPin,label:"Cities",value:String(route.cities.length),color:T.purple,sub:route.cities[0]+" → "+route.cities.at(-1)}),
         React.createElement(MiniStat, {icon:Train,label:"Train Legs",value:String(route.trainLegs.length),color:T.cyan,sub:"Point-to-point"}),
-
       )
     ),
     React.createElement(AnimIn, {delay:100},
-      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(260px,100%),1fr))",gap:14}},
-        tierKeys.map((k,i) => {
-          const t = tiers[k]; const rn = route.nights||NIGHTS; const pp = calcPP(t,rn); const couple = calcCouple(t,rn); const oop = couple - 3000; const isMid = k==="mid";
-          return React.createElement(GlowCard, {key:k,glow:tierColors[i],style:isMid?{border:`2px solid ${route.color}40`,boxShadow:`0 0 40px ${route.color}15`}:{}},
-            isMid && React.createElement("div", {style:{position:"absolute",top:12,right:16,background:route.gradient,borderRadius:99,padding:"3px 12px",fontSize:10,fontWeight:800,color:T.white}}, "RECOMMENDED"),
-            React.createElement("div", {style:{fontSize:28,marginBottom:4}}, t.emoji),
-            React.createElement("div", {style:{fontSize:13,fontWeight:700,color:tierColors[i],textTransform:"uppercase",letterSpacing:1}}, t.label),
-            React.createElement("div", {style:{fontSize:40,fontWeight:900,color:T.white,margin:"8px 0 2px",letterSpacing:-1}}, "$"+pp.toLocaleString()),
-            React.createElement("div", {style:{fontSize:12,color:T.textMuted}}, "per person"),
-            React.createElement("div", {style:{margin:"16px 0",padding:"12px 0",borderTop:"1px solid "+T.border,borderBottom:"1px solid "+T.border}},
-              React.createElement("div", {style:{fontSize:22,fontWeight:800,color:tierColors[i]}}, "$"+couple.toLocaleString()+" ",React.createElement("span",{style:{fontSize:12,fontWeight:500,color:T.textMuted}},"/ couple")),
-              React.createElement("div", {style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}}, "Out of pocket: $"+oop.toLocaleString()),
-            ),
-            React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:6,fontSize:12,color:T.textMuted}},
-              [["Flights","$"+t.flights],["Lodging ("+rn+"n)","$"+(t.accommodation*rn)],["Food ("+rn+"d)","$"+(t.food*rn)],["Transport","$"+t.trains],["Activities","$"+t.activities]].map(([l,v])=>
-                React.createElement("div",{key:l,style:{display:"flex",justifyContent:"space-between"}},React.createElement("span",null,l),React.createElement("span",{style:{color:T.text,fontWeight:600}},v))
-              )
-            )
-          );
-        })
+      React.createElement("div", {style:{display:"flex",justifyContent:"flex-end",alignItems:"center",gap:8,marginBottom:4}},
+        React.createElement("span", {style:{fontSize:12,color:T.textMuted}}, "Include flights"),
+        React.createElement("button", {onClick:()=>setIncludeFlights(!includeFlights),style:{width:44,height:24,borderRadius:12,border:"none",cursor:"pointer",background:includeFlights?route.color:T.border,position:"relative",transition:"background 0.3s",padding:0,WebkitTapHighlightColor:"transparent"}},
+          React.createElement("div", {style:{width:18,height:18,borderRadius:9,background:T.white,position:"absolute",top:3,left:includeFlights?23:3,transition:"left 0.3s",boxShadow:"0 1px 3px rgba(0,0,0,0.3)"}})
+        )
+      )
+    ),
+    React.createElement(AnimIn, {delay:100},
+      React.createElement(GlowCard, {glow:route.color,style:{border:`2px solid ${route.color}40`,boxShadow:`0 0 40px ${route.color}15`}},
+        React.createElement("div", {style:{fontSize:40,fontWeight:900,color:T.white,margin:"8px 0 2px",letterSpacing:-1}}, "$"+pp.toLocaleString()),
+        React.createElement("div", {style:{fontSize:12,color:T.textMuted}}, "per person"+(includeFlights?"":" (excl. flights)")),
+        React.createElement("div", {style:{margin:"16px 0",padding:"12px 0",borderTop:"1px solid "+T.border,borderBottom:"1px solid "+T.border}},
+          React.createElement("div", {style:{fontSize:22,fontWeight:800,color:route.color}}, "$"+couple.toLocaleString()+" ",React.createElement("span",{style:{fontSize:12,fontWeight:500,color:T.textMuted}},"/ couple")),
+          React.createElement("div", {style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}}, "Est. out-of-pocket: $"+oop.toLocaleString()),
+        ),
+        React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:6,fontSize:12,color:T.textMuted}},
+          (includeFlights?[["Flights","$"+t.flights]]:[]).concat([["Lodging ("+rn+"n)","$"+(t.accommodation*rn)],["Food ("+rn+"d)","$"+(t.food*rn)],["Transport","$"+t.trains],["Activities","$"+t.activities]]).map(([l,v])=>
+            React.createElement("div",{key:l,style:{display:"flex",justifyContent:"space-between"}},React.createElement("span",null,l),React.createElement("span",{style:{color:T.text,fontWeight:600}},v))
+          )
+        )
       )
     ),
     React.createElement(AnimIn, {delay:200},
       React.createElement(GlowCard, {glow:T.blue},
-        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16}}, "Where the Money Goes — Mid-Tier"),
+        React.createElement("h3", {style:{margin:"0 0 16px",color:T.white,fontSize:16}}, "Where the Money Goes"),
         React.createElement(ResponsiveContainer, {width:"99%",height:260},
           React.createElement(PieChart, null,
-            React.createElement(Pie, {data:[
-              {name:"Flights",value:tiers.mid.flights},{name:"Lodging",value:tiers.mid.accommodation*(route.nights||NIGHTS)},{name:"Food",value:tiers.mid.food*(route.nights||NIGHTS)},{name:"Transport",value:tiers.mid.trains},{name:"Activities",value:tiers.mid.activities},{name:"Misc",value:tiers.mid.misc*(route.nights||NIGHTS)},
-            ],cx:"50%",cy:"50%",innerRadius:60,outerRadius:100,paddingAngle:3,dataKey:"value",label:({name,value})=>name+" $"+value,labelLine:{stroke:T.textDim}},
-              CC.map((c,i) => React.createElement(Cell,{key:i,fill:c}))
+            React.createElement(Pie, {data:pieData,cx:"50%",cy:"50%",innerRadius:60,outerRadius:100,paddingAngle:3,dataKey:"value",label:({name,value})=>name+" $"+value,labelLine:{stroke:T.textDim}},
+              pieData.map((d,i) => React.createElement(Cell,{key:i,fill:CC[i%CC.length]}))
             ),
             React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},itemStyle:{color:T.text},labelStyle:{color:T.white},formatter:v=>"$"+v})
           )
@@ -2137,9 +2141,11 @@ function InspirationTab({route}) {
   );
 }
 
-function CompareTab({route,season}) {
-  const fMid = calcCouple(route.budgetTiers.fall.mid, route.nights||NIGHTS);
-  const sMid = calcCouple(route.budgetTiers.spring.mid, route.nights||NIGHTS);
+function CompareTab({route,season,includeFlights}) {
+  const rn = route.nights||NIGHTS;
+  const calcDisplay = (t) => { const base = t.accommodation*rn + t.trains + t.food*rn + t.activities + t.misc*rn + (includeFlights?t.flights:0); return base*2; };
+  const fMid = calcDisplay(route.budgetTiers.fall.value);
+  const sMid = calcDisplay(route.budgetTiers.spring.value);
   const save = fMid - sMid;
   const scorecard = route.compareScorecard;
   const iconLookup = {DollarSign,Sun,Mountain,Users,Calendar,Heart,Shield,Train,Coffee,Church};
@@ -2152,7 +2158,7 @@ function CompareTab({route,season}) {
         React.createElement(GlowCard, {glow:T.accent,style:{textAlign:"center"}},
           React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"🍂 Fall 2026"),
           React.createElement("div",{style:{fontSize:36,fontWeight:900,color:T.accent}},"$"+fMid.toLocaleString()),
-          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"per couple (mid-tier)"),
+          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"per couple"+(includeFlights?"":" (excl. flights)")),
           React.createElement("div",{style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}},"OOP: $"+(fMid-3000).toLocaleString()),
         ),
         React.createElement("div", {style:{textAlign:"center",padding:"0 8px"}},
@@ -2163,7 +2169,7 @@ function CompareTab({route,season}) {
         React.createElement(GlowCard, {glow:T.green,style:{textAlign:"center"}},
           React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"🌷 Spring 2027"),
           React.createElement("div",{style:{fontSize:36,fontWeight:900,color:T.green}},"$"+sMid.toLocaleString()),
-          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"per couple (mid-tier)"),
+          React.createElement("div",{style:{fontSize:12,color:T.textMuted}},"per couple"+(includeFlights?"":" (excl. flights)")),
           React.createElement("div",{style:{fontSize:14,fontWeight:700,color:T.green,marginTop:4}},"OOP: $"+(sMid-3000).toLocaleString()),
         ),
       )
@@ -2221,6 +2227,7 @@ function DetailView({route,routeIndex,onBack,initTab,initSeason,user}) {
   const validTabs = ["overview","itinerary","stays","food","gems","compare","notes"];
   const [season,setSeason] = useState(initSeason==="spring"?"spring":"fall");
   const [tab,setTab] = useState(validTabs.includes(initTab)?initTab:"overview");
+  const [includeFlights,setIncludeFlights] = useState(false);
   const [highlightCtx,setHighlightCtx] = useState(null);
   useEffect(()=>{setHash(route.id,tab,season);},[tab,season,route.id]);
   const ctxToTab = {itinerary:"itinerary",stay:"stays",activity:"food",gem:"gems"};
@@ -2279,12 +2286,12 @@ function DetailView({route,routeIndex,onBack,initTab,initSeason,user}) {
         }}, React.createElement(Icon,{size:13}), t.label);
       })
     ),
-    tab==="overview" && React.createElement(OverviewTab, {route,season}),
+    tab==="overview" && React.createElement(OverviewTab, {route,season,includeFlights,setIncludeFlights}),
     tab==="itinerary" && React.createElement(ItineraryTab, {route,season,user,highlightCtx}),
     tab==="stays" && React.createElement(StaysTab, {route,season,user,highlightCtx}),
     tab==="food" && React.createElement(FoodTab, {route,user,highlightCtx}),
     tab==="gems" && React.createElement(GemsTab, {route,user,highlightCtx}),
-    tab==="compare" && React.createElement(CompareTab, {route,season}),
+    tab==="compare" && React.createElement(CompareTab, {route,season,includeFlights}),
     tab==="notes" && React.createElement(NotesTab, {route,user,onNavigate}),
     React.createElement("div", {style:{textAlign:"center",padding:"32px 0 0",fontSize:11,color:T.textDim}},
       React.createElement("p",null,"Compiled from 2 family calls + 17 voice memos from 12 contributors · All preferences anonymized"),
