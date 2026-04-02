@@ -1597,7 +1597,12 @@ function VotingSection({user}) {
   // Compute weighted scores
   const scores = {};
   ROUTES.forEach(r => { scores[r.id] = 0; });
-  allVotes.forEach(v => { const pts = v.rank===1?3:v.rank===2?2:1; scores[v.route_id] = (scores[v.route_id]||0) + pts; });
+  const vipNames = ["gary","darlene"];
+  allVotes.forEach(v => {
+    const isVip = vipNames.includes(v.voter.toLowerCase());
+    const pts = v.rank===1?(isVip?5:3):v.rank===2?2:1;
+    scores[v.route_id] = (scores[v.route_id]||0) + pts;
+  });
   const ranked = ROUTES.map(r => ({id:r.id,name:r.name,color:r.color,score:scores[r.id]||0})).sort((a,b) => b.score - a.score);
   const maxScore = Math.max(...ranked.map(r => r.score), 1);
 
@@ -1612,7 +1617,7 @@ function VotingSection({user}) {
     React.createElement("div", {style:{textAlign:"center",marginBottom:24}},
       React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.rose,fontWeight:700,textTransform:"uppercase",marginBottom:6}}, "Family Vote"),
       React.createElement("h2", {style:{fontSize:"clamp(18px,4vw,24px)",fontWeight:900,color:T.white,margin:0}}, "Pick Your Top 3 Routes"),
-      React.createElement("p", {style:{color:T.textMuted,fontSize:12,margin:"6px 0 0"}}, "Rank your 1st, 2nd, and 3rd choice · weighted scoring (3/2/1 pts)")
+      React.createElement("p", {style:{color:T.textMuted,fontSize:12,margin:"6px 0 0"}}, "Rank your 1st, 2nd, and 3rd choice · weighted scoring (3/2/1 pts · Gary & Darlene 1st = 5 pts)")
     ),
     React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(300px,100%),1fr))",gap:16}},
       // Vote inputs
