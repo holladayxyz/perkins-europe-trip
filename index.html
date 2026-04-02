@@ -1537,7 +1537,7 @@ function NotesTab({route,user,onNavigate}) {
 
 // ============ VOTING COUNTDOWN ============
 function VotingCountdown() {
-  const deadline = new Date("2026-04-06T00:00:00").getTime();
+  const deadline = new Date("2026-04-06T00:00:00-07:00").getTime();
   const [now, setNow] = useState(Date.now());
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
   const diff = Math.max(0, deadline - now);
