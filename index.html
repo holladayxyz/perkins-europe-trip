@@ -1535,6 +1535,34 @@ function NotesTab({route,user,onNavigate}) {
   );
 }
 
+// ============ VOTING COUNTDOWN ============
+function VotingCountdown() {
+  const deadline = new Date("2026-04-06T00:00:00").getTime();
+  const [now, setNow] = useState(Date.now());
+  useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
+  const diff = Math.max(0, deadline - now);
+  const days = Math.floor(diff / 86400000);
+  const hrs = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  const locked = diff <= 0;
+  const unit = (val, label) => React.createElement("div", {style:{display:"flex",flexDirection:"column",alignItems:"center",minWidth:54}},
+    React.createElement("span", {style:{fontSize:"clamp(22px,5vw,32px)",fontWeight:900,color:locked?T.textMuted:T.rose,fontVariantNumeric:"tabular-nums"}}, String(val).padStart(2,"0")),
+    React.createElement("span", {style:{fontSize:10,color:T.textMuted,textTransform:"uppercase",letterSpacing:1,marginTop:2}}, label)
+  );
+  const sep = React.createElement("span", {style:{fontSize:"clamp(18px,4vw,28px)",fontWeight:700,color:T.textMuted,alignSelf:"flex-start",paddingTop:2}}, ":");
+  return React.createElement("div", {style:{textAlign:"center",marginBottom:16,marginTop:48}},
+    React.createElement("div", {style:{display:"inline-flex",alignItems:"center",gap:2,background:"rgba(255,255,255,0.04)",border:"1px solid "+T.rose+"33",borderRadius:12,padding:"12px 24px"}},
+      locked
+        ? React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.textMuted,letterSpacing:1,textTransform:"uppercase"}}, "Voting is locked")
+        : React.createElement(React.Fragment, null,
+            React.createElement("span", {style:{fontSize:11,fontWeight:700,color:T.rose,letterSpacing:2,textTransform:"uppercase",marginRight:12}}, "Voting locks in"),
+            unit(days,"days"), sep, unit(hrs,"hrs"), sep, unit(mins,"min"), sep, unit(secs,"sec")
+          )
+    )
+  );
+}
+
 // ============ VOTING SECTION ============
 function VotingSection({user}) {
   const [votes,setVotes] = useState({1:"",2:"",3:""});
@@ -1682,6 +1710,7 @@ function OverviewScreen({onSelect,user}) {
         )
       ))
     ),
+    React.createElement(VotingCountdown),
     React.createElement(VotingSection, {user}),
     React.createElement(AnimIn, {delay:400},
       React.createElement("div", {style:{marginTop:48}},
