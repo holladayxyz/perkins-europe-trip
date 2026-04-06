@@ -1856,7 +1856,7 @@ function OverviewScreen({onSelect,user}) {
         );
       })
     ),
-    React.createElement(HeadToHead),
+    React.createElement("div", {style:{marginTop:32}}, React.createElement(HeadToHead)),
     React.createElement(VotingCountdown),
     React.createElement(FinalVotingSection, {user})
   );
