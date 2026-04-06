@@ -1691,25 +1691,40 @@ function FinalVotingSection({user}) {
 function HeadToHead() {
   const finalists = ROUTES.filter(r => FINALIST_IDS.includes(r.id));
   const r1 = finalists[0], r2 = finalists[1];
-  const oop = (r) => Math.max(0, calcCouple(r.budgetTiers.fall.value, r.nights||NIGHTS) + (r.azToJfk||0)*2 - 3000);
+
+  // Compute derived data
+  const totalTrainHrs = (r) => r.trainLegs.reduce((s,l) => s + parseFloat(l.hrs), 0);
+  const totalTrainCost = (r) => r.trainLegs.reduce((s,l) => s + l.cost, 0);
+  const avgScenic = (r) => (r.trainLegs.reduce((s,l) => s + l.scenic, 0) / r.trainLegs.length).toFixed(1);
+  const avgWeatherHigh = (r) => Math.round(r.weather.reduce((s,w) => s + w.fH, 0) / r.weather.length);
+  const avgWeatherLow = (r) => Math.round(r.weather.reduce((s,w) => s + w.fL, 0) / r.weather.length);
+  const avgRainDays = (r) => Math.round(r.weather.reduce((s,w) => s + w.fR, 0) / r.weather.length);
+  const dailyFood = (r) => r.foodByCountry.reduce((s,f) => s + f.breakfast + f.lunch + f.dinner + f.snacks, 0) / r.foodByCountry.length;
+
   const rows = [
-    {label:"Countries", a:r1.countryFlags.join(" ")+" "+r1.countries.length, b:r2.countryFlags.join(" ")+" "+r2.countries.length},
-    {label:"Cities", a:r1.cities.join(", "), b:r2.cities.join(", ")},
-    {label:"Duration", a:(r1.nights||NIGHTS)+" nights", b:(r2.nights||NIGHTS)+" nights"},
-    {label:"Train Legs", a:String(r1.trainLegs.length), b:String(r2.trainLegs.length)},
-    {label:"Est. Out-of-Pocket", a:"$"+oop(r1).toLocaleString(), b:"$"+oop(r2).toLocaleString()},
-    {label:"Key Highlights", a:r1.highlights.slice(0,3).join(" · "), b:r2.highlights.slice(0,3).join(" · ")},
+    {label:"Avg. Fall High",icon:"☀️", a:avgWeatherHigh(r1)+"°F", b:avgWeatherHigh(r2)+"°F"},
+    {label:"Avg. Fall Low",icon:"🌙", a:avgWeatherLow(r1)+"°F", b:avgWeatherLow(r2)+"°F"},
+    {label:"Rain Days / mo",icon:"🌧️", a:avgRainDays(r1)+" days", b:avgRainDays(r2)+" days"},
+    {label:"Total Train Time",icon:"🚂", a:totalTrainHrs(r1)+"h across "+r1.trainLegs.length+" legs", b:totalTrainHrs(r2)+"h across "+r2.trainLegs.length+" legs"},
+    {label:"Train Cost / pp",icon:"🎫", a:"€"+totalTrainCost(r1)+" (~$"+Math.round(totalTrainCost(r1)*1.08)+")", b:"€"+totalTrainCost(r2)+" (~$"+Math.round(totalTrainCost(r2)*1.08)+")"},
+    {label:"Scenic Rating",icon:"🏔️", a:avgScenic(r1)+" / 5", b:avgScenic(r2)+" / 5"},
+    {label:"Avg. Daily Food",icon:"🍽️", a:"~$"+Math.round(dailyFood(r1))+"/pp/day", b:"~$"+Math.round(dailyFood(r2))+"/pp/day"},
+    {label:"Languages",icon:"🗣️", a:"English + French", b:"German + Czech (English widely spoken)"},
+    {label:"Iconic Moments",icon:"✨", a:"Eurostar under the Channel · Canterbury Cathedral · Louvre · Eiffel Tower sunset", b:"Neuschwanstein Castle · Sound of Music · Vienna concert · Prague Castle at night"},
+    {label:"Vibe",icon:"🎭", a:"Refined & literary — English countryside + Parisian charm", b:"Fairy-tale & grand — castles, beer halls, coffeehouses"},
   ];
+
   return React.createElement(AnimIn, {delay:200},
     React.createElement(GlowCard, {glow:T.purple,style:{padding:0,overflow:"hidden"}},
       React.createElement("div", {style:{padding:"16px 20px 12px",borderBottom:"1px solid "+T.border}},
         React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}},
           React.createElement(Compass, {size:16,color:T.purple}),
           React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Head-to-Head Comparison")
-        )
+        ),
+        React.createElement("p", {style:{fontSize:11,color:T.textMuted,textAlign:"center",margin:"6px 0 0"}}, "The stuff that's not on the cards — weather, travel time, food costs, vibe")
       ),
       // Header row with route names
-      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"120px 1fr 1fr",borderBottom:"1px solid "+T.border,background:T.bg+"80"}},
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"minmax(100px,130px) 1fr 1fr",borderBottom:"1px solid "+T.border,background:T.bg+"80"}},
         React.createElement("div", {style:{padding:"10px 12px"}}),
         React.createElement("div", {style:{padding:"10px 12px",textAlign:"center",borderLeft:"1px solid "+T.border}},
           React.createElement("span", {style:{fontSize:12,fontWeight:800,color:r1.color}}, r1.name)
@@ -1719,8 +1734,10 @@ function HeadToHead() {
         )
       ),
       // Data rows
-      rows.map((row,i) => React.createElement("div", {key:i,style:{display:"grid",gridTemplateColumns:"120px 1fr 1fr",borderBottom:i<rows.length-1?"1px solid "+T.border:"none",background:i%2===0?"transparent":T.bg+"40"}},
-        React.createElement("div", {style:{padding:"10px 12px",fontSize:11,fontWeight:700,color:T.textMuted,display:"flex",alignItems:"center"}}, row.label),
+      rows.map((row,i) => React.createElement("div", {key:i,style:{display:"grid",gridTemplateColumns:"minmax(100px,130px) 1fr 1fr",borderBottom:i<rows.length-1?"1px solid "+T.border:"none",background:i%2===0?"transparent":T.bg+"40"}},
+        React.createElement("div", {style:{padding:"10px 12px",fontSize:11,fontWeight:700,color:T.textMuted,display:"flex",alignItems:"center",gap:4}},
+          React.createElement("span", null, row.icon), row.label
+        ),
         React.createElement("div", {style:{padding:"10px 12px",fontSize:12,color:T.text,borderLeft:"1px solid "+T.border,lineHeight:1.5}}, row.a),
         React.createElement("div", {style:{padding:"10px 12px",fontSize:12,color:T.text,borderLeft:"1px solid "+T.border,lineHeight:1.5}}, row.b)
       ))
