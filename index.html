@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="theme-color" content="#0c0f1a" />
     <meta property="og:title" content="Perkins Family Europe Trip" />
-    <meta property="og:description" content="Celebrating 50 Years of Marriage — 8 curated routes through Europe for 16 travelers. Vote, explore & plan together." />
+    <meta property="og:description" content="Celebrating 50 Years of Marriage — Final Round: 2 routes, 1 vote. Choose your favorite for 16 travelers." />
     <meta property="og:image" content="https://perkins-europe-trip.vercel.app/og-logo.png" />
     <meta property="og:image:width" content="2508" />
     <meta property="og:image:height" content="1736" />
@@ -15,7 +15,7 @@
     <meta property="og:url" content="https://perkins-europe-trip.vercel.app" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Perkins Family Europe Trip" />
-    <meta name="twitter:description" content="Celebrating 50 Years — 6 routes through Europe for 16 travelers. Vote & plan together." />
+    <meta name="twitter:description" content="Celebrating 50 Years — Final Round: 2 routes, 1 vote per person." />
     <meta name="twitter:image" content="https://perkins-europe-trip.vercel.app/og-logo.png" />
     <title>Perkins Family Europe Trip</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -59,6 +59,12 @@ function useUser() {
   const save = (name) => { setUser(name); try { localStorage.setItem("perkins_user",name); } catch {} };
   return [user,save];
 }
+
+// ===================== ROUND 2 CONFIG =====================
+const FINALIST_IDS = ["cotswolds-london-canterbury-paris","germany-austria-prague"];
+const FINAL_DEADLINE = new Date("2026-04-09T00:00:00-07:00").getTime(); // Wed Apr 8 midnight AZ
+const VIP_FINAL_NAMES = ["gary","darlene"];
+const VIP_WEIGHT = 2; // Gary & Darlene votes count 2x
 
 // ===================== ROUTE DATA =====================
 const ROUTES = [
@@ -1535,12 +1541,11 @@ function NotesTab({route,user,onNavigate}) {
   );
 }
 
-// ============ VOTING COUNTDOWN ============
+// ============ VOTING COUNTDOWN (ROUND 2) ============
 function VotingCountdown() {
-  const deadline = new Date("2026-04-06T00:00:00-07:00").getTime();
   const [now, setNow] = useState(Date.now());
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
-  const diff = Math.max(0, deadline - now);
+  const diff = Math.max(0, FINAL_DEADLINE - now);
   const days = Math.floor(diff / 86400000);
   const hrs = Math.floor((diff % 86400000) / 3600000);
   const mins = Math.floor((diff % 3600000) / 60000);
@@ -1551,92 +1556,98 @@ function VotingCountdown() {
     React.createElement("span", {style:{fontSize:10,color:T.textMuted,textTransform:"uppercase",letterSpacing:1,marginTop:2}}, label)
   );
   const sep = React.createElement("span", {style:{fontSize:"clamp(18px,4vw,28px)",fontWeight:700,color:T.textMuted,alignSelf:"flex-start",paddingTop:2}}, ":");
-  return React.createElement("div", {style:{textAlign:"center",marginBottom:16,marginTop:48}},
+  return React.createElement("div", {style:{textAlign:"center",marginBottom:16,marginTop:32}},
     React.createElement("div", {style:{display:"inline-flex",alignItems:"center",gap:2,background:"rgba(255,255,255,0.04)",border:"1px solid "+T.rose+"33",borderRadius:12,padding:"12px 24px"}},
       locked
-        ? React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.textMuted,letterSpacing:1,textTransform:"uppercase"}}, "Voting is locked")
+        ? React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.textMuted,letterSpacing:1,textTransform:"uppercase"}}, "Final voting is closed")
         : React.createElement(React.Fragment, null,
-            React.createElement("span", {style:{fontSize:11,fontWeight:700,color:T.rose,letterSpacing:2,textTransform:"uppercase",marginRight:12}}, "Voting locks in"),
+            React.createElement("span", {style:{fontSize:11,fontWeight:700,color:T.rose,letterSpacing:2,textTransform:"uppercase",marginRight:12}}, "Final vote locks in"),
             unit(days,"days"), sep, unit(hrs,"hrs"), sep, unit(mins,"min"), sep, unit(secs,"sec")
           )
     )
   );
 }
 
-// ============ VOTING SECTION ============
-function VotingSection({user}) {
-  const [votes,setVotes] = useState({1:"",2:"",3:""});
+// ============ FINAL VOTING SECTION (ROUND 2) ============
+function FinalVotingSection({user}) {
+  const finalists = ROUTES.filter(r => FINALIST_IDS.includes(r.id));
+  const [myVote,setMyVote] = useState("");
   const [allVotes,setAllVotes] = useState([]);
   const [loading,setLoading] = useState(true);
   const [saving,setSaving] = useState(false);
+  const locked = Date.now() >= FINAL_DEADLINE;
 
-  const fetchMyVotes = async () => {
+  const fetchMyVote = async () => {
     if (!user) return;
-    const {data} = await sb.from("perkins_votes").select("*").eq("voter",user);
-    const obj = {1:"",2:"",3:""};
-    (data||[]).forEach(v => { obj[v.rank] = v.route_id; });
-    setVotes(obj);
+    const {data} = await sb.from("perkins_final_votes").select("*").eq("voter",user).limit(1);
+    if (data && data.length > 0) setMyVote(data[0].route_id);
+    else setMyVote("");
   };
   const fetchAllVotes = async () => {
-    const {data} = await sb.from("perkins_votes").select("*");
+    const {data} = await sb.from("perkins_final_votes").select("*");
     setAllVotes(data||[]);
     setLoading(false);
   };
-  useEffect(() => { fetchMyVotes(); fetchAllVotes(); }, [user]);
+  useEffect(() => { fetchMyVote(); fetchAllVotes(); }, [user]);
 
-  const saveVote = async (rank,routeId) => {
-    if (!user) return;
+  const castVote = async (routeId) => {
+    if (!user || locked) return;
     setSaving(true);
-    await sb.from("perkins_votes").delete().eq("voter",user).eq("rank",rank);
-    if (routeId) await sb.from("perkins_votes").insert({voter:user,route_id:routeId,rank});
-    setVotes(v => ({...v,[rank]:routeId}));
+    // upsert: delete old vote then insert new
+    await sb.from("perkins_final_votes").delete().eq("voter",user);
+    await sb.from("perkins_final_votes").insert({voter:user,route_id:routeId});
+    setMyVote(routeId);
     await fetchAllVotes();
     setSaving(false);
   };
 
   // Compute weighted scores
   const scores = {};
-  ROUTES.forEach(r => { scores[r.id] = 0; });
-  const vipNames = ["gary","darlene"];
+  finalists.forEach(r => { scores[r.id] = 0; });
   allVotes.forEach(v => {
-    const isVip = vipNames.includes(v.voter.toLowerCase());
-    const pts = v.rank===1?(isVip?5:3):v.rank===2?2:1;
-    scores[v.route_id] = (scores[v.route_id]||0) + pts;
+    const isVip = VIP_FINAL_NAMES.includes(v.voter.toLowerCase());
+    scores[v.route_id] = (scores[v.route_id]||0) + (isVip ? VIP_WEIGHT : 1);
   });
-  const ranked = ROUTES.map(r => ({id:r.id,name:r.name,color:r.color,score:scores[r.id]||0})).sort((a,b) => b.score - a.score);
-  const maxScore = Math.max(...ranked.map(r => r.score), 1);
+  const totalPts = Object.values(scores).reduce((a,b)=>a+b,0) || 1;
 
-  // Unique voters
+  // Voters list
   const voters = [...new Set(allVotes.map(v=>v.voter))];
 
-  const sel = {background:T.bg,border:"1px solid "+T.border,borderRadius:8,padding:"8px 12px",color:T.text,fontSize:13,outline:"none",fontFamily:"inherit",cursor:"pointer",width:"100%"};
-  const rankLabels = {1:"1st Choice (3 pts)",2:"2nd Choice (2 pts)",3:"3rd Choice (1 pt)"};
-  const rankEmoji = {1:"🥇",2:"🥈",3:"🥉"};
+  // Determine winner (only if locked)
+  const winner = locked ? finalists.reduce((a,b) => (scores[a.id]||0) >= (scores[b.id]||0) ? a : b) : null;
 
-  return React.createElement("div", {style:{marginTop:48}},
+  return React.createElement("div", {style:{marginTop:32}},
     React.createElement("div", {style:{textAlign:"center",marginBottom:24}},
-      React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.rose,fontWeight:700,textTransform:"uppercase",marginBottom:6}}, "Family Vote"),
-      React.createElement("h2", {style:{fontSize:"clamp(18px,4vw,24px)",fontWeight:900,color:T.white,margin:0}}, "Pick Your Top 3 Routes"),
-      React.createElement("p", {style:{color:T.textMuted,fontSize:12,margin:"6px 0 0"}}, "Rank your 1st, 2nd, and 3rd choice · weighted scoring (3/2/1 pts · Gary & Darlene 1st = 5 pts)")
+      React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.rose,fontWeight:700,textTransform:"uppercase",marginBottom:6}}, "Final Vote"),
+      React.createElement("h2", {style:{fontSize:"clamp(18px,4vw,24px)",fontWeight:900,color:T.white,margin:0}}, "Choose One Route"),
+      React.createElement("p", {style:{color:T.textMuted,fontSize:12,margin:"6px 0 0"}}, "One vote per person · Gary & Darlene votes count 2x")
     ),
     React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(300px,100%),1fr))",gap:16}},
-      // Vote inputs
+      // Vote buttons
       React.createElement(GlowCard, {glow:T.rose,style:{padding:20}},
         user ? React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:12}},
           React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},
             React.createElement(Vote, {size:18,color:T.rose}),
-            React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Your Rankings")
+            React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Your Vote")
           ),
-          [1,2,3].map(rank => {
-            const used = Object.entries(votes).filter(([r,v])=>v&&Number(r)!==rank).map(([,v])=>v);
-            return React.createElement("div", {key:rank},
-              React.createElement("label", {style:{fontSize:11,color:T.textMuted,fontWeight:600,display:"block",marginBottom:4}}, rankEmoji[rank]+" "+rankLabels[rank]),
-              React.createElement("select", {value:votes[rank],onChange:e=>saveVote(rank,e.target.value),disabled:saving,style:sel},
-                React.createElement("option", {value:""}, "— Select a route —"),
-                ROUTES.filter(r => !used.includes(r.id)).map(r => React.createElement("option", {key:r.id,value:r.id}, r.name))
+          finalists.map(r => {
+            const selected = myVote === r.id;
+            return React.createElement("button", {key:r.id, onClick:()=>!locked&&castVote(r.id), disabled:saving||locked,
+              style:{display:"flex",alignItems:"center",gap:12,padding:"14px 16px",borderRadius:12,cursor:locked?"default":"pointer",
+                background:selected?`${r.color}20`:T.bg,
+                border:selected?`2px solid ${r.color}`:`2px solid ${T.border}`,
+                transition:"all 0.3s",opacity:saving?0.6:1}},
+              React.createElement("div", {style:{width:24,height:24,borderRadius:12,border:selected?`2px solid ${r.color}`:`2px solid ${T.textDim}`,
+                display:"flex",alignItems:"center",justifyContent:"center",flexShrink:0,background:selected?r.color:"transparent",transition:"all 0.3s"}},
+                selected && React.createElement(Check, {size:14,color:T.white})
+              ),
+              React.createElement("div", {style:{textAlign:"left"}},
+                React.createElement("div", {style:{fontSize:14,fontWeight:700,color:selected?T.white:T.text}}, r.name),
+                React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, r.countryFlags.join(" ")+" · "+r.cities.length+" cities")
               )
             );
-          })
+          }),
+          locked && React.createElement("div", {style:{fontSize:12,color:T.textMuted,textAlign:"center",padding:"8px 0"}}, "Voting has closed.")
         ) : React.createElement("div", {style:{textAlign:"center",padding:20}},
           React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:0}}, "Enter your name at the top to vote.")
         )
@@ -1645,24 +1656,25 @@ function VotingSection({user}) {
       React.createElement(GlowCard, {glow:T.accent,style:{padding:20}},
         React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:16}},
           React.createElement(TrendingUp, {size:18,color:T.accent}),
-          React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Current Standings"),
+          React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Live Results"),
           voters.length > 0 && React.createElement("span", {style:{fontSize:10,color:T.textMuted,background:T.bg,padding:"2px 8px",borderRadius:99}}, voters.length+" voter"+(voters.length!==1?"s":""))
         ),
         loading ? React.createElement("div", {style:{color:T.textMuted,fontSize:13,padding:20,textAlign:"center"}}, "Loading votes...") :
         allVotes.length === 0 ? React.createElement("div", {style:{color:T.textMuted,fontSize:13,padding:20,textAlign:"center"}}, "No votes yet. Be the first!") :
-        React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:10}},
-          ranked.map((r,i) => React.createElement("div", {key:r.id,style:{display:"flex",alignItems:"center",gap:10}},
-            React.createElement("span", {style:{fontSize:14,fontWeight:800,color:i===0?T.accent:T.textMuted,width:20,textAlign:"right"}}, "#"+(i+1)),
-            React.createElement("div", {style:{flex:1}},
-              React.createElement("div", {style:{display:"flex",justifyContent:"space-between",marginBottom:3}},
-                React.createElement("span", {style:{fontSize:13,fontWeight:700,color:T.text}}, r.name),
-                React.createElement("span", {style:{fontSize:12,fontWeight:800,color:r.color}}, r.score+" pts")
+        React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:14}},
+          finalists.map(r => {
+            const pts = scores[r.id]||0;
+            const pct = Math.round(pts/totalPts*100);
+            return React.createElement("div", {key:r.id},
+              React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
+                React.createElement("span", {style:{fontSize:14,fontWeight:700,color:T.text}}, r.name),
+                React.createElement("span", {style:{fontSize:13,fontWeight:800,color:r.color}}, pts+" pts · "+pct+"%")
               ),
-              React.createElement("div", {style:{height:6,background:T.bg,borderRadius:99,overflow:"hidden"}},
-                React.createElement("div", {style:{height:"100%",width:(r.score/maxScore*100)+"%",background:r.color,borderRadius:99,transition:"width 0.5s"}})
+              React.createElement("div", {style:{height:10,background:T.bg,borderRadius:99,overflow:"hidden"}},
+                React.createElement("div", {style:{height:"100%",width:pct+"%",background:r.color,borderRadius:99,transition:"width 0.5s"}})
               )
-            )
-          ))
+            );
+          })
         ),
         voters.length > 0 && React.createElement("div", {style:{marginTop:16,paddingTop:12,borderTop:"1px solid "+T.border}},
           React.createElement("div", {style:{fontSize:11,color:T.textMuted,fontWeight:600,marginBottom:6}}, "Voters"),
@@ -1675,102 +1687,161 @@ function VotingSection({user}) {
   );
 }
 
+// ============ HEAD-TO-HEAD COMPARISON ============
+function HeadToHead() {
+  const finalists = ROUTES.filter(r => FINALIST_IDS.includes(r.id));
+  const r1 = finalists[0], r2 = finalists[1];
+  const oop = (r) => Math.max(0, calcCouple(r.budgetTiers.fall.value, r.nights||NIGHTS) + (r.azToJfk||0)*2 - 3000);
+  const rows = [
+    {label:"Countries", a:r1.countryFlags.join(" ")+" "+r1.countries.length, b:r2.countryFlags.join(" ")+" "+r2.countries.length},
+    {label:"Cities", a:r1.cities.join(", "), b:r2.cities.join(", ")},
+    {label:"Duration", a:(r1.nights||NIGHTS)+" nights", b:(r2.nights||NIGHTS)+" nights"},
+    {label:"Train Legs", a:String(r1.trainLegs.length), b:String(r2.trainLegs.length)},
+    {label:"Est. Out-of-Pocket", a:"$"+oop(r1).toLocaleString(), b:"$"+oop(r2).toLocaleString()},
+    {label:"Key Highlights", a:r1.highlights.slice(0,3).join(" · "), b:r2.highlights.slice(0,3).join(" · ")},
+  ];
+  return React.createElement(AnimIn, {delay:200},
+    React.createElement(GlowCard, {glow:T.purple,style:{padding:0,overflow:"hidden"}},
+      React.createElement("div", {style:{padding:"16px 20px 12px",borderBottom:"1px solid "+T.border}},
+        React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,justifyContent:"center"}},
+          React.createElement(Compass, {size:16,color:T.purple}),
+          React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Head-to-Head Comparison")
+        )
+      ),
+      // Header row with route names
+      React.createElement("div", {style:{display:"grid",gridTemplateColumns:"120px 1fr 1fr",borderBottom:"1px solid "+T.border,background:T.bg+"80"}},
+        React.createElement("div", {style:{padding:"10px 12px"}}),
+        React.createElement("div", {style:{padding:"10px 12px",textAlign:"center",borderLeft:"1px solid "+T.border}},
+          React.createElement("span", {style:{fontSize:12,fontWeight:800,color:r1.color}}, r1.name)
+        ),
+        React.createElement("div", {style:{padding:"10px 12px",textAlign:"center",borderLeft:"1px solid "+T.border}},
+          React.createElement("span", {style:{fontSize:12,fontWeight:800,color:r2.color}}, r2.name)
+        )
+      ),
+      // Data rows
+      rows.map((row,i) => React.createElement("div", {key:i,style:{display:"grid",gridTemplateColumns:"120px 1fr 1fr",borderBottom:i<rows.length-1?"1px solid "+T.border:"none",background:i%2===0?"transparent":T.bg+"40"}},
+        React.createElement("div", {style:{padding:"10px 12px",fontSize:11,fontWeight:700,color:T.textMuted,display:"flex",alignItems:"center"}}, row.label),
+        React.createElement("div", {style:{padding:"10px 12px",fontSize:12,color:T.text,borderLeft:"1px solid "+T.border,lineHeight:1.5}}, row.a),
+        React.createElement("div", {style:{padding:"10px 12px",fontSize:12,color:T.text,borderLeft:"1px solid "+T.border,lineHeight:1.5}}, row.b)
+      ))
+    )
+  );
+}
+
 function OverviewScreen({onSelect,user}) {
+  const finalists = ROUTES.filter(r => FINALIST_IDS.includes(r.id));
+  const locked = Date.now() >= FINAL_DEADLINE;
+
+  // Fetch final votes to determine winner when locked
+  const [finalVotes,setFinalVotes] = useState([]);
+  useEffect(() => {
+    if (!locked) return;
+    sb.from("perkins_final_votes").select("*").then(({data}) => setFinalVotes(data||[]));
+  }, [locked]);
+
+  // Compute winner
+  const scores = {};
+  finalists.forEach(r => { scores[r.id] = 0; });
+  finalVotes.forEach(v => {
+    const isVip = VIP_FINAL_NAMES.includes(v.voter.toLowerCase());
+    scores[v.route_id] = (scores[v.route_id]||0) + (isVip ? VIP_WEIGHT : 1);
+  });
+  const winnerRoute = locked && finalVotes.length > 0
+    ? finalists.reduce((a,b) => (scores[a.id]||0) >= (scores[b.id]||0) ? a : b)
+    : null;
+
+  // If voting closed and we have a winner, show winner announcement
+  if (winnerRoute) {
+    const winnerIdx = ROUTES.findIndex(r => r.id === winnerRoute.id);
+    return React.createElement("div", {style:{maxWidth:1100,margin:"0 auto",padding:"0 12px 60px"}},
+      React.createElement(AnimIn, null,
+        React.createElement("div", {style:{textAlign:"center",padding:"48px 16px 32px",position:"relative"}},
+          React.createElement("div", {style:{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 0%,${winnerRoute.color}18 0%,transparent 60%)`,pointerEvents:"none"}}),
+          React.createElement("div", {style:{fontSize:48,marginBottom:16}}, "🎉"),
+          React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.accent,fontWeight:700,textTransform:"uppercase",marginBottom:12}}, "The votes are in!"),
+          React.createElement("h1", {style:{fontSize:"clamp(24px,6vw,36px)",fontWeight:900,color:T.white,margin:"0 0 8px",letterSpacing:-1}}, "The Perkins Family is going to"),
+          React.createElement("h1", {style:{fontSize:"clamp(28px,7vw,44px)",fontWeight:900,color:winnerRoute.color,margin:"0 0 12px",letterSpacing:-1}}, winnerRoute.name),
+          React.createElement("p", {style:{color:T.textMuted,fontSize:14,margin:"0 0 8px"}}, "Celebrating 50 Years of Marriage"),
+          React.createElement("div", {style:{display:"flex",gap:6,justifyContent:"center",flexWrap:"wrap",margin:"16px 0"}},
+            winnerRoute.cities.map((c,ci) => React.createElement("span", {key:ci,style:{fontSize:12,background:`${winnerRoute.color}12`,color:winnerRoute.color,padding:"4px 12px",borderRadius:99,fontWeight:600,border:`1px solid ${winnerRoute.color}25`}}, winnerRoute.cityFlags[ci]+" "+c))
+          ),
+          React.createElement("button", {onClick:()=>onSelect(winnerIdx),style:{display:"inline-flex",alignItems:"center",gap:8,background:winnerRoute.gradient,border:"none",borderRadius:99,padding:"14px 32px",color:T.white,fontSize:16,fontWeight:800,cursor:"pointer",marginTop:16,boxShadow:`0 4px 20px ${winnerRoute.color}40`}},
+            "Explore the Winning Route", React.createElement(ChevronRight, {size:18})
+          )
+        )
+      ),
+      // Show final vote tally
+      React.createElement(AnimIn, {delay:200},
+        React.createElement("div", {style:{maxWidth:500,margin:"0 auto"}},
+          React.createElement(GlowCard, {glow:T.accent,style:{padding:20,textAlign:"center"}},
+            React.createElement("div", {style:{fontSize:11,fontWeight:700,color:T.textMuted,textTransform:"uppercase",letterSpacing:2,marginBottom:12}}, "Final Tally"),
+            finalists.map(r => {
+              const pts = scores[r.id]||0;
+              const totalPts = Object.values(scores).reduce((a,b)=>a+b,0)||1;
+              const pct = Math.round(pts/totalPts*100);
+              const isWinner = r.id === winnerRoute.id;
+              return React.createElement("div", {key:r.id,style:{marginBottom:12}},
+                React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:4}},
+                  React.createElement("span", {style:{fontSize:14,fontWeight:isWinner?800:600,color:isWinner?T.white:T.textMuted}}, (isWinner?"🏆 ":"")+r.name),
+                  React.createElement("span", {style:{fontSize:13,fontWeight:800,color:r.color}}, pts+" pts · "+pct+"%")
+                ),
+                React.createElement("div", {style:{height:8,background:T.bg,borderRadius:99,overflow:"hidden"}},
+                  React.createElement("div", {style:{height:"100%",width:pct+"%",background:r.color,borderRadius:99}})
+                )
+              );
+            })
+          )
+        )
+      )
+    );
+  }
+
+  // Normal Round 2 voting screen
   return React.createElement("div", {style:{maxWidth:1100,margin:"0 auto",padding:"0 12px 60px"}},
     React.createElement(AnimIn, null,
       React.createElement("div", {style:{textAlign:"center",padding:"32px 16px 24px",position:"relative"}},
         React.createElement("div", {style:{position:"absolute",inset:0,background:"radial-gradient(ellipse at 50% 0%,rgba(240,160,80,0.08) 0%,transparent 60%)",pointerEvents:"none"}}),
-        React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.accent,fontWeight:700,textTransform:"uppercase",marginBottom:8}}, "Choose Your Adventure"),
+        React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.accent,fontWeight:700,textTransform:"uppercase",marginBottom:8}}, "Final Round"),
         React.createElement("h1", {style:{fontSize:"clamp(24px,6vw,36px)",fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, "Perkins Family Europe Trip"),
         React.createElement("p", {style:{color:T.textMuted,fontSize:14,margin:"0 0 8px"}}, "Celebrating 50 Years of Marriage"),
-        React.createElement("p", {style:{color:T.textDim,fontSize:12,margin:0,lineHeight:1.5}}, "8 curated routes focused on quaint villages, local food & culture · 16 travelers · 8 couples · Fall 2026 or Spring 2027"),
+        React.createElement("p", {style:{color:T.textDim,fontSize:12,margin:0,lineHeight:1.5}}, "The top 2 routes from Round 1 · Pick your favorite · One vote per person"),
       )
     ),
     React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(280px,100%),1fr))",gap:16}},
-      ROUTES.map((route,i) => React.createElement(AnimIn, {key:route.id,delay:i*120,style:{height:"100%"}},
-        React.createElement(GlowCard, {glow:route.color,onClick:()=>onSelect(i),style:{padding:0,overflow:"hidden",height:"100%",display:"flex",flexDirection:"column"}},
-          React.createElement(MiniMap, {route}),
-          React.createElement("div", {style:{padding:"20px 24px 24px",position:"relative",flex:1,display:"flex",flexDirection:"column"}},
-            React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},
-              React.createElement("span", {style:{fontSize:11,fontWeight:800,color:route.color,letterSpacing:1,textTransform:"uppercase"}}, "Route "+(i+1)),
-              React.createElement("span", {style:{fontSize:10,color:T.textDim}}, "·"),
-              React.createElement("span", {style:{fontSize:10,color:T.textMuted}}, route.countries.length+" countries"),
-              React.createElement("span", {style:{fontSize:10,fontWeight:700,color:route.color,background:`${route.color}18`,padding:"2px 8px",borderRadius:99,border:`1px solid ${route.color}30`}}, (route.nights||NIGHTS)+" nights + 2 travel days"),
-            ),
-            React.createElement("h2", {style:{fontSize:22,fontWeight:900,color:T.white,margin:"0 0 2px"}}, route.name),
-            React.createElement("p", {style:{fontSize:13,color:T.textMuted,margin:"0 0 12px"}}, route.tagline),
-            React.createElement("div", {style:{display:"flex",gap:4,flexWrap:"wrap",marginBottom:14,flex:1}},
-              route.cities.map((c,ci) => React.createElement("span", {key:ci,style:{fontSize:11,background:`${route.color}12`,color:route.color,padding:"3px 10px",borderRadius:99,fontWeight:600,border:`1px solid ${route.color}25`}}, route.cityFlags[ci]+" "+c))
-            ),
-            React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid "+T.border,marginTop:"auto"}},
-              React.createElement("div", null,
-                React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, "Est. out-of-pocket · Fall"),
-                React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+Math.max(0,calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)+(route.azToJfk||0)*2-3000).toLocaleString()),
+      finalists.map((route) => {
+        const i = ROUTES.indexOf(route);
+        return React.createElement(AnimIn, {key:route.id,delay:i*120,style:{height:"100%"}},
+          React.createElement(GlowCard, {glow:route.color,onClick:()=>onSelect(i),style:{padding:0,overflow:"hidden",height:"100%",display:"flex",flexDirection:"column"}},
+            React.createElement(MiniMap, {route}),
+            React.createElement("div", {style:{padding:"20px 24px 24px",position:"relative",flex:1,display:"flex",flexDirection:"column"}},
+              React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},
+                React.createElement("span", {style:{fontSize:11,fontWeight:800,color:route.color,letterSpacing:1,textTransform:"uppercase"}}, "Finalist"),
+                React.createElement("span", {style:{fontSize:10,color:T.textDim}}, "·"),
+                React.createElement("span", {style:{fontSize:10,color:T.textMuted}}, route.countries.length+" countries"),
+                React.createElement("span", {style:{fontSize:10,fontWeight:700,color:route.color,background:`${route.color}18`,padding:"2px 8px",borderRadius:99,border:`1px solid ${route.color}30`}}, (route.nights||NIGHTS)+" nights + 2 travel days"),
               ),
-              React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,color:route.color,fontSize:13,fontWeight:700}},
-                "Explore Route", React.createElement(ChevronRight, {size:16})
-              )
-            )
-          )
-        )
-      ))
-    ),
-    React.createElement(VotingCountdown),
-    React.createElement(VotingSection, {user}),
-    React.createElement(AnimIn, {delay:400},
-      React.createElement("div", {style:{marginTop:48}},
-        React.createElement("div", {style:{textAlign:"center",marginBottom:24}},
-          React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:T.purple,fontWeight:700,textTransform:"uppercase",marginBottom:6}}, "Source Data"),
-          React.createElement("h2", {style:{fontSize:"clamp(18px,4vw,24px)",fontWeight:900,color:T.white,margin:0}}, "What the Family Said"),
-          React.createElement("p", {style:{color:T.textMuted,fontSize:12,margin:"6px 0 0"}}, "Compiled from 2 family calls + 17 voice memos from 12 contributors")
-        ),
-        React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(320px,100%),1fr))",gap:16}},
-          React.createElement(GlowCard, {glow:T.accent},
-            React.createElement("h3", {style:{margin:"0 0 4px",color:T.white,fontSize:16}}, "Destination Popularity"),
-            React.createElement("p", {style:{margin:"0 0 16px",fontSize:12,color:T.textMuted}}, "How many times each destination was mentioned"),
-            React.createElement(ResponsiveContainer, {width:"99%",height:260},
-              React.createElement(BarChart, {data:destinationVotes,layout:"vertical"},
-                React.createElement(CartesianGrid, {strokeDasharray:"3 3",stroke:T.border}),
-                React.createElement(XAxis, {type:"number",domain:[0,10],tick:{fill:T.textMuted,fontSize:11}}),
-                React.createElement(YAxis, {dataKey:"name",type:"category",width:120,tick:{fill:T.textMuted,fontSize:11}}),
-                React.createElement(Tooltip, {contentStyle:{background:T.card,border:"1px solid "+T.border,borderRadius:8,color:T.text},itemStyle:{color:T.text},labelStyle:{color:T.white}}),
-                React.createElement(Bar, {dataKey:"votes",name:"Mentions",radius:[0,8,8,0]},
-                  destinationVotes.map((_,i)=>React.createElement(Cell,{key:i,fill:CC[i%CC.length]}))
+              React.createElement("h2", {style:{fontSize:22,fontWeight:900,color:T.white,margin:"0 0 2px"}}, route.name),
+              React.createElement("p", {style:{fontSize:13,color:T.textMuted,margin:"0 0 12px"}}, route.tagline),
+              React.createElement("div", {style:{display:"flex",gap:4,flexWrap:"wrap",marginBottom:14,flex:1}},
+                route.cities.map((c,ci) => React.createElement("span", {key:ci,style:{fontSize:11,background:`${route.color}12`,color:route.color,padding:"3px 10px",borderRadius:99,fontWeight:600,border:`1px solid ${route.color}25`}}, route.cityFlags[ci]+" "+c))
+              ),
+              React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",paddingTop:12,borderTop:"1px solid "+T.border,marginTop:"auto"}},
+                React.createElement("div", null,
+                  React.createElement("div", {style:{fontSize:11,color:T.textMuted}}, "Est. out-of-pocket · Fall"),
+                  React.createElement("div", {style:{fontSize:22,fontWeight:900,color:route.color}}, "$"+Math.max(0,calcCouple(route.budgetTiers.fall.value,route.nights||NIGHTS)+(route.azToJfk||0)*2-3000).toLocaleString()),
+                ),
+                React.createElement("div", {style:{display:"flex",alignItems:"center",gap:6,color:route.color,fontSize:13,fontWeight:700}},
+                  "Explore Route", React.createElement(ChevronRight, {size:16})
                 )
               )
             )
-          ),
-          React.createElement(GlowCard, {glow:T.purple},
-            React.createElement("h3", {style:{margin:"0 0 4px",color:T.white,fontSize:16}}, "Experience Priorities"),
-            React.createElement("p", {style:{margin:"0 0 16px",fontSize:12,color:T.textMuted}}, "Weighted importance across all family input"),
-            React.createElement(ResponsiveContainer, {width:"99%",height:260},
-              React.createElement(RadarChart, {data:experienceData},
-                React.createElement(PolarGrid, {stroke:T.border}),
-                React.createElement(PolarAngleAxis, {dataKey:"exp",tick:{fill:T.textMuted,fontSize:10}}),
-                React.createElement(PolarRadiusAxis, {domain:[0,10],tick:{fill:T.textDim,fontSize:10}}),
-                React.createElement(Radar, {name:"Priority",dataKey:"score",stroke:T.accent,fill:T.accent,fillOpacity:0.2,strokeWidth:2})
-              )
-            )
           )
-        ),
-        React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(220px,100%),1fr))",gap:14,marginTop:16}},
-          groupPreferences.map((gp,i) => {
-            const colors = [T.accent,T.blue,T.green,T.purple];
-            const icons = [Globe,Compass,Heart,Shield];
-            const Icon = icons[i]; const color = colors[i];
-            return React.createElement(GlowCard, {key:i,glow:color,style:{padding:16}},
-              React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:10}},
-                React.createElement("div", {style:{width:32,height:32,borderRadius:8,background:color+"18",display:"flex",alignItems:"center",justifyContent:"center"}}, React.createElement(Icon,{size:16,color})),
-                React.createElement("div", {style:{fontSize:14,fontWeight:800,color:T.white}}, gp.category)
-              ),
-              React.createElement("div", {style:{display:"flex",flexWrap:"wrap",gap:5}},
-                gp.items.map((item,j) => React.createElement("span", {key:j,style:{fontSize:11,padding:"4px 10px",borderRadius:99,background:color+"12",border:"1px solid "+color+"25",color:T.text,fontWeight:500}}, item))
-              )
-            );
-          })
-        )
-      )
-    )
+        );
+      })
+    ),
+    React.createElement(HeadToHead),
+    React.createElement(VotingCountdown),
+    React.createElement(FinalVotingSection, {user})
   );
 }
 
@@ -2311,13 +2382,13 @@ function DetailView({route,routeIndex,onBack,initTab,initSeason,user}) {
   ];
   return React.createElement("div", {style:{maxWidth:900,margin:"0 auto",padding:"0 12px calc(40px + env(safe-area-inset-bottom,0px))"}},
     React.createElement("button", {onClick:onBack,style:{display:"flex",alignItems:"center",gap:6,background:"transparent",border:"none",color:route.color,fontSize:13,fontWeight:700,cursor:"pointer",padding:"12px 0",marginTop:4,WebkitTapHighlightColor:"transparent"}},
-      React.createElement(ChevronLeft, {size:16}), "Back to All Routes"
+      React.createElement(ChevronLeft, {size:16}), "Back to Final Round"
     ),
     React.createElement("div", {style:{textAlign:"center",padding:"12px 12px 24px",position:"relative"}},
       React.createElement("div", {style:{position:"absolute",inset:0,background:`radial-gradient(ellipse at 50% 0%,${route.color}14 0%,transparent 60%)`,pointerEvents:"none"}}),
       React.createElement("div", {style:{fontSize:11,letterSpacing:3,color:route.color,fontWeight:700,textTransform:"uppercase",marginBottom:6}}, route.tagline),
       React.createElement("h1", {style:{fontSize:"clamp(24px,6vw,32px)",fontWeight:900,color:T.white,margin:"0 0 6px",letterSpacing:-1}}, route.name),
-      React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:"0 0 16px"}}, "Perkins Family Europe Trip · Route "+(routeIndex+1)+" of "+ROUTES.length),
+      React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:"0 0 16px"}}, "Perkins Family Europe Trip · Final Round Finalist"),
       React.createElement("div", {className:"hide-scrollbar",style:{display:"flex",justifyContent:"center",alignItems:"center",gap:4,flexWrap:"wrap",marginBottom:20,padding:"0 4px"}},
         route.cities.map((c,i) => React.createElement("div", {key:c,style:{display:"flex",alignItems:"center",gap:3}},
           React.createElement("span", {style:{background:T.card,border:"1px solid "+T.border,borderRadius:99,padding:"5px 10px",fontSize:12,fontWeight:600,color:T.text,display:"inline-flex",alignItems:"center",gap:4,whiteSpace:"nowrap"}},
