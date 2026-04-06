@@ -1706,12 +1706,9 @@ function HeadToHead() {
     {label:"Avg. Fall Low",icon:"🌙", a:avgWeatherLow(r1)+"°F", b:avgWeatherLow(r2)+"°F"},
     {label:"Rain Days / mo",icon:"🌧️", a:avgRainDays(r1)+" days", b:avgRainDays(r2)+" days"},
     {label:"Total Train Time",icon:"🚂", a:totalTrainHrs(r1)+"h across "+r1.trainLegs.length+" legs", b:totalTrainHrs(r2)+"h across "+r2.trainLegs.length+" legs"},
-    {label:"Train Cost / pp",icon:"🎫", a:"€"+totalTrainCost(r1)+" (~$"+Math.round(totalTrainCost(r1)*1.08)+")", b:"€"+totalTrainCost(r2)+" (~$"+Math.round(totalTrainCost(r2)*1.08)+")"},
-    {label:"Scenic Rating",icon:"🏔️", a:avgScenic(r1)+" / 5", b:avgScenic(r2)+" / 5"},
-    {label:"Avg. Daily Food",icon:"🍽️", a:"~$"+Math.round(dailyFood(r1))+"/pp/day", b:"~$"+Math.round(dailyFood(r2))+"/pp/day"},
     {label:"Languages",icon:"🗣️", a:"English + French", b:"German + Czech (English widely spoken)"},
-    {label:"Iconic Moments",icon:"✨", a:"Eurostar under the Channel · Canterbury Cathedral · Louvre · Eiffel Tower sunset", b:"Neuschwanstein Castle · Sound of Music · Vienna concert · Prague Castle at night"},
-    {label:"Vibe",icon:"🎭", a:"Refined & literary — English countryside + Parisian charm", b:"Fairy-tale & grand — castles, beer halls, coffeehouses"},
+    {label:"Iconic Moments",icon:"✨", a:"Fairy-tale Cotswolds villages · Canterbury Cathedral · Eurostar under the Channel · Louvre & Eiffel Tower · Versailles option", b:"Neuschwanstein Castle · Sound of Music · Vienna concert & coffeehouses · Prague Castle at night"},
+    {label:"Vibe",icon:"🎭", a:"Picturesque & charming — stone cottages, English countryside, Parisian elegance", b:"Grand & fairy-tale — castles, beer halls, imperial palaces"},
   ];
 
   return React.createElement(AnimIn, {delay:200},
