@@ -59,6 +59,14 @@ function useUser() {
   const save = (name) => { setUser(name); try { localStorage.setItem("perkins_user",name); } catch {} };
   return [user,save];
 }
+// Stable device ID for preventing duplicate final votes across name changes
+function getDeviceId() {
+  try {
+    let id = localStorage.getItem("perkins_device_id");
+    if (!id) { id = crypto.randomUUID(); localStorage.setItem("perkins_device_id", id); }
+    return id;
+  } catch { return "unknown"; }
+}
 
 // ===================== ROUND 2 CONFIG =====================
 const FINALIST_IDS = ["cotswolds-london-canterbury-paris","germany-austria-prague"];
@@ -1586,9 +1594,11 @@ function FinalVotingSection({user,showResults}) {
   const [saving,setSaving] = useState(false);
   const locked = Date.now() >= FINAL_DEADLINE;
 
+  const deviceId = getDeviceId();
+
   const fetchMyVote = async () => {
     if (!user) return;
-    const {data} = await sb.from("perkins_final_votes").select("*").eq("voter",user).limit(1);
+    const {data} = await sb.from("perkins_final_votes").select("*").eq("device_id",deviceId).limit(1);
     if (data && data.length > 0) setMyVote(data[0].route_id);
     else setMyVote("");
   };
@@ -1602,9 +1612,9 @@ function FinalVotingSection({user,showResults}) {
   const castVote = async (routeId) => {
     if (!user || locked) return;
     setSaving(true);
-    // upsert: delete old vote then insert new
-    await sb.from("perkins_final_votes").delete().eq("voter",user);
-    await sb.from("perkins_final_votes").insert({voter:user,route_id:routeId});
+    // upsert by device_id so name changes don't allow re-voting
+    await sb.from("perkins_final_votes").delete().eq("device_id",deviceId);
+    await sb.from("perkins_final_votes").insert({voter:user,route_id:routeId,device_id:deviceId});
     setMyVote(routeId);
     await fetchAllVotes();
     setSaving(false);
