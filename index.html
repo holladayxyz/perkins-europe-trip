@@ -1542,8 +1542,10 @@ function NotesTab({route,user,onNavigate}) {
 }
 
 // ============ VOTING COUNTDOWN (ROUND 2) ============
-function VotingCountdown() {
+function VotingCountdown({onSecretReveal}) {
   const [now, setNow] = useState(Date.now());
+  const [taps, setTaps] = useState(0);
+  const tapTimer = useRef(null);
   useEffect(() => { const id = setInterval(() => setNow(Date.now()), 1000); return () => clearInterval(id); }, []);
   const diff = Math.max(0, FINAL_DEADLINE - now);
   const days = Math.floor(diff / 86400000);
@@ -1551,13 +1553,20 @@ function VotingCountdown() {
   const mins = Math.floor((diff % 3600000) / 60000);
   const secs = Math.floor((diff % 60000) / 1000);
   const locked = diff <= 0;
+  const handleTap = () => {
+    const next = taps + 1;
+    setTaps(next);
+    clearTimeout(tapTimer.current);
+    if (next >= 5) { onSecretReveal && onSecretReveal(); setTaps(0); }
+    else { tapTimer.current = setTimeout(() => setTaps(0), 2000); }
+  };
   const unit = (val, label) => React.createElement("div", {style:{display:"flex",flexDirection:"column",alignItems:"center",minWidth:54}},
     React.createElement("span", {style:{fontSize:"clamp(22px,5vw,32px)",fontWeight:900,color:locked?T.textMuted:T.rose,fontVariantNumeric:"tabular-nums"}}, String(val).padStart(2,"0")),
     React.createElement("span", {style:{fontSize:10,color:T.textMuted,textTransform:"uppercase",letterSpacing:1,marginTop:2}}, label)
   );
   const sep = React.createElement("span", {style:{fontSize:"clamp(18px,4vw,28px)",fontWeight:700,color:T.textMuted,alignSelf:"flex-start",paddingTop:2}}, ":");
   return React.createElement("div", {style:{textAlign:"center",marginBottom:16,marginTop:32}},
-    React.createElement("div", {style:{display:"inline-flex",alignItems:"center",gap:2,background:"rgba(255,255,255,0.04)",border:"1px solid "+T.rose+"33",borderRadius:12,padding:"12px 24px"}},
+    React.createElement("div", {onClick:handleTap,style:{display:"inline-flex",alignItems:"center",gap:2,background:"rgba(255,255,255,0.04)",border:"1px solid "+T.rose+"33",borderRadius:12,padding:"12px 24px",cursor:"default",WebkitTapHighlightColor:"transparent",userSelect:"none"}},
       locked
         ? React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.textMuted,letterSpacing:1,textTransform:"uppercase"}}, "Final voting is closed")
         : React.createElement(React.Fragment, null,
@@ -1569,7 +1578,7 @@ function VotingCountdown() {
 }
 
 // ============ FINAL VOTING SECTION (ROUND 2) ============
-function FinalVotingSection({user}) {
+function FinalVotingSection({user,showResults}) {
   const finalists = ROUTES.filter(r => FINALIST_IDS.includes(r.id));
   const [myVote,setMyVote] = useState("");
   const [allVotes,setAllVotes] = useState([]);
@@ -1622,8 +1631,8 @@ function FinalVotingSection({user}) {
       React.createElement("h2", {style:{fontSize:"clamp(18px,4vw,24px)",fontWeight:900,color:T.white,margin:0}}, "Choose One Route"),
       React.createElement("p", {style:{color:T.textMuted,fontSize:12,margin:"6px 0 0"}}, "One vote per person")
     ),
-    React.createElement("div", {style:{display:"grid",gridTemplateColumns:"repeat(auto-fit,minmax(min(300px,100%),1fr))",gap:16}},
-      // Vote buttons
+    // Vote buttons
+    React.createElement("div", {style:{maxWidth:480,margin:"0 auto"}},
       React.createElement(GlowCard, {glow:T.rose,style:{padding:20}},
         user ? React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:12}},
           React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:4}},
@@ -1651,35 +1660,39 @@ function FinalVotingSection({user}) {
         ) : React.createElement("div", {style:{textAlign:"center",padding:20}},
           React.createElement("p", {style:{color:T.textMuted,fontSize:13,margin:0}}, "Enter your name at the top to vote.")
         )
-      ),
-      // Results
-      React.createElement(GlowCard, {glow:T.accent,style:{padding:20}},
-        React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:16}},
-          React.createElement(TrendingUp, {size:18,color:T.accent}),
-          React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Live Results"),
-          voters.length > 0 && React.createElement("span", {style:{fontSize:10,color:T.textMuted,background:T.bg,padding:"2px 8px",borderRadius:99}}, voters.length+" voter"+(voters.length!==1?"s":""))
-        ),
-        loading ? React.createElement("div", {style:{color:T.textMuted,fontSize:13,padding:20,textAlign:"center"}}, "Loading votes...") :
-        allVotes.length === 0 ? React.createElement("div", {style:{color:T.textMuted,fontSize:13,padding:20,textAlign:"center"}}, "No votes yet. Be the first!") :
-        React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:14}},
-          finalists.map(r => {
-            const pts = scores[r.id]||0;
-            const pct = Math.round(pts/totalPts*100);
-            return React.createElement("div", {key:r.id},
-              React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
-                React.createElement("span", {style:{fontSize:14,fontWeight:700,color:T.text}}, r.name),
-                React.createElement("span", {style:{fontSize:13,fontWeight:800,color:r.color}}, pts+" pts · "+pct+"%")
-              ),
-              React.createElement("div", {style:{height:10,background:T.bg,borderRadius:99,overflow:"hidden"}},
-                React.createElement("div", {style:{height:"100%",width:pct+"%",background:r.color,borderRadius:99,transition:"width 0.5s"}})
-              )
-            );
-          })
-        ),
-        voters.length > 0 && React.createElement("div", {style:{marginTop:16,paddingTop:12,borderTop:"1px solid "+T.border}},
-          React.createElement("div", {style:{fontSize:11,color:T.textMuted,fontWeight:600,marginBottom:6}}, "Voters"),
-          React.createElement("div", {style:{display:"flex",flexWrap:"wrap",gap:4}},
-            voters.map(v => React.createElement("span", {key:v,style:{fontSize:11,padding:"3px 10px",borderRadius:99,background:T.accent+"12",border:"1px solid "+T.accent+"25",color:T.text,fontWeight:500}}, v))
+      )
+    ),
+    // Secret results panel — only shown after tapping countdown 5 times
+    showResults && React.createElement(AnimIn, null,
+      React.createElement("div", {style:{maxWidth:480,margin:"16px auto 0"}},
+        React.createElement(GlowCard, {glow:T.accent,style:{padding:20}},
+          React.createElement("div", {style:{display:"flex",alignItems:"center",gap:8,marginBottom:16}},
+            React.createElement(TrendingUp, {size:18,color:T.accent}),
+            React.createElement("span", {style:{fontSize:14,fontWeight:800,color:T.white}}, "Live Results"),
+            voters.length > 0 && React.createElement("span", {style:{fontSize:10,color:T.textMuted,background:T.bg,padding:"2px 8px",borderRadius:99}}, voters.length+" voter"+(voters.length!==1?"s":""))
+          ),
+          loading ? React.createElement("div", {style:{color:T.textMuted,fontSize:13,padding:20,textAlign:"center"}}, "Loading votes...") :
+          allVotes.length === 0 ? React.createElement("div", {style:{color:T.textMuted,fontSize:13,padding:20,textAlign:"center"}}, "No votes yet. Be the first!") :
+          React.createElement("div", {style:{display:"flex",flexDirection:"column",gap:14}},
+            finalists.map(r => {
+              const pts = scores[r.id]||0;
+              const pct = Math.round(pts/totalPts*100);
+              return React.createElement("div", {key:r.id},
+                React.createElement("div", {style:{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:6}},
+                  React.createElement("span", {style:{fontSize:14,fontWeight:700,color:T.text}}, r.name),
+                  React.createElement("span", {style:{fontSize:13,fontWeight:800,color:r.color}}, pts+" pts · "+pct+"%")
+                ),
+                React.createElement("div", {style:{height:10,background:T.bg,borderRadius:99,overflow:"hidden"}},
+                  React.createElement("div", {style:{height:"100%",width:pct+"%",background:r.color,borderRadius:99,transition:"width 0.5s"}})
+                )
+              );
+            })
+          ),
+          voters.length > 0 && React.createElement("div", {style:{marginTop:16,paddingTop:12,borderTop:"1px solid "+T.border}},
+            React.createElement("div", {style:{fontSize:11,color:T.textMuted,fontWeight:600,marginBottom:6}}, "Voters"),
+            React.createElement("div", {style:{display:"flex",flexWrap:"wrap",gap:4}},
+              voters.map(v => React.createElement("span", {key:v,style:{fontSize:11,padding:"3px 10px",borderRadius:99,background:T.accent+"12",border:"1px solid "+T.accent+"25",color:T.text,fontWeight:500}}, v))
+            )
           )
         )
       )
@@ -1745,6 +1758,7 @@ function HeadToHead() {
 function OverviewScreen({onSelect,user}) {
   const finalists = ROUTES.filter(r => FINALIST_IDS.includes(r.id));
   const locked = Date.now() >= FINAL_DEADLINE;
+  const [showSecret, setShowSecret] = useState(false);
 
   // Fetch final votes to determine winner when locked
   const [finalVotes,setFinalVotes] = useState([]);
@@ -1854,8 +1868,8 @@ function OverviewScreen({onSelect,user}) {
       })
     ),
     React.createElement("div", {style:{marginTop:32}}, React.createElement(HeadToHead)),
-    React.createElement(VotingCountdown),
-    React.createElement(FinalVotingSection, {user})
+    React.createElement(VotingCountdown, {onSecretReveal:()=>setShowSecret(s=>!s)}),
+    React.createElement(FinalVotingSection, {user,showResults:showSecret})
   );
 }
 
