@@ -1624,7 +1624,7 @@ function FinalVotingSection({user,showResults}) {
   const scores = {};
   finalists.forEach(r => { scores[r.id] = 0; });
   allVotes.forEach(v => {
-    const isVip = VIP_FINAL_NAMES.includes(v.voter.toLowerCase());
+    const isVip = VIP_FINAL_NAMES.some(n => v.voter.toLowerCase().includes(n));
     scores[v.route_id] = (scores[v.route_id]||0) + (isVip ? VIP_WEIGHT : 1);
   });
   const totalPts = Object.values(scores).reduce((a,b)=>a+b,0) || 1;
@@ -1781,7 +1781,7 @@ function OverviewScreen({onSelect,user}) {
   const scores = {};
   finalists.forEach(r => { scores[r.id] = 0; });
   finalVotes.forEach(v => {
-    const isVip = VIP_FINAL_NAMES.includes(v.voter.toLowerCase());
+    const isVip = VIP_FINAL_NAMES.some(n => v.voter.toLowerCase().includes(n));
     scores[v.route_id] = (scores[v.route_id]||0) + (isVip ? VIP_WEIGHT : 1);
   });
   const winnerRoute = locked && finalVotes.length > 0
